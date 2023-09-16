@@ -5,12 +5,12 @@ plugins {
 
 android {
 	namespace = "com.farukaygun.yorozuyalist"
-	compileSdk = 33
+	compileSdk = 34
 
 	defaultConfig {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
-		targetSdk = 33
+		targetSdk = 34
 		versionCode = 1
 		versionName = "1.0"
 
@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
+	val koinVersion = "3.4.0"
+	val ktorVersion = "2.3.4"
+	val coilVersion = "2.4.0"
 
 	implementation("androidx.core:core-ktx:1.12.0")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -59,8 +62,17 @@ dependencies {
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
 	implementation("androidx.compose.material3:material3")
-	// Koin for Android
-	implementation("io.insert-koin:koin-android:3.4.0")
+	// Koin
+	implementation("io.insert-koin:koin-android:$koinVersion")
+	// Ktor
+	implementation("io.ktor:ktor-client-core:$ktorVersion")
+	implementation("io.ktor:ktor-client-android:$ktorVersion")
+	implementation("io.ktor:ktor-client-serialization:$ktorVersion")
+	implementation("io.ktor:ktor-client-logging:$ktorVersion")
+	implementation("io.ktor:ktor-client-json:$ktorVersion")
+	implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
+	// Coil
+	implementation("io.coil-kt:coil-compose:$coilVersion")
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
