@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.util
 
-class Utils {
+class Util {
 	companion object {
 		fun generateCodeChallenge(): String {
 			val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '-' + '.' + '_' + '~'

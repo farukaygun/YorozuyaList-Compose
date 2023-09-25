@@ -1,9 +1,7 @@
-package com.farukaygun.yorozuyalist.data.network
+package com.farukaygun.yorozuyalist.data.di
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class KtorClient : Application() {
-
-}
+class MyApplication : Application()

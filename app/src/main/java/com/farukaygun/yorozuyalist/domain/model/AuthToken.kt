@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.data.remote.dto
+package com.farukaygun.yorozuyalist.domain.model
 
 import com.google.gson.annotations.SerializedName
 

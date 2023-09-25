@@ -1,8 +1,13 @@
 package com.farukaygun.yorozuyalist.data.di
 
+import com.farukaygun.yorozuyalist.data.remote.APIService
+import com.farukaygun.yorozuyalist.data.remote.APIServiceImpl
+import com.farukaygun.yorozuyalist.data.repository.LoginRepository
+import com.farukaygun.yorozuyalist.domain.repository.LoginRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -39,5 +44,17 @@ object AppModule {
 			}
 		}
 		return client
+	}
+
+	@Provides
+	@Singleton
+	fun provideAPIService(client: HttpClient): APIService {
+		return APIServiceImpl(client)
+	}
+
+	@Provides
+	@Singleton
+	fun provideLoginRepository(api: APIService): LoginRepository {
+		return LoginRepositoryImpl(api)
 	}
 }
