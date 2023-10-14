@@ -9,11 +9,19 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(private val repository: LoginRepository) {
-	fun executeAuthToken(): Flow<Resource<AuthToken>> = flow {
+	fun executeAuthToken(
+		code: String,
+		clientId: String,
+		codeVerifier: String
+	): Flow<Resource<AuthToken>> = flow {
 		try {
 			emit(Resource.Loading())
 
-			val authToken = repository.getAuthToken()
+			val authToken = repository.getAuthToken(
+				code,
+				clientId,
+				codeVerifier
+			)
 
 			emit(Resource.Success(authToken.toAuthToken()))
 		} catch (e: Exception) {

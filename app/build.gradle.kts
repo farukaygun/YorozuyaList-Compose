@@ -3,7 +3,7 @@ plugins {
 	id("com.android.application")
 	id("org.jetbrains.kotlin.android")
 	id("com.google.dagger.hilt.android")
-	id("kotlin-kapt")
+	id("com.google.devtools.ksp")
 }
 
 android {
@@ -53,14 +53,15 @@ android {
 }
 
 dependencies {
-	val hiltVersion = "2.48"
-	val ktorVersion = "2.3.4"
+	implementation("com.google.android.engage:engage-core:1.3.0")
+	val hiltVersion = "2.48.1"
+	val ktorVersion = "2.3.5"
 	val coilVersion = "2.4.0"
 
 	implementation("androidx.core:core-ktx:1.12.0")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-	implementation("androidx.activity:activity-compose:1.7.2")
-	implementation(platform("androidx.compose:compose-bom:2023.09.01"))
+	implementation("androidx.activity:activity-compose:1.8.0")
+	implementation(platform("androidx.compose:compose-bom:2023.10.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
@@ -68,12 +69,12 @@ dependencies {
 
 	// navigation
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-	implementation("androidx.navigation:navigation-compose:2.7.3")
+	implementation("androidx.navigation:navigation-compose:2.7.4")
 
 	//Dagger - Hilt
 	implementation("com.google.dagger:hilt-android:$hiltVersion")
-	kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
-	kapt("androidx.hilt:hilt-compiler:1.0.0")
+	ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
+	ksp("androidx.hilt:hilt-compiler:1.0.0")
 	implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 	implementation("androidx.hilt:hilt-work:1.0.0")
 	implementation("androidx.work:work-runtime-ktx:2.8.1")
@@ -95,8 +96,8 @@ dependencies {
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2023.09.01"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2023.10.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.1")
+	debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
 }

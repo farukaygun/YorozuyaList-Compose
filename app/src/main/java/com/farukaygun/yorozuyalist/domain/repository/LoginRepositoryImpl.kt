@@ -9,8 +9,15 @@ import com.farukaygun.yorozuyalist.util.Util
 import javax.inject.Inject
 
 class LoginRepositoryImpl @Inject constructor(private val api: APIService) : LoginRepository {
-	override suspend fun getAuthToken(): AuthTokenDto {
-		return api.getAuthToken()
+	override suspend fun getAuthToken(
+		code: String,
+		clientId: String,
+		codeVerifier: String,
+	): AuthTokenDto {
+		return api.getAuthToken(
+			code,
+			clientId,
+			codeVerifier,
+		)
 	}
-
 }

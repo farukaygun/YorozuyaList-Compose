@@ -2,12 +2,16 @@ package com.farukaygun.yorozuyalist.util
 
 class Util {
 	companion object {
+		private var codeVerifier = ""
 		fun generateCodeChallenge(): String {
-			val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '-' + '.' + '_' + '~'
+			if (codeVerifier.isEmpty()) {
+				val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '-' + '.' + '_' + '~'
 
-			return (1..128)
-				.map { allowedChars.random() } // return random element from collection
-				.joinToString("") // add element to new string
+				codeVerifier = (1..64)
+					.map { allowedChars.random() } // return random element from collection
+					.joinToString("") // add element to new string
+			}
+			return codeVerifier
 		}
 	}
 }

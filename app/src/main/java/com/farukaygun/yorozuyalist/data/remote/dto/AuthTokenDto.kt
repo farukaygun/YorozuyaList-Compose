@@ -17,7 +17,7 @@ data class AuthTokenDto(
 fun AuthTokenDto.toAuthToken(): AuthToken {
 	return AuthToken(
 		accessToken = accessToken,
-		expiresİn = expiresIn,
+		expiresIn = expiresIn,
 		refreshToken = refreshToken,
 		tokenType = tokenType
 	)
