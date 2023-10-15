@@ -21,6 +21,8 @@ import com.farukaygun.yorozuyalist.ui.theme.YorozuyaListTheme
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Private
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -41,7 +43,10 @@ class MainActivity : ComponentActivity() {
 						startDestination = Screen.LoginScreen.route
 					) {
 						composable(route = Screen.LoginScreen.route) {
-							LoginScreen(navController = navController)
+							LoginScreen(
+								navController = navController,
+								viewModel = loginViewModel
+							)
 						}
 						composable(route = Screen.HomeScreen.route) {
 							HomeScreen(navController = navController)
@@ -54,6 +59,7 @@ class MainActivity : ComponentActivity() {
 
 	override fun onNewIntent(intent: Intent?) {
 		super.onNewIntent(intent)
+		println("activity: $loginViewModel")
 		loginViewModel.parseIntentData(intent)
 	}
 }
