@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">YorozuyaList</string>
+    <string name="login">Giriş Yap</string>
+    <string name="user_login_error">Kullanıcı Girişi Hatası</string>
+</resources>

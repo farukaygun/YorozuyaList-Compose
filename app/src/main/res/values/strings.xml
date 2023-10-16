@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">YorozuyaList</string>
+    <string name="login">Login</string>
+    <string name="user_login_error">User Login Error!</string>
 </resources>
