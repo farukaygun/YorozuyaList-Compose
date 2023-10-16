@@ -1,11 +1,17 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
@@ -15,10 +21,29 @@ fun HomeScreen(
 	navController: NavController,
 	viewModel: LoginViewModel = hiltViewModel()
 ) {
-	Text(
-		text = "Home Screen",
-		modifier = Modifier
-			.fillMaxSize()
-			.background(Color.Black),
-	)
+	HomeScreenContent()
+}
+
+@Composable
+fun HomeScreenContent() {
+	Box(modifier = Modifier.fillMaxSize()
+		.background(Color.White),
+		contentAlignment = Alignment.Center,
+	) {
+		Column(
+			verticalArrangement = Arrangement.Center,
+			horizontalAlignment = Alignment.CenterHorizontally,
+		) {
+			Text(
+				text = "Home Screen",
+				color = Color.Black
+			)
+		}
+	}
+}
+
+@Preview
+@Composable
+fun HomeScreenPreview() {
+	HomeScreenContent()
 }

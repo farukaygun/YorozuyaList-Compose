@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
+import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Constants.YOROZUYA_PAGELINK
 import com.farukaygun.yorozuyalist.util.CustomExtensions.openCustomTab
@@ -74,6 +75,16 @@ class LoginViewModel @Inject constructor(
 				}
 			}
 		}.launchIn(viewModelScope)
+	}
+
+	fun saveToken() {
+		val state = _state.value
+		state.authToken?.let {
+			sharedPrefsHelper.saveString("accessToken", state.authToken.accessToken)
+			sharedPrefsHelper.saveInt("expiresIn", state.authToken.expiresIn)
+			sharedPrefsHelper.saveString("refreshToken", state.authToken.refreshToken)
+			sharedPrefsHelper.saveBool("isLoggedIn", true)
+		}
 	}
 
 	fun onEvent(event: LoginEvent) {

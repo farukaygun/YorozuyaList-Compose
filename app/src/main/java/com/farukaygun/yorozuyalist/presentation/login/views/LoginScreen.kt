@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,9 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
+import com.farukaygun.yorozuyalist.presentation.common.CommonUI
 import com.farukaygun.yorozuyalist.presentation.login.LoginEvent
+import com.farukaygun.yorozuyalist.presentation.login.LoginState
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.ui.theme.caveatBrush
 
@@ -40,9 +42,24 @@ fun LoginScreen(
 	navController: NavController,
 	viewModel: LoginViewModel = hiltViewModel()
 ) {
-	val state = viewModel.state.value
 	val context = LocalContext.current
+	val state = viewModel.state.value
 
+	LoginScreenContent(
+		navController,
+		state,
+		onLoginClick = { viewModel.onEvent(LoginEvent.Login(context)) },
+		saveToken = { viewModel.saveToken() }
+	)
+}
+
+@Composable
+fun LoginScreenContent(
+	navController: NavController,
+	state: LoginState,
+	onLoginClick: () -> Unit,
+	saveToken: () -> Unit
+) {
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
@@ -56,7 +73,7 @@ fun LoginScreen(
 
 			Image(
 				painter = painterResource(id = R.drawable.icon),
-				contentDescription = "Yorozuya List Icon",
+				contentDescription = stringResource(R.string.app_icon_desc),
 				modifier = Modifier.fillMaxWidth(.5f)
 			)
 
@@ -72,7 +89,7 @@ fun LoginScreen(
 			Spacer(modifier = Modifier.height(32.dp))
 
 			Button(
-				onClick = { viewModel.onEvent(LoginEvent.Login(context)) },
+				onClick = { onLoginClick() },
 				modifier = Modifier.width(128.dp)
 			) {
 
@@ -83,42 +100,37 @@ fun LoginScreen(
 				)
 			}
 
-			Spacer(modifier = Modifier.height(32.dp))
-
 			if (state.error.isNotEmpty()) {
 				Text(
 					text = state.error,
 					fontSize = 16.sp,
 					color = Color.Red,
-					textAlign = TextAlign.Center,
+					textAlign = TextAlign.Justify,
 					modifier = Modifier.padding(16.dp)
 				)
-
-				Spacer(modifier = Modifier.height(32.dp))
 			}
 
-			CircularProgressIndicator(
-				modifier = Modifier
-					.alpha(if (state.isLoading) 1f else 0f)
-					.width(32.dp)
-					.height(32.dp)
-			)
+			Column(modifier = Modifier.alpha(if (state.isLoading) 1f else 0f)) {
+				CommonUI.IndeterminateCircularIndicator()
+			}
 		}
 	}
 
 	LaunchedEffect(state.authToken) {
+		saveToken()
 		state.authToken?.let {
-			viewModel.sharedPrefsHelper.saveString("accessToken", state.authToken.accessToken)
-			viewModel.sharedPrefsHelper.saveInt("expiresIn", state.authToken.expiresIn)
-			viewModel.sharedPrefsHelper.saveString("refreshToken", state.authToken.refreshToken)
-			viewModel.sharedPrefsHelper.saveBool("isLoggedIn", true)
-
 			navController.navigate(Screen.HomeScreen.route)
 		}
 	}
 }
 
-@Preview
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun LoginScreenPreview() {
+	LoginScreenContent(
+		navController = rememberNavController(),
+		state = LoginState(),
+		onLoginClick = {},
+		saveToken = {}
+	)
 }

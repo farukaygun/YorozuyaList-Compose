@@ -2,4 +2,6 @@
     <string name="app_name">YorozuyaList</string>
     <string name="login">Login</string>
     <string name="user_login_error">User Login Error!</string>
+    <string name="app_icon_desc">Yorozuya List app icon</string>
+    <string name="ok">OK</string>
 </resources>
