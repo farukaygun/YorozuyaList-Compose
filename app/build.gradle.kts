@@ -89,9 +89,9 @@ dependencies {
 
 	// Coil
 	implementation("io.coil-kt:coil-compose:$coilVersion")
-
-	// Browser
+	// Custom Tabs
 	implementation("androidx.browser:browser:1.6.0")
+	implementation("androidx.preference:preference-ktx:1.2.1")
 
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")

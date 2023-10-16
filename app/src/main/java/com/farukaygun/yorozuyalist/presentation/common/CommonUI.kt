@@ -15,30 +15,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 object CommonUI {
-    @Composable
-    fun IndeterminateCircularIndicator() {
-        CircularProgressIndicator(
-            modifier = Modifier.width(64.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant,
-            trackColor = MaterialTheme.colorScheme.secondary,
-        )
-    }
+	@Composable
+	fun IndeterminateCircularIndicator() {
+		CircularProgressIndicator(
+			modifier = Modifier.width(32.dp),
+			color = MaterialTheme.colorScheme.surfaceVariant,
+			trackColor = MaterialTheme.colorScheme.secondary,
+		)
+	}
 
-    @Composable
-    fun MySnackbar(message: String) {
-        Column {
-            val (snackbarVisibleState, setSnackBarState) = remember { mutableStateOf(true) }
+	@Composable
+	fun MySnackbar(message: String) {
+		Column {
+			val (snackbarVisibleState, setSnackBarState) = remember { mutableStateOf(true) }
 
-            if (snackbarVisibleState) {
-                Snackbar(
-                    action = {
-                        Button(onClick = { setSnackBarState(false) }) {
-                            Text("OK")
-                        }
-                    },
-                    modifier = Modifier.padding(8.dp)
-                ) { Text(text = message) }
-            }
-        }
-    }
+			if (snackbarVisibleState) {
+				Snackbar(
+					action = {
+						Button(onClick = { setSnackBarState(false) }) {
+							Text("OK")
+						}
+					},
+					modifier = Modifier.padding(8.dp)
+				) { Text(text = message) }
+			}
+		}
+	}
 }

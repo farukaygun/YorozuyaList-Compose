@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.data.remote.dto
 
-import com.google.gson.annotations.SerializedName
 import com.farukaygun.yorozuyalist.domain.model.AuthToken
+import com.google.gson.annotations.SerializedName
 
 data class AuthTokenDto(
 	@SerializedName("access_token")
