@@ -49,4 +49,18 @@ class SharedPrefsHelper {
 	}
 
 	fun getInt(key: String) = sharedPreferences?.getInt(key, 0) ?: 0
+
+	fun saveLong(key: String, long: Long) {
+		sharedPreferences?.edit(commit = true) {
+			putLong(key, long)
+		}
+	}
+
+	fun getLong(key: String) = sharedPreferences?.getLong(key, 0) ?: 0
+
+	fun removeKey(key: String) {
+		sharedPreferences?.edit(commit = true) {
+			remove(key)
+		}
+	}
 }

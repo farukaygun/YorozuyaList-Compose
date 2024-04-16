@@ -108,11 +108,7 @@ fun LoginScreen(
 
 	LaunchedEffect(state.authToken) {
 		state.authToken?.let {
-			viewModel.sharedPrefsHelper.saveString("accessToken", state.authToken.accessToken)
-			viewModel.sharedPrefsHelper.saveInt("expiresIn", state.authToken.expiresIn)
-			viewModel.sharedPrefsHelper.saveString("refreshToken", state.authToken.refreshToken)
-			viewModel.sharedPrefsHelper.saveBool("isLoggedIn", true)
-
+			viewModel.saveToken(context, it)
 			navController.navigate(Screen.HomeScreen.route)
 		}
 	}
