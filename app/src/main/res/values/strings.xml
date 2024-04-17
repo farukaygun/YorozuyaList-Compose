@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">YorozuyaList</string>
     <string name="login">Login</string>
-    <string name="user_login_error">User Login Error!</string>
+    <string name="user_login_error">User login error!</string>
+    <string name="token_refresh_error">Token refresh error!</string>
 </resources>

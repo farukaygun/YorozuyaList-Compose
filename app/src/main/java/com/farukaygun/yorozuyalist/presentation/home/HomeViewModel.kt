@@ -5,10 +5,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.model.RefreshToken
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
+import com.farukaygun.yorozuyalist.util.StringValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -68,7 +70,11 @@ class HomeViewModel @Inject constructor(
 					)
 				}
 				is Resource.Error -> {
-					// TODO: What should do here?
+					_state.value = HomeState(
+						error = it.message ?: StringValue.StringResource(R.string.token_refresh_error)
+							.toString(),
+						isLoading = false
+					)
 				}
 				is Resource.Loading -> {
 					_state.value = HomeState(isLoading = true)
