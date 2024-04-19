@@ -14,9 +14,8 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
-import javax.inject.Inject
 
-class APIServiceImpl @Inject constructor(private val client: HttpClient) : APIService {
+class APIServiceImpl(private val client: HttpClient) : APIService {
 	override suspend fun getAuthToken(
 		code: String,
 		clientId: String,

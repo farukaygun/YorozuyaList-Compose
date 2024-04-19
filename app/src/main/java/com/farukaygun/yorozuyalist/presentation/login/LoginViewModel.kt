@@ -17,14 +17,11 @@ import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
 import com.farukaygun.yorozuyalist.util.Util
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
-@HiltViewModel
-class LoginViewModel @Inject constructor(
+class LoginViewModel(
 	private val loginUseCase: LoginUseCase
 ) : ViewModel() {
 	private val _state = mutableStateOf(LoginState())

@@ -18,11 +18,11 @@ import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
 import com.farukaygun.yorozuyalist.ui.theme.YorozuyaListTheme
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-	private val loginViewModel: LoginViewModel by viewModels()
+	private val loginViewModel: LoginViewModel by inject()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

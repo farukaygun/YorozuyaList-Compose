@@ -8,9 +8,8 @@ import com.farukaygun.yorozuyalist.domain.model.RefreshToken
 import com.farukaygun.yorozuyalist.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class LoginUseCase @Inject constructor(private val repository: LoginRepository) {
+class LoginUseCase(private val repository: LoginRepository) {
 	fun executeAuthToken(
 		code: String,
 		clientId: String,

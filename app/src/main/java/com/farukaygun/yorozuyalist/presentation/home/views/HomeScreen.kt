@@ -10,15 +10,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
 	navController: NavController,
-	viewModel: HomeViewModel = hiltViewModel()
+	viewModel: HomeViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
 	val context = LocalContext.current
@@ -39,7 +39,8 @@ fun HomeScreen(
 			.fillMaxSize()
 	) {
 		Box(
-			modifier = Modifier.fillMaxSize()
+			modifier = Modifier
+				.fillMaxSize()
 				.background(Color.Black),
 			contentAlignment = Alignment.Center
 		) {

@@ -27,18 +27,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.login.LoginEvent
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.ui.theme.caveatBrush
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
 	navController: NavController,
-	viewModel: LoginViewModel = hiltViewModel()
+	viewModel: LoginViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
 	val context = LocalContext.current
