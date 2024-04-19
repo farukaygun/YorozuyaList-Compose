@@ -3,7 +3,7 @@ package com.farukaygun.yorozuyalist.presentation.home.views
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -23,28 +23,34 @@ fun HomeScreen(
 	val state = viewModel.state.value
 	val context = LocalContext.current
 
-	Box(
+	LaunchedEffect(Unit) {
+		if (!viewModel.isLoggedIn(context))
+			navController.navigate(Screen.LoginScreen.route)
+	}
+
+	LaunchedEffect(state.refreshToken) {
+		state.refreshToken?.let {
+			viewModel.saveRefreshToken(context, it)
+		}
+	}
+
+	Surface(
 		modifier = Modifier
 			.fillMaxSize()
-			.background(Color.Black),
-		contentAlignment = Alignment.Center
 	) {
-		Text(
-			text = "Home Screen",
-			modifier = Modifier
-				.fillMaxSize(),
-			color = Color.White
-		)
+		Box(
+			modifier = Modifier.fillMaxSize()
+				.background(Color.Black),
+			contentAlignment = Alignment.Center
+		) {
 
-		LaunchedEffect(Unit) {
-			if (!viewModel.isLoggedIn(context))
-				navController.navigate(Screen.LoginScreen.route)
-		}
-
-		LaunchedEffect(state.refreshToken) {
-			state.refreshToken?.let {
-				viewModel.saveRefreshToken(context, it)
-			}
+//			Text(
+//				text = "Home Screen",
+//				modifier = Modifier
+//					.fillMaxSize(),
+//				color = Color.White,
+//				textAlign = TextAlign.Center
+//			)
 		}
 	}
 }

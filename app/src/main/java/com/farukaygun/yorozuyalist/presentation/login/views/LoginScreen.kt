@@ -3,7 +3,6 @@ package com.farukaygun.yorozuyalist.presentation.login.views
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,11 +43,17 @@ fun LoginScreen(
 	val state = viewModel.state.value
 	val context = LocalContext.current
 
-	Box(
+	LaunchedEffect(state.authToken) {
+		state.authToken?.let {
+			viewModel.saveToken(context, it)
+			navController.navigate(Screen.HomeScreen.route)
+		}
+	}
+
+	Surface(
 		modifier = Modifier
 			.fillMaxSize()
-			.background(Color.White),
-		contentAlignment = Alignment.Center
+			.background(Color.White)
 	) {
 		Column(
 			verticalArrangement = Arrangement.Center,
@@ -103,13 +109,6 @@ fun LoginScreen(
 					.width(32.dp)
 					.height(32.dp)
 			)
-		}
-	}
-
-	LaunchedEffect(state.authToken) {
-		state.authToken?.let {
-			viewModel.saveToken(context, it)
-			navController.navigate(Screen.HomeScreen.route)
 		}
 	}
 }
