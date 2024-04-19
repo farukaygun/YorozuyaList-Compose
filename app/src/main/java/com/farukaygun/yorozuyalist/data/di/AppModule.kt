@@ -1,9 +1,5 @@
 package com.farukaygun.yorozuyalist.data.di
 
-import com.farukaygun.yorozuyalist.data.remote.APIService
-import com.farukaygun.yorozuyalist.data.remote.APIServiceImpl
-import com.farukaygun.yorozuyalist.data.repository.LoginRepository
-import com.farukaygun.yorozuyalist.domain.repository.LoginRepositoryImpl
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
