@@ -1,9 +1,9 @@
 package com.farukaygun.yorozuyalist.data.remote.dto
 
-import com.farukaygun.yorozuyalist.domain.model.AuthToken
+import com.farukaygun.yorozuyalist.domain.model.AccessToken
 import com.google.gson.annotations.SerializedName
 
-data class AuthTokenDto(
+data class AccessTokenDto(
 	@SerializedName("access_token")
 	val accessToken: String,
 	@SerializedName("expires_in")
@@ -14,8 +14,8 @@ data class AuthTokenDto(
 	val tokenType: String
 )
 
-fun AuthTokenDto.toAuthToken(): AuthToken {
-	return AuthToken(
+fun AccessTokenDto.toAccessToken(): AccessToken {
+	return AccessToken(
 		accessToken = accessToken,
 		expiresIn = expiresIn,
 		refreshToken = refreshToken,

@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.domain.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
-import com.farukaygun.yorozuyalist.data.remote.dto.AuthTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
 import com.farukaygun.yorozuyalist.data.repository.LoginRepository
 
@@ -10,7 +10,7 @@ class LoginRepositoryImpl(private val api: APIService) : LoginRepository {
 		code: String,
 		clientId: String,
 		codeVerifier: String,
-	): AuthTokenDto {
+	): AccessTokenDto {
 		return api.getAuthToken(
 			code,
 			clientId,

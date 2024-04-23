@@ -1,13 +1,12 @@
 package com.farukaygun.yorozuyalist.presentation.login
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.AuthToken
+import com.farukaygun.yorozuyalist.domain.model.AccessToken
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Constants.YOROZUYA_PAGELINK
@@ -22,7 +21,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class LoginViewModel(
-	private val loginUseCase: LoginUseCase
+	private val loginUseCase: LoginUseCase,
+	private val sharedPrefsHelper: SharedPrefsHelper
 ) : ViewModel() {
 	private val _state = mutableStateOf(LoginState())
 	val state: State<LoginState> = _state
@@ -54,7 +54,7 @@ class LoginViewModel(
 			when (it) {
 				is Resource.Success -> {
 					_state.value = LoginState(
-						authToken = it.data,
+						accessToken = it.data,
 						isLoading = false,
 						error = ""
 					)
@@ -73,13 +73,12 @@ class LoginViewModel(
 		}.launchIn(viewModelScope)
 	}
 
-	fun saveToken(context: Context, authToken: AuthToken) {
-		val sharedPrefsHelper = SharedPrefsHelper(context)
-		val expiresIn = System.currentTimeMillis() + authToken.expiresIn * 1000
+	fun saveToken(accessToken: AccessToken) {
+		val expiresIn = System.currentTimeMillis() + accessToken.expiresIn * 1000
 
-		sharedPrefsHelper.saveString("accessToken", authToken.accessToken)
+		sharedPrefsHelper.saveString("accessToken", accessToken.accessToken)
 		sharedPrefsHelper.saveLong("expiresIn", expiresIn)
-		sharedPrefsHelper.saveString("refreshToken", authToken.refreshToken)
+		sharedPrefsHelper.saveString("refreshToken", accessToken.refreshToken)
 		sharedPrefsHelper.saveBool("isLoggedIn", true)
 	}
 

@@ -43,9 +43,9 @@ fun LoginScreen(
 	val state = viewModel.state.value
 	val context = LocalContext.current
 
-	LaunchedEffect(state.authToken) {
-		state.authToken?.let {
-			viewModel.saveToken(context, it)
+	LaunchedEffect(state.accessToken) {
+		state.accessToken?.let {
+			viewModel.saveToken(it)
 			navController.navigate(Screen.HomeScreen.route)
 		}
 	}
