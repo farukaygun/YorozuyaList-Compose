@@ -32,11 +32,9 @@ import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
-import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
-import org.koin.core.KoinApplication
 
 @Composable
 fun HomeScreen(
@@ -53,10 +51,24 @@ fun HomeScreen(
 		}
 	}
 
-	HomeScreenSection(
-		state = state,
-		title = "Seasonal Anime"
-	)
+	Column {
+		HomeScreenSection(
+			data = state.animeTodayList,
+			state = state,
+			title = "Today"
+
+		)
+		HomeScreenSection(
+			data = state.animeSeasonalList,
+			state = state,
+			title = "Seasonal Anime"
+		)
+		HomeScreenSection(
+			data = state.animeRecommendationList,
+			state = state,
+			title = "Recommendation Anime"
+		)
+	}
 }
 
 // Common HomeScreen horizontal list.
@@ -64,16 +76,15 @@ fun HomeScreen(
 fun HorizontalList(animeList : List<Data>) {
 	Surface(
 		modifier = Modifier
-			.fillMaxSize()
 	) {
 		Box(
 			modifier = Modifier
-				.fillMaxSize()
+				.fillMaxWidth()
 				.background(Color.Black),
 			contentAlignment = Alignment.Center
 		) {
 			LazyRow(modifier = Modifier
-				.fillMaxSize()
+				.fillMaxWidth()
 				.padding(8.dp)) {
 				items(animeList) {anime ->
 					ListItemRow(data = anime, onItemClick = {
@@ -86,11 +97,10 @@ fun HorizontalList(animeList : List<Data>) {
 }
 
 @Composable
-fun HomeScreenSection(state: HomeState, title: String) {
+fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
 	Surface {
 		Box(
 			modifier = Modifier
-				.fillMaxSize()
 				.background(Color.Black),
 			contentAlignment = Alignment.Center,
 
@@ -113,7 +123,7 @@ fun HomeScreenSection(state: HomeState, title: String) {
 					}
 				}
 
-				HorizontalList(state.animeSeasonalList)
+				HorizontalList(data)
 			}
 		}
 	}

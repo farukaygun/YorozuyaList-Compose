@@ -19,12 +19,32 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.farukaygun.yorozuyalist.R
+import com.farukaygun.yorozuyalist.data.di.apiServiceModule
+import com.farukaygun.yorozuyalist.data.di.modelModule
+import com.farukaygun.yorozuyalist.data.di.repositoryModule
+import com.farukaygun.yorozuyalist.data.di.useCaseModule
+import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
+import com.farukaygun.yorozuyalist.domain.model.ListStatus
+import com.farukaygun.yorozuyalist.domain.model.Node
+import com.farukaygun.yorozuyalist.domain.model.Ranking
+import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
+import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
+import org.koin.android.ext.koin.androidContext
+import org.koin.compose.KoinApplication
+import org.koin.compose.getKoin
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListItemRow(
@@ -36,24 +56,13 @@ fun ListItemRow(
 		.width(100.dp),
 		horizontalAlignment = Alignment.CenterHorizontally) {
 
-		SubcomposeAsyncImage(
+		AsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(data.node.mainPicture.medium)
 				.crossfade(true)
+				.crossfade(500)
 				.build(),
-			loading = {
-				Box(
-					modifier = Modifier
-						.fillMaxWidth(),
-					contentAlignment = Alignment.Center
-				) {
-					CircularProgressIndicator(
-						modifier = Modifier
-							.wrapContentHeight()
-							.align(Alignment.Center) // Centers the indicator vertically
-					)
-				}
-		    },
+			placeholder = painterResource(id = R.drawable.overflow),
 			contentDescription = data.node.title,
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
@@ -71,4 +80,40 @@ fun ListItemRow(
 			color = Color.White,
 		)
 	}
+}
+
+@Composable
+@Preview
+fun ListItemRowPreview(
+) {
+	val data = Data(
+		node = Node(
+			id = 52991,
+			title = "Sousou no Frieren",
+			mainPicture = MainPicture(
+				medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
+				large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
+			),
+			status = "finished_airing",
+			mean = "9.38",
+			mediaType = "tv",
+			startSeason = StartSeason(
+				year = 2023,
+				season = "Fall"
+			),
+			numListUsers = 701406
+
+		),
+		listStatus = ListStatus(
+			status = "finished_airing",
+			score = 10,
+			numEpisodesWatched = 12,
+			isRewatching = false,
+			updatedAt = ""
+		),
+		ranking = Ranking(
+			rank = 1,
+		)
+	)
+	ListItemRow(data = data, onItemClick = {})
 }
