@@ -55,7 +55,7 @@ android {
 dependencies {
 	implementation("com.google.android.engage:engage-core:1.4.0")
 	val ktorVersion = "2.3.5"
-	val koinVersion="3.4.0"
+	val koinVersion="3.5.6"
 	val coilVersion = "2.4.0"
 
 	implementation("androidx.core:core-ktx:1.13.0")

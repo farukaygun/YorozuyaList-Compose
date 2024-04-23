@@ -28,12 +28,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
+import com.farukaygun.yorozuyalist.data.di.apiServiceModule
+import com.farukaygun.yorozuyalist.data.di.repositoryModule
+import com.farukaygun.yorozuyalist.data.di.useCaseModule
+import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.login.LoginEvent
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.ui.theme.caveatBrush
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.KoinApplication
+import org.koin.dsl.module
 
 @Composable
 fun LoginScreen(
@@ -113,7 +121,20 @@ fun LoginScreen(
 	}
 }
 
-@Preview
 @Composable
+@Preview
 fun LoginScreenPreview() {
+	val context = LocalContext.current
+
+	KoinApplication(application = {
+		androidContext(context)
+		modules(
+			viewModelModule,
+			repositoryModule,
+			useCaseModule,
+			apiServiceModule
+		)
+	}) {
+		LoginScreen(navController = rememberNavController())
+	}
 }

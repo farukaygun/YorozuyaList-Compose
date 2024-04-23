@@ -18,14 +18,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.farukaygun.yorozuyalist.data.di.apiServiceModule
+import com.farukaygun.yorozuyalist.data.di.repositoryModule
+import com.farukaygun.yorozuyalist.data.di.useCaseModule
+import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
+import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.KoinApplication
+import org.koin.core.KoinApplication
 
 @Composable
 fun HomeScreen(
@@ -116,4 +127,22 @@ fun SectionTitle(title: String) {
 		color = Color.White,
 		fontSize = 24.sp,
 	)
+}
+
+@Composable
+@Preview
+fun HomeScreenPreview() {
+	val context = LocalContext.current
+
+	KoinApplication(application = {
+		androidContext(context)
+		modules(
+			viewModelModule,
+			repositoryModule,
+			useCaseModule,
+			apiServiceModule
+		)
+	}) {
+		HomeScreen(navController = rememberNavController())
+	}
 }
