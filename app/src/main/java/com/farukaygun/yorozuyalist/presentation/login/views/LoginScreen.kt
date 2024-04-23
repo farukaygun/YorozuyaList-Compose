@@ -41,7 +41,6 @@ import com.farukaygun.yorozuyalist.ui.theme.caveatBrush
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
-import org.koin.dsl.module
 
 @Composable
 fun LoginScreen(

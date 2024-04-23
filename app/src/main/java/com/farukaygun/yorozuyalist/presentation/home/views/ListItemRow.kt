@@ -1,16 +1,12 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,27 +20,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.data.di.apiServiceModule
-import com.farukaygun.yorozuyalist.data.di.modelModule
-import com.farukaygun.yorozuyalist.data.di.repositoryModule
-import com.farukaygun.yorozuyalist.data.di.useCaseModule
-import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.domain.model.ListStatus
 import com.farukaygun.yorozuyalist.domain.model.Node
 import com.farukaygun.yorozuyalist.domain.model.Ranking
 import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
 import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
-import org.koin.android.ext.koin.androidContext
-import org.koin.compose.KoinApplication
-import org.koin.compose.getKoin
-import org.koin.compose.koinInject
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ListItemRow(
