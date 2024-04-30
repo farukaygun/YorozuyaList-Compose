@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">YorozuyaList</string>
-    <string name="login">Login</string>
+    <string name="app_name">Yorozuya List</string>
+    <string name="login">Login with MAL</string>
     <string name="user_login_error">User login error!</string>
     <string name="token_refresh_error">Token refresh error!</string>
+    <string name="error_fetching">Error while fetching!</string>
+    <string name="login_code_error">Error during user login: \'code\' parameter not found.</string>
 </resources>

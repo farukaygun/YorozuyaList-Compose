@@ -5,9 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
+import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.domain.model.RefreshToken
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.getYearAndSeason
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.weekDayJapan
+import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
@@ -102,30 +106,89 @@ class HomeViewModel(
 		sharedPrefsHelper.removeKey("isLoggedIn")
 	}
 
-	fun getSeasonalAnime(
-		year: Int,
-		season: String,
-		limit: Int
+	fun getTodayAnime(
+		limit: Int = 500
 	) {
-		job = animeUseCase.executeSeasonalAnime(year, season, limit)
+		val (year, season) = getYearAndSeason()
+		val animeList = mutableListOf<Data>()
+
+		job = animeUseCase.executeSeasonalAnime(year, season.value, limit)
+			.onEach {
+				when(it) {
+					is Resource.Success -> {
+						it.data?.data?.forEach {anime ->
+							if (anime.node.broadcast?.dayOfTheWeek.equals(weekDayJapan.toString(), true) && anime.node.status == Constants.CURRENTLY_AIRING)
+								animeList.add(anime)
+						}
+
+						animeList.let {animeList ->
+							_state.value =_state.value.copy(
+								animeTodayList = animeList,
+								isLoading = false,
+								error = ""
+							)
+						}
+					}
+					is Resource.Error -> {
+						_state.value = HomeState(
+							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString(),
+						)
+					}
+					is Resource.Loading -> {
+						_state.value = _state.value.copy(isLoading = true)
+					}
+				}
+			}.launchIn(viewModelScope)
+	}
+
+
+	fun getSeasonalAnime(
+		limit: Int = 10
+	) {
+		val (year, season) = getYearAndSeason()
+		job = animeUseCase.executeSeasonalAnime(year, season.value, limit)
 			.onEach {
 				when (it) {
 					is Resource.Success -> {
-						_state.value = HomeState(
+						_state.value = _state.value.copy(
 							animeSeasonalList = it.data?.data ?: emptyList(),
 							isLoading = false,
 							error = ""
 						)
 					}
 					is Resource.Error -> {
-						_state.value = HomeState(
-							error = it.message ?: "Seasonal anime error!", //StringValue.StringResource(R.string.anime_seasonal_error)
-								//.toString(),
-							isLoading = false
+						_state.value = _state.value.copy(
+							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString(),
 						)
 					}
 					is Resource.Loading -> {
-						_state.value = HomeState(isLoading = true)
+						_state.value = _state.value.copy(isLoading = true)
+					}
+				}
+			}.launchIn(viewModelScope)
+	}
+
+	fun getSuggestedAnime(
+		limit: Int = 10,
+		offset: Int = 0
+	) {
+		job = animeUseCase.executeSuggestedAnime(limit, offset)
+			.onEach {
+				when (it) {
+					is Resource.Success -> {
+						_state.value = _state.value.copy(
+							animeSuggestionList = it.data?.data ?: emptyList(),
+							isLoading = false,
+							error = ""
+						)
+					}
+					is Resource.Error -> {
+						_state.value = _state.value.copy(
+							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString(),
+						)
+					}
+					is Resource.Loading -> {
+						_state.value = _state.value.copy(isLoading = true)
 					}
 				}
 			}.launchIn(viewModelScope)

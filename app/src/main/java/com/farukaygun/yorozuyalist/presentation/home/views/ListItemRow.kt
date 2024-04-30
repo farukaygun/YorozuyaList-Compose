@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -61,7 +62,7 @@ fun ListItemRow(
 			textAlign = TextAlign.Center,
 			maxLines = 2,
 			overflow = TextOverflow.Ellipsis,
-			color = Color.White,
+			color = MaterialTheme.colorScheme.onSurface,
 		)
 	}
 }

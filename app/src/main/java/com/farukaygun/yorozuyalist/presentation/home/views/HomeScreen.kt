@@ -1,6 +1,5 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
@@ -9,26 +8,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
+import com.farukaygun.yorozuyalist.presentation.common.AppBarState
 import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
 import org.koin.android.ext.koin.androidContext
@@ -44,18 +50,22 @@ fun HomeScreen(
 
 	LaunchedEffect(Unit) {
 		if (viewModel.isLoggedIn()) {
-			viewModel.getSeasonalAnime(2023, "fall", 100)
+			viewModel.getSeasonalAnime()
+			viewModel.getTodayAnime()
+			viewModel.getSuggestedAnime()
 		} else {
 			navController.navigate(Screen.LoginScreen.route)
 		}
 	}
 
-	Column {
+	Column(
+		modifier = Modifier
+			.verticalScroll(rememberScrollState())
+	) {
 		HomeScreenSection(
 			data = state.animeTodayList,
 			state = state,
 			title = "Today"
-
 		)
 		HomeScreenSection(
 			data = state.animeSeasonalList,
@@ -63,23 +73,79 @@ fun HomeScreen(
 			title = "Seasonal Anime"
 		)
 		HomeScreenSection(
-			data = state.animeRecommendationList,
+			data = state.animeSuggestionList,
 			state = state,
-			title = "Recommendation Anime"
+			title = "Suggested Anime"
 		)
 	}
 }
+
+@Composable
+fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
+	Surface {
+		Box(
+			modifier = Modifier
+				.padding(16.dp, 8.dp, 16.dp, 8.dp),
+			contentAlignment = Alignment.Center,
+
+			) {
+			Column {
+				SectionTitle(title)
+
+				if (state.isLoading) {
+					Box(
+						modifier = Modifier
+							.fillMaxWidth()
+							.defaultMinSize(minHeight = 170.dp),
+						contentAlignment = Alignment.Center
+					) {
+						CircularProgressIndicator(
+							modifier = Modifier
+								.wrapContentHeight()
+								.align(Alignment.Center)
+						)
+					}
+				}
+				HorizontalList(data)
+			}
+		}
+	}
+}
+
+@Composable
+fun SectionTitle(title: String) {
+	Box(
+		modifier = Modifier
+			.padding(8.dp)
+			.fillMaxWidth()
+	) {
+		Text(
+			text = title,
+			color = MaterialTheme.colorScheme.onSurface,
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.titleLarge,
+			modifier = Modifier.align(Alignment.CenterStart),
+		)
+		Icon(
+			painter = painterResource(id = R.drawable.outline_arrow_forward_24),
+			contentDescription = "More",
+			modifier = Modifier.align(Alignment.CenterEnd),
+			tint = MaterialTheme.colorScheme.onSurface,
+		)
+	}
+}
+
 
 // Common HomeScreen horizontal list.
 @Composable
 fun HorizontalList(animeList : List<Data>) {
 	Surface(
 		modifier = Modifier
+			.fillMaxWidth()
 	) {
 		Box(
 			modifier = Modifier
-				.fillMaxWidth()
-				.background(Color.Black),
+				.fillMaxWidth(),
 			contentAlignment = Alignment.Center
 		) {
 			LazyRow(modifier = Modifier
@@ -94,50 +160,6 @@ fun HorizontalList(animeList : List<Data>) {
 		}
 	}
 }
-
-@Composable
-fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
-	Surface {
-		Box(
-			modifier = Modifier
-				.background(Color.Black),
-			contentAlignment = Alignment.Center,
-
-		) {
-			Column {
-				SectionTitle(title)
-
-				if (state.isLoading) {
-					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.defaultMinSize(minHeight = 170.dp),
-						contentAlignment = Alignment.Center
-					) {
-						CircularProgressIndicator(
-							modifier = Modifier
-								.wrapContentHeight()
-								.align(Alignment.Center) // Centers the indicator vertically
-						)
-					}
-				}
-
-				HorizontalList(data)
-			}
-		}
-	}
-}
-
-@Composable
-fun SectionTitle(title: String) {
-	Text(
-		text = title,
-		modifier = Modifier.padding(16.dp, 8.dp, 16.dp, 0.dp),
-		color = Color.White,
-		fontSize = 24.sp,
-	)
-}
-
 @Composable
 @Preview
 fun HomeScreenPreview() {
@@ -152,6 +174,8 @@ fun HomeScreenPreview() {
 			apiServiceModule
 		)
 	}) {
-		HomeScreen(navController = rememberNavController())
+		HomeScreen(
+			navController = rememberNavController()
+		)
 	}
 }

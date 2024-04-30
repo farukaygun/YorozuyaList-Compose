@@ -1,6 +1,7 @@
 package com.farukaygun.yorozuyalist.data.repository
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
+import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
 
 interface AnimeRepository {
 	suspend fun getSeasonalAnime(
@@ -8,4 +9,9 @@ interface AnimeRepository {
 		season: String,
 		limit: Int
 	): AnimeSeasonalDto
+
+	suspend fun getSuggestedAnime(
+		limit: Int,
+		offset: Int
+	): AnimeSuggestedDto
 }

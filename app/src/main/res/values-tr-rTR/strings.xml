@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">YorozuyaList</string>
-    <string name="login">Giriş Yap</string>
-    <string name="user_login_error">Kullanıcı girişi hatası!</string>
-    <string name="token_refresh_error">Token yenileme hatası!</string>
+    <string name="app_name">Yorozuya List</string>
+    <string name="login">MAL ile Giriş Yap</string>
+    <string name="user_login_error">Kullanıcı girişinde hata oluştu!</string>
+    <string name="token_refresh_error">Token yenilenirken hata oluştu!</string>
+    <string name="error_fetching">Verileri getirirken hata oluştu!</string>
+    <string name="login_code_error">Kullanıcı girişinde hata oluştu: \'code\' parametresi bulunamadı.</string>
 </resources>

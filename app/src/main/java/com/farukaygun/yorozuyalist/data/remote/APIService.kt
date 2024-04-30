@@ -2,6 +2,7 @@ package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
+import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
 
 interface APIService {
@@ -19,6 +20,11 @@ interface APIService {
 	suspend fun getSeasonalAnime(
 		year: Int,
 		season: String,
-		limit: Int
+		limit: Int = 10
 	): AnimeSeasonalDto
+
+	suspend fun getSuggestedAnime(
+		limit: Int = 10,
+		offset: Int = 0,
+	) : AnimeSuggestedDto
 }

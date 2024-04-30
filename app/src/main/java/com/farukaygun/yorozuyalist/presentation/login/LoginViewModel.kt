@@ -1,5 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.login
 
+import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -34,18 +35,22 @@ class LoginViewModel(
 
 	private var job: Job? = null
 
-	fun parseIntentData(intent: Intent?) {
+	fun parseIntentData(context: Context, intent: Intent?) {
 		if (intent?.data?.toString()?.startsWith(YOROZUYA_PAGELINK) == true) {
 			intent.data?.let {
 				val code = it.getQueryParameter("code")
 				if (code != null) {
-					getAccessToken(code)
+					getAccessToken(context, code)
+				} else {
+					_state.value = _state.value.copy(
+						error = StringValue.StringResource(R.string.login_code_error).asString(context)
+					)
 				}
 			}
 		}
 	}
 
-	private fun getAccessToken(code: String) {
+	private fun getAccessToken(context: Context, code: String) {
 		job = loginUseCase.executeAuthToken(
 			code,
 			Private.CLIENT_ID,
@@ -53,21 +58,19 @@ class LoginViewModel(
 		).onEach {
 			when (it) {
 				is Resource.Success -> {
-					_state.value = LoginState(
+					_state.value = _state.value.copy(
 						accessToken = it.data,
 						isLoading = false,
 						error = ""
 					)
 				}
 				is Resource.Error -> {
-					_state.value = LoginState(
-						error = it.message ?: StringValue.StringResource(R.string.user_login_error)
-							.toString(),
-						isLoading = false
+					_state.value = _state.value.copy(
+						error = it.message ?: StringValue.StringResource(R.string.user_login_error).asString(context),
 					)
 				}
 				is Resource.Loading -> {
-					_state.value = LoginState(isLoading = true)
+					_state.value = _state.value.copy(isLoading = true)
 				}
 			}
 		}.launchIn(viewModelScope)
