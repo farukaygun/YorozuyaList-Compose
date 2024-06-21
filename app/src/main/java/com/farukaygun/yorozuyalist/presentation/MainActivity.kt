@@ -7,23 +7,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.farukaygun.yorozuyalist.presentation.common.AppBarState
 import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
-import com.farukaygun.yorozuyalist.presentation.common.views.CustomTopAppBar
+import com.farukaygun.yorozuyalist.presentation.composables.views.SearchBar
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
+import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
 import org.koin.android.ext.android.inject
 
@@ -39,37 +36,42 @@ class MainActivity : ComponentActivity() {
 					color = MaterialTheme.colorScheme.background
 				) {
 					val navController = rememberNavController()
-					val appBarState = rememberAppBarState(navController = navController)
+					val searchBarState = rememberAppBarState(navController = navController)
 
 					Scaffold(
 						topBar = {
-							if (appBarState.isVisible)  {
-								CustomTopAppBar(
-									appBarState = appBarState,
-									modifier = Modifier.fillMaxWidth()
-								)
-							}
-						}
+							 if (searchBarState.isVisible) {
+								 SearchBar(navController = navController)
+							 }
+						},
 					) { padding ->
 						NavHost(
 							navController = navController,
 							startDestination = Screen.HomeScreen.route,
-							modifier = Modifier.padding(padding)
+							modifier = Modifier.padding(padding),
 						) {
-							composable(route = Screen.LoginScreen.route) {
+							composable(
+								route = Screen.LoginScreen.route
+							) {
 								LoginScreen(
 									navController = navController,
 									viewModel = loginViewModel
 								)
 							}
 							composable(
-								route = Screen.HomeScreen.route
+								route = Screen.HomeScreen.route,
 							) {
 								BackHandler(true) {
 									Log.d("MainActivity", "Navigation Home: Back Pressed")
 								}
 
 								HomeScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.SearchScreen.route,
+							) {
+								SearchScreen(navController = navController)
 							}
 						}
 					}

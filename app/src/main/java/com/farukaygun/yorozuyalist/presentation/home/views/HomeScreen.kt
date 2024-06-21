@@ -17,7 +17,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +33,7 @@ import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
-import com.farukaygun.yorozuyalist.presentation.common.AppBarState
+import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
 import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
 import org.koin.android.ext.koin.androidContext
@@ -49,13 +48,9 @@ fun HomeScreen(
 	val state = viewModel.state.value
 
 	LaunchedEffect(Unit) {
-		if (viewModel.isLoggedIn()) {
-			viewModel.getSeasonalAnime()
-			viewModel.getTodayAnime()
-			viewModel.getSuggestedAnime()
-		} else {
-			navController.navigate(Screen.LoginScreen.route)
-		}
+		if (viewModel.isLoggedIn())
+			viewModel.onEvent(HomeEvent.InitRequestChain)
+		else navController.navigate(Screen.LoginScreen.route)
 	}
 
 	Column(
@@ -135,8 +130,6 @@ fun SectionTitle(title: String) {
 	}
 }
 
-
-// Common HomeScreen horizontal list.
 @Composable
 fun HorizontalList(animeList : List<Data>) {
 	Surface(
@@ -160,6 +153,7 @@ fun HorizontalList(animeList : List<Data>) {
 		}
 	}
 }
+
 @Composable
 @Preview
 fun HomeScreenPreview() {

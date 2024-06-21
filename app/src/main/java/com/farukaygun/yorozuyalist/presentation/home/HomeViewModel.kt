@@ -15,7 +15,9 @@ import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Clock
@@ -106,13 +108,14 @@ class HomeViewModel(
 		sharedPrefsHelper.removeKey("isLoggedIn")
 	}
 
-	fun getTodayAnime(
+	private fun getTodayAnime(
 		limit: Int = 500
 	) {
 		val (year, season) = getYearAndSeason()
 		val animeList = mutableListOf<Data>()
 
 		job = animeUseCase.executeSeasonalAnime(year, season.value, limit)
+			.flowOn(Dispatchers.IO)
 			.onEach {
 				when(it) {
 					is Resource.Success -> {
@@ -142,11 +145,10 @@ class HomeViewModel(
 	}
 
 
-	fun getSeasonalAnime(
-		limit: Int = 10
-	) {
+	private fun getSeasonalAnime() {
 		val (year, season) = getYearAndSeason()
-		job = animeUseCase.executeSeasonalAnime(year, season.value, limit)
+		job = animeUseCase.executeSeasonalAnime(year, season.value)
+			.flowOn(Dispatchers.IO)
 			.onEach {
 				when (it) {
 					is Resource.Success -> {
@@ -168,11 +170,9 @@ class HomeViewModel(
 			}.launchIn(viewModelScope)
 	}
 
-	fun getSuggestedAnime(
-		limit: Int = 10,
-		offset: Int = 0
-	) {
-		job = animeUseCase.executeSuggestedAnime(limit, offset)
+	private fun getSuggestedAnime() {
+		job = animeUseCase.executeSuggestedAnime()
+			.flowOn(Dispatchers.IO)
 			.onEach {
 				when (it) {
 					is Resource.Success -> {
@@ -192,5 +192,15 @@ class HomeViewModel(
 					}
 				}
 			}.launchIn(viewModelScope)
+	}
+
+	fun onEvent(event: HomeEvent) {
+		when (event) {
+			is HomeEvent.InitRequestChain -> {
+				getTodayAnime()
+				getSeasonalAnime()
+				getSuggestedAnime()
+			}
+		}
 	}
 }

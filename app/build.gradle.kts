@@ -53,23 +53,23 @@ android {
 }
 
 dependencies {
-	val ktorVersion = "2.3.10"
+	val ktorVersion = "2.3.11"
 	val koinVersion="3.5.6"
 	val coilVersion = "2.6.0"
 
-	implementation("com.google.android.engage:engage-core:1.4.0")
-	implementation("androidx.core:core-ktx:1.13.0")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+	implementation("com.google.android.engage:engage-core:1.5.2")
+	implementation("androidx.core:core-ktx:1.13.1")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
 	implementation("androidx.activity:activity-compose:1.9.0")
-	implementation(platform("androidx.compose:compose-bom:2024.04.01"))
+	implementation(platform("androidx.compose:compose-bom:2024.06.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
 	implementation("androidx.compose.material3:material3:1.2.1")
 
 	// navigation
-	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-	implementation("androidx.navigation:navigation-compose:2.7.7")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
+	implementation("androidx.navigation:navigation-compose:2.8.0-beta03")
 
 	// Ktor
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -91,13 +91,13 @@ dependencies {
 	implementation("androidx.browser:browser:1.8.0")
 	implementation("androidx.preference:preference-ktx:1.2.1")
 
-	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0-RC.2")
+	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
 
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.1.5")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.6")
+	debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
 }

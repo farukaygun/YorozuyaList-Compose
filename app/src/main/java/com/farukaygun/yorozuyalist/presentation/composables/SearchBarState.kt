@@ -16,8 +16,12 @@ import kotlinx.coroutines.flow.onEach
 
 class AppBarState(
 	navController: NavController,
-	scope: CoroutineScope
+	scope: CoroutineScope,
 ) {
+	private var currentScreen by mutableStateOf<Screen?>(null)
+
+	val isVisible: Boolean
+		get() = currentScreen?.isAppBarVisible == true
 
 	init {
 		navController.currentBackStackEntryFlow
@@ -28,14 +32,6 @@ class AppBarState(
 			}
 			.launchIn(scope)
 	}
-	var currentScreen by mutableStateOf<Screen?>(null)
-		private set
-
-	val isVisible: Boolean
-		get() = currentScreen?.isAppBarVisible == true
-
-	val title: String
-		get() = currentScreen?.title.toString()
 }
 
 @Composable

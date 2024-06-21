@@ -1,6 +1,7 @@
 package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
@@ -84,6 +85,39 @@ class APIServiceImpl(
 			)
 			parameter("limit", limit)
 			parameter("offset", offset)
+		}.body()
+	}
+
+	override suspend fun getSearchedAnime(
+		query: String,
+		limit: Int,
+		offset: Int,
+	): AnimeSearchedDto {
+		return client.get(Constants.ANIME_URL) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("q", query)
+			parameter("limit", limit)
+			parameter("offset", offset)
+			parameter("fields", "id,title,main_picture,mean,media_type,num_episodes,start_season")
+		}.body()
+	}
+
+	override suspend fun getSearchedAnime(
+		url: String
+	): AnimeSearchedDto {
+
+		println("api getSearchedAnime url: $url")
+		println("token ${sharedPrefsHelper.getString("accessToken")}")
+
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("fields", "id,title,main_picture,mean,media_type,num_episodes,start_season")
 		}.body()
 	}
 }
