@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.model.Paging
+import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.StringValue
@@ -30,7 +31,7 @@ class SearchViewModel(
 	private var job: Job? = null
 
 	private fun search(query: String) {
-		job = animeUseCase.executeSearchedAnime(query = query)
+		job = animeUseCase.executeSearchedAnime(query)
 			.flowOn(Dispatchers.IO)
 			.onEach {
 				when (it) {
@@ -54,38 +55,35 @@ class SearchViewModel(
 	}
 
 	private fun loadMore() {
-		viewModelScope.launch(Dispatchers.IO) {
-			_state.value.animeSearched?.paging?.next?.let { next ->
-				animeUseCase.executeSearchedAnime(url = next)
-					.onEach {
-						when (it) {
-							is Resource.Success -> {
-								val currentData = _state.value.animeSearched?.data?.toMutableList() ?: mutableListOf()
-								val newData = it.data?.data ?: emptyList()
-								currentData.addAll(newData)
+		 _state.value.animeSearched?.paging?.next?.let { next ->
+			 job = animeUseCase.executeSearchedAnime(url = _state.value.animeSearched?.paging?.next!!)
+				.flowOn(Dispatchers.IO)
+				.onEach {
+					when (it) {
+						is Resource.Success -> {
+							val currentData = _state.value.animeSearched?.data?.toMutableList() ?: mutableListOf()
+							val newData = it.data?.data ?: emptyList()
+							currentData.addAll(newData)
 
-								_state.value = _state.value.copy(
-									animeSearched = _state.value.animeSearched?.copy(
-										data = currentData,
-										paging = it.data?.paging ?: Paging(null, null)
-									),
-									isLoading = false,
-									error = ""
-								)
-							}
-
-							is Resource.Error -> {
-								_state.value = _state.value.copy(
-									error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString()
-								)
-							}
-
-							is Resource.Loading -> {
-								_state.value = _state.value.copy(isLoading = true)
-							}
+							_state.value = _state.value.copy(
+								animeSearched = _state.value.animeSearched?.copy(
+									data = currentData,
+									paging = it.data?.paging ?: Paging(null, null)
+								),
+								isLoading = false,
+								error = ""
+							)
 						}
-					}.collect()
-			}
+						is Resource.Error -> {
+							_state.value = _state.value.copy(
+								error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString()
+							)
+						}
+						is Resource.Loading -> {
+							_state.value = _state.value.copy(isLoading = true)
+						}
+					}
+				}.launchIn(viewModelScope)
 		}
 	}
 
@@ -96,34 +94,3 @@ class SearchViewModel(
 		}
 	}
 }
-
-//		if (_state.value.isLoading || _state.value.animeSearched?.paging?.next.isNullOrEmpty()) return
-//		println("url: ${_state.value.animeSearched?.paging?.next}")
-//		animeUseCase.executeSearchedAnime(url = _state.value.animeSearched?.paging?.next!!)
-//			.flowOn(Dispatchers.IO)
-//			.onEach {
-//				when (it) {
-//					is Resource.Success -> {
-//						val currentData = _state.value.animeSearched?.data?.toMutableList() ?: mutableListOf()
-//						val newData = it.data?.data ?: emptyList()
-//						currentData.addAll(newData)
-//
-//						_state.value = _state.value.copy(
-//							animeSearched = _state.value.animeSearched?.copy(
-//								data = currentData,
-//								paging = it.data?.paging ?: Paging(null, null)
-//							),
-//							isLoading = false,
-//							error = ""
-//						)
-//					}
-//					is Resource.Error -> {
-//						_state.value = _state.value.copy(
-//							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString()
-//						)
-//					}
-//					is Resource.Loading -> {
-//						_state.value = _state.value.copy(isLoading = true)
-//					}
-//				}
-//			}.launchIn(viewModelScope)

@@ -110,8 +110,7 @@ fun ListItemColumn(
 				)
 
 				Text(
-					text = "a",
-					//text = "${data.node.startSeason.season.capitalize(Locale.current)} ${data.node.startSeason.year}",
+					text = "${data.node.startSeason.season.capitalize(Locale.current)} ${data.node.startSeason.year}",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
