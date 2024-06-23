@@ -1,9 +1,9 @@
 package com.farukaygun.yorozuyalist.presentation.search.views
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -75,10 +76,12 @@ fun SearchScreen(
 			viewModel = viewModel
 		)
 
-		SearchList(
-			data = state.animeSearched?.data ?: emptyList(),
-			viewModel = viewModel
-		)
+		state.animeSearched?.data?.let {
+			SearchList(
+				data = it,
+				viewModel = viewModel
+			)
+		}
 	}
 }
 
@@ -159,15 +162,18 @@ fun SearchList(
 	viewModel: SearchViewModel
 ) {
 	val listState = rememberLazyListState()
-	listState.OnBottomReached(buffer = 2) {
-		println("OnBottomReached")
-		println("${viewModel.state.value.animeSearched?.paging?.next}")
+	listState.OnBottomReached(buffer = 10) {
 		viewModel.onEvent(SearchEvent.LoadMore)
+	}
+
+	LaunchedEffect(viewModel.scrollToTop.value) {
+		listState.scrollToItem(0)
+		viewModel.scrollToTop.value = false
 	}
 
 	Surface(
 		modifier = Modifier
-			.fillMaxWidth()
+			.fillMaxSize()
 	) {
 		Box(
 			modifier = Modifier
@@ -179,11 +185,16 @@ fun SearchList(
 				modifier = Modifier
 					.fillMaxWidth()
 					.padding(8.dp)) {
+
 				items(data) {anime ->
 					ListItemColumn(data = anime, onItemClick = {
 						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
 					})
 				}
+			}
+
+			if (viewModel.state.value.isLoading) {
+				CircularProgressIndicator()
 			}
 		}
 	}

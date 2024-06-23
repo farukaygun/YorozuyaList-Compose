@@ -6,6 +6,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.farukaygun.yorozuyalist.presentation.animations.Animations
 import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
 import com.farukaygun.yorozuyalist.presentation.composables.views.SearchBar
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
@@ -39,11 +47,7 @@ class MainActivity : ComponentActivity() {
 					val searchBarState = rememberAppBarState(navController = navController)
 
 					Scaffold(
-						topBar = {
-							 if (searchBarState.isVisible) {
-								 SearchBar(navController = navController)
-							 }
-						},
+						topBar = { SearchBar(navController = navController, isVisible = searchBarState.isVisible) },
 					) { padding ->
 						NavHost(
 							navController = navController,
@@ -51,7 +55,7 @@ class MainActivity : ComponentActivity() {
 							modifier = Modifier.padding(padding),
 						) {
 							composable(
-								route = Screen.LoginScreen.route
+								route = Screen.LoginScreen.route,
 							) {
 								LoginScreen(
 									navController = navController,
@@ -60,6 +64,8 @@ class MainActivity : ComponentActivity() {
 							}
 							composable(
 								route = Screen.HomeScreen.route,
+								popEnterTransition = { fadeIn() },
+								popExitTransition = { fadeOut() }
 							) {
 								BackHandler(true) {
 									Log.d("MainActivity", "Navigation Home: Back Pressed")
@@ -70,6 +76,8 @@ class MainActivity : ComponentActivity() {
 
 							composable(
 								route = Screen.SearchScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
 							) {
 								SearchScreen(navController = navController)
 							}

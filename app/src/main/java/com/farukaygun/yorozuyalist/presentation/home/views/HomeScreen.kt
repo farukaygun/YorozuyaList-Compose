@@ -50,7 +50,7 @@ fun HomeScreen(
 	LaunchedEffect(Unit) {
 		if (viewModel.isLoggedIn())
 			viewModel.onEvent(HomeEvent.InitRequestChain)
-		else navController.navigate(Screen.LoginScreen.route)
+		else navController.navigate(route = Screen.LoginScreen.route)
 	}
 
 	Column(

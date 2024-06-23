@@ -37,24 +37,36 @@ import com.farukaygun.yorozuyalist.domain.model.Ranking
 import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
 import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
 
+// If I delete the safe call, it gives a null pointer exception error when loadMore triggered.
+@Suppress("UNNECESSARY_SAFE_CALL")
 @Composable
 fun ListItemColumn(
 	data: Data,
-	onItemClick : (Data) -> Unit
+	onItemClick: (Data) -> Unit
 ) {
-	Row(modifier = Modifier
-		.padding(8.dp)
-		.fillMaxWidth(),
-	verticalAlignment = Alignment.Top) {
+	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "Unknown Title"
+	val mediaType = data.node.mediaType?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "Unknown Media Type"
+	val numEpisodes = data.node.numEpisodes?.toString().takeUnless { it.isNullOrEmpty() } ?: "Unknown"
+	val mainPictureUrl = data.node.mainPicture?.medium?.takeUnless { it.isEmpty() } ?: R.drawable.overflow
+	val season = data.node.startSeason?.season?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "Unknown Season"
+	val year = data.node.startSeason?.year?.toString().takeUnless { it.isNullOrEmpty() } ?: "Unknown Year"
+	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
+
+	Row(
+		modifier = Modifier
+			.padding(8.dp)
+			.fillMaxWidth(),
+		verticalAlignment = Alignment.Top
+	) {
 
 		AsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
-				.data(data.node.mainPicture.medium)
+				.data(mainPictureUrl)
 				.crossfade(true)
 				.crossfade(500)
 				.build(),
 			placeholder = painterResource(id = R.drawable.overflow),
-			contentDescription = data.node.title,
+			contentDescription = title,
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
@@ -68,7 +80,7 @@ fun ListItemColumn(
 			)
 		) {
 			Text(
-				text = data.node.title,
+				text = title,
 				textAlign = TextAlign.Start,
 				maxLines = 2,
 				overflow = TextOverflow.Ellipsis,
@@ -88,7 +100,7 @@ fun ListItemColumn(
 				)
 
 				Text(
-					text = "${data.node.mediaType.toUpperCase(Locale.current)} (${data.node.numEpisodes} episodes)",
+					text = "$mediaType ($numEpisodes episodes)",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -96,7 +108,6 @@ fun ListItemColumn(
 					style = MaterialTheme.typography.bodyMedium
 				)
 			}
-
 
 			Spacer(modifier = Modifier.height(8.dp))
 
@@ -110,7 +121,7 @@ fun ListItemColumn(
 				)
 
 				Text(
-					text = "${data.node.startSeason.season.capitalize(Locale.current)} ${data.node.startSeason.year}",
+					text = "$season $year",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -131,7 +142,7 @@ fun ListItemColumn(
 				)
 
 				Text(
-					text = data.node.mean,
+					text = meanScore,
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -142,6 +153,7 @@ fun ListItemColumn(
 		}
 	}
 }
+
 
 @Composable
 @Preview

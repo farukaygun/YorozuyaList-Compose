@@ -1,5 +1,10 @@
 package com.farukaygun.yorozuyalist.presentation.composables.views
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,16 +30,26 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
+import com.farukaygun.yorozuyalist.presentation.animations.Animations
+import com.farukaygun.yorozuyalist.presentation.common.AppBarState
+import com.farukaygun.yorozuyalist.presentation.search.SearchState
 
 @Composable
 fun SearchBar(
-	navController: NavController
+	navController: NavController,
+	isVisible: Boolean,
 ) {
 	Column(
 		modifier = Modifier
 			.padding(top = 16.dp)
 			.verticalScroll(rememberScrollState())
 	) {
+		AnimatedVisibility(
+			visible = isVisible,
+			enter = expandVertically(),
+			exit = shrinkVertically()
+		) {
+
 		Surface(
 			modifier = Modifier
 				.fillMaxWidth()
@@ -44,26 +59,27 @@ fun SearchBar(
 			shape = RoundedCornerShape(32.dp),
 			color = MaterialTheme.colorScheme.surfaceVariant,
 		) {
-			Row(
-				modifier = Modifier
-					.padding(horizontal = 16.dp),
-				horizontalArrangement = Arrangement.spacedBy(16.dp),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.outline_search_24),
-					contentDescription = "Search",
-					tint = MaterialTheme.colorScheme.onSurfaceVariant
-				)
-
-				Text(
-					text = "Search",
+				Row(
 					modifier = Modifier
-						.weight(1f)
-						.alpha(.5f),
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
-					style = MaterialTheme.typography.bodyMedium
-				)
+						.padding(horizontal = 16.dp),
+					horizontalArrangement = Arrangement.spacedBy(16.dp),
+					verticalAlignment = Alignment.CenterVertically
+				) {
+					Icon(
+						painter = painterResource(id = R.drawable.outline_search_24),
+						contentDescription = "Search",
+						tint = MaterialTheme.colorScheme.onSurfaceVariant
+					)
+
+					Text(
+						text = "Search",
+						modifier = Modifier
+							.weight(1f)
+							.alpha(.5f),
+						color = MaterialTheme.colorScheme.onSurfaceVariant,
+						style = MaterialTheme.typography.bodyMedium
+					)
+				}
 			}
 		}
 	}
@@ -72,5 +88,5 @@ fun SearchBar(
 @Composable
 @Preview
 fun SearchBarPreview() {
-	SearchBar(rememberNavController())
+	SearchBar(rememberNavController(), true)
 }
