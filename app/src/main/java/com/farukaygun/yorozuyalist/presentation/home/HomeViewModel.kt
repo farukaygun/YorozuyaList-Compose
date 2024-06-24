@@ -35,14 +35,16 @@ class HomeViewModel(
 
 	private var job: Job? = null
 
-	fun isLoggedIn() : Boolean {
+	fun isLoggedIn(): Boolean {
 		val accessToken = sharedPrefsHelper.getString("accessToken")
 
 		val expiresInAsMillis = sharedPrefsHelper.getLong("expiresIn")
 		val expiresInInstant = Instant.fromEpochMilliseconds(expiresInAsMillis)
-		val expiresInLocalDateTime = expiresInInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+		val expiresInLocalDateTime =
+			expiresInInstant.toLocalDateTime(TimeZone.currentSystemDefault())
 		val currentDateTimeInstant = Clock.System.now()
-		val currentLocalDateTime = currentDateTimeInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+		val currentLocalDateTime =
+			currentDateTimeInstant.toLocalDateTime(TimeZone.currentSystemDefault())
 
 		if (accessToken.isEmpty() || currentLocalDateTime > expiresInLocalDateTime) {
 			clearToken()
@@ -56,8 +58,12 @@ class HomeViewModel(
 			_state.value.refreshToken?.let {
 				saveRefreshToken(it)
 			}
-		}
-		else _state.value.refreshToken = RefreshToken(accessToken, sharedPrefsHelper.getLong("expiresIn"), sharedPrefsHelper.getString("refreshToken"), "")
+		} else _state.value.refreshToken = RefreshToken(
+			accessToken,
+			sharedPrefsHelper.getLong("expiresIn"),
+			sharedPrefsHelper.getString("refreshToken"),
+			""
+		)
 
 		return true
 	}
@@ -68,27 +74,32 @@ class HomeViewModel(
 		job = loginUseCase.executeRefreshToken(
 			grantType,
 			refreshToken
-		).onEach {
-			when (it) {
-				is Resource.Success -> {
-					_state.value = HomeState(
-						refreshToken = it.data,
-						isLoading = false,
-						error = ""
-					)
+		)
+			.flowOn(Dispatchers.IO)
+			.onEach {
+				when (it) {
+					is Resource.Success -> {
+						_state.value = HomeState(
+							refreshToken = it.data,
+							isLoading = false,
+							error = ""
+						)
+					}
+
+					is Resource.Error -> {
+						_state.value = HomeState(
+							error = it.message
+								?: StringValue.StringResource(R.string.token_refresh_error)
+									.toString(),
+							isLoading = false
+						)
+					}
+
+					is Resource.Loading -> {
+						_state.value = HomeState(isLoading = true)
+					}
 				}
-				is Resource.Error -> {
-					_state.value = HomeState(
-						error = it.message ?: StringValue.StringResource(R.string.token_refresh_error)
-							.toString(),
-						isLoading = false
-					)
-				}
-				is Resource.Loading -> {
-					_state.value = HomeState(isLoading = true)
-				}
-			}
-		}.launchIn(viewModelScope)
+			}.launchIn(viewModelScope)
 	}
 
 	private fun saveRefreshToken(refreshToken: RefreshToken) {
@@ -100,8 +111,7 @@ class HomeViewModel(
 		sharedPrefsHelper.saveBool("isLoggedIn", true)
 	}
 
-	private fun clearToken()
-	{
+	private fun clearToken() {
 		sharedPrefsHelper.removeKey("accessToken")
 		sharedPrefsHelper.removeKey("expiresIn")
 		sharedPrefsHelper.removeKey("refreshToken")
@@ -117,26 +127,33 @@ class HomeViewModel(
 		job = animeUseCase.executeSeasonalAnime(year, season.value, limit)
 			.flowOn(Dispatchers.IO)
 			.onEach {
-				when(it) {
+				when (it) {
 					is Resource.Success -> {
-						it.data?.data?.forEach {anime ->
-							if (anime.node.broadcast?.dayOfTheWeek.equals(weekDayJapan.toString(), true) && anime.node.status == Constants.CURRENTLY_AIRING)
+						it.data?.data?.forEach { anime ->
+							if (anime.node.broadcast?.dayOfTheWeek.equals(
+									weekDayJapan.toString(),
+									true
+								) && anime.node.status == Constants.CURRENTLY_AIRING
+							)
 								animeList.add(anime)
 						}
 
-						animeList.let {animeList ->
-							_state.value =_state.value.copy(
+						animeList.let { animeList ->
+							_state.value = _state.value.copy(
 								animeTodayList = animeList,
 								isLoading = false,
 								error = ""
 							)
 						}
 					}
+
 					is Resource.Error -> {
 						_state.value = HomeState(
-							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString(),
+							error = it.message
+								?: StringValue.StringResource(R.string.error_fetching).toString(),
 						)
 					}
+
 					is Resource.Loading -> {
 						_state.value = _state.value.copy(isLoading = true)
 					}
@@ -158,11 +175,14 @@ class HomeViewModel(
 							error = ""
 						)
 					}
+
 					is Resource.Error -> {
 						_state.value = _state.value.copy(
-							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString(),
+							error = it.message
+								?: StringValue.StringResource(R.string.error_fetching).toString(),
 						)
 					}
+
 					is Resource.Loading -> {
 						_state.value = _state.value.copy(isLoading = true)
 					}
@@ -182,11 +202,14 @@ class HomeViewModel(
 							error = ""
 						)
 					}
+
 					is Resource.Error -> {
 						_state.value = _state.value.copy(
-							error = it.message ?: StringValue.StringResource(R.string.error_fetching).toString(),
+							error = it.message
+								?: StringValue.StringResource(R.string.error_fetching).toString(),
 						)
 					}
+
 					is Resource.Loading -> {
 						_state.value = _state.value.copy(isLoading = true)
 					}

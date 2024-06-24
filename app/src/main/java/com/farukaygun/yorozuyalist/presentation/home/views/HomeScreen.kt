@@ -80,7 +80,7 @@ fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
 	Surface {
 		Box(
 			modifier = Modifier
-				.padding(16.dp, 8.dp, 16.dp, 8.dp),
+				.padding(horizontal = 16.dp, vertical = 8.dp),
 			contentAlignment = Alignment.Center,
 
 			) {
@@ -131,7 +131,7 @@ fun SectionTitle(title: String) {
 }
 
 @Composable
-fun HorizontalList(animeList : List<Data>) {
+fun HorizontalList(animeList: List<Data>) {
 	Surface(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -141,10 +141,12 @@ fun HorizontalList(animeList : List<Data>) {
 				.fillMaxWidth(),
 			contentAlignment = Alignment.Center
 		) {
-			LazyRow(modifier = Modifier
-				.fillMaxWidth()
-				.padding(8.dp)) {
-				items(animeList) {anime ->
+			LazyRow(
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(8.dp)
+			) {
+				items(animeList) { anime ->
 					ListItemRow(data = anime, onItemClick = {
 						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
 					})

@@ -1,9 +1,5 @@
 package com.farukaygun.yorozuyalist.presentation.search
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 
 data class SearchState(

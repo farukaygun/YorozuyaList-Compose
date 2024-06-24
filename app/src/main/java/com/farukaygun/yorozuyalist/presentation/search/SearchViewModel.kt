@@ -5,22 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Paging
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.StringValue
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 
 class SearchViewModel(
 	private val animeUseCase: AnimeUseCase,

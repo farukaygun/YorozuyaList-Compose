@@ -1,8 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.composables.views
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
@@ -30,35 +28,31 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
-import com.farukaygun.yorozuyalist.presentation.animations.Animations
-import com.farukaygun.yorozuyalist.presentation.common.AppBarState
-import com.farukaygun.yorozuyalist.presentation.search.SearchState
 
 @Composable
-fun SearchBar(
+fun AppBar(
 	navController: NavController,
-	isVisible: Boolean,
+	isVisible: Boolean
 ) {
-	Column(
-		modifier = Modifier
-			.padding(top = 16.dp)
-			.verticalScroll(rememberScrollState())
+	AnimatedVisibility(
+		visible = isVisible,
+		enter = expandVertically(),
+		exit = shrinkVertically()
 	) {
-		AnimatedVisibility(
-			visible = isVisible,
-			enter = expandVertically(),
-			exit = shrinkVertically()
-		) {
-
-		Surface(
+		Column(
 			modifier = Modifier
-				.fillMaxWidth()
-				.height(56.dp)
-				.padding(horizontal = 16.dp)
-				.clickable { navController.navigate(Screen.SearchScreen.route) },
-			shape = RoundedCornerShape(32.dp),
-			color = MaterialTheme.colorScheme.surfaceVariant,
+				.padding(top = 16.dp)
+				.verticalScroll(rememberScrollState())
 		) {
+			Surface(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(56.dp)
+					.padding(horizontal = 16.dp)
+					.clickable { navController.navigate(Screen.SearchScreen.route) },
+				shape = RoundedCornerShape(32.dp),
+				color = MaterialTheme.colorScheme.surfaceVariant,
+			) {
 				Row(
 					modifier = Modifier
 						.padding(horizontal = 16.dp),
@@ -87,6 +81,6 @@ fun SearchBar(
 
 @Composable
 @Preview
-fun SearchBarPreview() {
-	SearchBar(rememberNavController(), true)
+fun AppBarPreview() {
+	AppBar(rememberNavController(), true)
 }
