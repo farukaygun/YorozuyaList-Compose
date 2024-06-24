@@ -2,16 +2,13 @@ package com.farukaygun.yorozuyalist.presentation.search.views
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -25,7 +22,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +50,6 @@ import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.composables.views.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.search.SearchEvent
-import com.farukaygun.yorozuyalist.presentation.search.SearchState
 import com.farukaygun.yorozuyalist.presentation.search.SearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
@@ -62,14 +57,12 @@ import org.koin.compose.KoinApplication
 
 @Composable
 fun SearchScreen(
-	navController: NavController,
-	viewModel: SearchViewModel = koinViewModel()
+	navController: NavController, viewModel: SearchViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
 
 	Column(
-		modifier = Modifier
-			.padding(bottom = 16.dp)
+		modifier = Modifier.padding(bottom = 16.dp)
 	) {
 		SearchBar(
 			navController = navController,
@@ -87,8 +80,7 @@ fun SearchScreen(
 
 @Composable
 fun SearchBar(
-	navController: NavController,
-	viewModel: SearchViewModel
+	navController: NavController, viewModel: SearchViewModel
 ) {
 	var query by rememberSaveable(stateSaver = TextFieldValue.Saver) {
 		mutableStateOf(TextFieldValue())
@@ -98,68 +90,52 @@ fun SearchBar(
 
 	Column(
 		modifier = Modifier
-			.padding(top = 16.dp)
 			.verticalScroll(rememberScrollState())
 	) {
-		Surface(
+		TextField(
+			value = query,
+			onValueChange = { query = it },
 			modifier = Modifier
 				.fillMaxWidth()
-				.height(56.dp)
-				.padding(horizontal = 16.dp),
-			shape = RoundedCornerShape(32.dp),
-			color = MaterialTheme.colorScheme.surfaceVariant,
-		) {
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				IconButton(
-					onClick = { navController.popBackStack() }
-				) {
+				.focusRequester(focusRequester),
+			placeholder = {
+				Text(
+					text = "Search",
+					modifier = Modifier
+						.weight(1f)
+						.alpha(.5f),
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					style = MaterialTheme.typography.bodyMedium,
+				)
+			},
+			leadingIcon = {
+				IconButton(onClick = { navController.popBackStack() }) {
 					Icon(
 						painter = painterResource(id = R.drawable.outline_arrow_back_24),
 						contentDescription = "Search",
 						tint = MaterialTheme.colorScheme.onSurfaceVariant,
 					)
 				}
-
-				TextField(
-					value = query,
-					onValueChange = { query = it },
-					modifier = Modifier
-						.fillMaxWidth()
-						.focusRequester(focusRequester),
-					placeholder = { Text(
-						text = "Search",
-						modifier = Modifier
-							.weight(1f)
-							.alpha(.5f),
-						color = MaterialTheme.colorScheme.onSurfaceVariant,
-						style = MaterialTheme.typography.bodyMedium,
-					) },
-					keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-					keyboardActions = KeyboardActions(
-						onSearch = {
-							keyboardController?.hide()
-							viewModel.onEvent(SearchEvent.Search(query.text))
-						}
-					),
-					singleLine = true,
-					colors = TextFieldDefaults.colors(
-						focusedIndicatorColor = Color.Transparent,
-						unfocusedIndicatorColor = Color.Transparent,
-						focusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-						unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-					),
-				)
-			}
-		}
+			},
+			keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+			keyboardActions = KeyboardActions(onSearch = {
+				keyboardController?.hide()
+				viewModel.onEvent(SearchEvent.Search(query.text))
+			}),
+			singleLine = true,
+			colors = TextFieldDefaults.colors(
+				focusedContainerColor = Color.Transparent,
+				unfocusedContainerColor = Color.Transparent,
+				focusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
+				unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant
+			),
+		)
 	}
 }
 
 @Composable
 fun SearchList(
-	data : List<Data>,
-	viewModel: SearchViewModel
+	data: List<Data>, viewModel: SearchViewModel
 ) {
 	val listState = rememberLazyListState()
 	listState.OnBottomReached(buffer = 10) {
@@ -172,21 +148,18 @@ fun SearchList(
 	}
 
 	Surface(
-		modifier = Modifier
-			.fillMaxSize()
+		modifier = Modifier.fillMaxSize()
 	) {
 		Box(
-			modifier = Modifier
-				.fillMaxWidth(),
-			contentAlignment = Alignment.Center
+			modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
 		) {
 			LazyColumn(
-				state = listState,
-				modifier = Modifier
+				state = listState, modifier = Modifier
 					.fillMaxWidth()
-					.padding(8.dp)) {
+					.padding(8.dp)
+			) {
 
-				items(data) {anime ->
+				items(data) { anime ->
 					ListItemColumn(data = anime, onItemClick = {
 						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
 					})
@@ -208,10 +181,7 @@ fun SearchScreenPreview() {
 	KoinApplication(application = {
 		androidContext(context)
 		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
+			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
 		)
 	}) {
 		SearchScreen(

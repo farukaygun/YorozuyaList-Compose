@@ -1,7 +1,5 @@
 package com.farukaygun.yorozuyalist.data.di
 
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.data.di.AppModule.provideKtorClient
 import com.farukaygun.yorozuyalist.data.remote.APIService
 import com.farukaygun.yorozuyalist.data.remote.APIServiceImpl
