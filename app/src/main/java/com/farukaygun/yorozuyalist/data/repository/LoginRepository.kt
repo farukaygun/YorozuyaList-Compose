@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.data.repository
 
-import com.farukaygun.yorozuyalist.data.remote.dto.AuthTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
 
 interface LoginRepository {
@@ -8,7 +8,7 @@ interface LoginRepository {
 		code: String,
 		clientId: String,
 		codeVerifier: String
-	): AuthTokenDto
+	): AccessTokenDto
 
 	suspend fun getRefreshToken(
 		grantType: String,

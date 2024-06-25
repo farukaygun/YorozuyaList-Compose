@@ -6,50 +6,111 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.farukaygun.yorozuyalist.presentation.anime_list.views.AnimeListScreen
+import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
+import com.farukaygun.yorozuyalist.presentation.composables.app_bar.AppBar
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
-import com.farukaygun.yorozuyalist.ui.theme.YorozuyaListTheme
-import dagger.hilt.android.AndroidEntryPoint
+import com.farukaygun.yorozuyalist.presentation.manga_list.views.MangaListScreen
+import com.farukaygun.yorozuyalist.presentation.profile.views.ProfileScreen
+import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
+import com.farukaygun.yorozuyalist.ui.theme.AppTheme
+import org.koin.android.ext.android.inject
 
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-	private val loginViewModel: LoginViewModel by viewModels()
+	private val loginViewModel: LoginViewModel by inject()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContent {
-			YorozuyaListTheme {
-				// A surface container using the 'background' color from the theme
+			AppTheme {
 				Surface(
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colorScheme.background
 				) {
 					val navController = rememberNavController()
-					NavHost(
-						navController = navController,
-						startDestination = Screen.HomeScreen.route
-					) {
-						composable(route = Screen.LoginScreen.route) {
-							LoginScreen(
+					val searchBarState = rememberAppBarState(navController = navController)
+
+					Scaffold(
+						topBar = {
+							AppBar(
 								navController = navController,
-								viewModel = loginViewModel
+								isVisible = searchBarState.isVisible,
 							)
+						},
+						bottomBar = {
+							BottomNavBar(navController = navController)
 						}
-						composable(route = Screen.HomeScreen.route) {
-							BackHandler(true) {
-								Log.d("MainActivity", "Navigation Home: Back Pressed")
+					) { padding ->
+						NavHost(
+							navController = navController,
+							startDestination = Screen.HomeScreen.route,
+							modifier = Modifier.padding(padding),
+						) {
+							composable(
+								route = Screen.LoginScreen.route,
+							) {
+								LoginScreen(
+									navController = navController,
+									viewModel = loginViewModel
+								)
+							}
+							composable(
+								route = Screen.HomeScreen.route,
+								popEnterTransition = { fadeIn() },
+								popExitTransition = { fadeOut() }
+							) {
+								BackHandler(true) {
+									Log.d("MainActivity", "Navigation Home: Back Pressed")
+								}
+
+								HomeScreen(navController = navController)
 							}
 
-							HomeScreen(navController = navController)
+							composable(
+								route = Screen.AnimeListScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								AnimeListScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.MangaListScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								MangaListScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.ProfileScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								ProfileScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.SearchScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								SearchScreen(navController = navController)
+							}
 						}
 					}
 				}
@@ -57,8 +118,8 @@ class MainActivity : ComponentActivity() {
 		}
 	}
 
-	override fun onNewIntent(intent: Intent?) {
+	override fun onNewIntent(intent: Intent) {
 		super.onNewIntent(intent)
-		loginViewModel.parseIntentData(intent)
+		loginViewModel.parseIntentData(applicationContext, intent)
 	}
 }

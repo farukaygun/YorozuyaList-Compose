@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Yorozuya List",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

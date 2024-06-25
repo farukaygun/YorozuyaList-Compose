@@ -1,9 +1,9 @@
 package com.farukaygun.yorozuyalist.presentation.login
 
-import com.farukaygun.yorozuyalist.domain.model.AuthToken
+import com.farukaygun.yorozuyalist.domain.model.AccessToken
 
 data class LoginState(
 	val isLoading: Boolean = false,
-	val authToken: AuthToken? = null,
+	val accessToken: AccessToken? = null,
 	val error: String = "",
 )

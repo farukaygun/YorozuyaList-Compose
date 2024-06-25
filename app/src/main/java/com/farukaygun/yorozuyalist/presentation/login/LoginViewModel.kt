@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.AuthToken
+import com.farukaygun.yorozuyalist.domain.model.AccessToken
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Constants.YOROZUYA_PAGELINK
@@ -17,15 +17,13 @@ import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
 import com.farukaygun.yorozuyalist.util.Util
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
 
-@HiltViewModel
-class LoginViewModel @Inject constructor(
-	private val loginUseCase: LoginUseCase
+class LoginViewModel(
+	private val loginUseCase: LoginUseCase,
+	private val sharedPrefsHelper: SharedPrefsHelper
 ) : ViewModel() {
 	private val _state = mutableStateOf(LoginState())
 	val state: State<LoginState> = _state
@@ -37,18 +35,22 @@ class LoginViewModel @Inject constructor(
 
 	private var job: Job? = null
 
-	fun parseIntentData(intent: Intent?) {
+	fun parseIntentData(context: Context, intent: Intent?) {
 		if (intent?.data?.toString()?.startsWith(YOROZUYA_PAGELINK) == true) {
 			intent.data?.let {
 				val code = it.getQueryParameter("code")
 				if (code != null) {
-					getAccessToken(code)
+					getAccessToken(context, code)
+				} else {
+					_state.value = _state.value.copy(
+						error = StringValue.StringResource(R.string.login_code_error).asString(context)
+					)
 				}
 			}
 		}
 	}
 
-	private fun getAccessToken(code: String) {
+	private fun getAccessToken(context: Context, code: String) {
 		job = loginUseCase.executeAuthToken(
 			code,
 			Private.CLIENT_ID,
@@ -56,33 +58,30 @@ class LoginViewModel @Inject constructor(
 		).onEach {
 			when (it) {
 				is Resource.Success -> {
-					_state.value = LoginState(
-						authToken = it.data,
+					_state.value = _state.value.copy(
+						accessToken = it.data,
 						isLoading = false,
 						error = ""
 					)
 				}
 				is Resource.Error -> {
-					_state.value = LoginState(
-						error = it.message ?: StringValue.StringResource(R.string.user_login_error)
-							.toString(),
-						isLoading = false
+					_state.value = _state.value.copy(
+						error = it.message ?: StringValue.StringResource(R.string.user_login_error).asString(context),
 					)
 				}
 				is Resource.Loading -> {
-					_state.value = LoginState(isLoading = true)
+					_state.value = _state.value.copy(isLoading = true)
 				}
 			}
 		}.launchIn(viewModelScope)
 	}
 
-	fun saveToken(context: Context, authToken: AuthToken) {
-		val sharedPrefsHelper = SharedPrefsHelper(context)
-		val expiresIn = System.currentTimeMillis() + authToken.expiresIn * 1000
+	fun saveToken(accessToken: AccessToken) {
+		val expiresIn = System.currentTimeMillis() + accessToken.expiresIn * 1000
 
-		sharedPrefsHelper.saveString("accessToken", authToken.accessToken)
+		sharedPrefsHelper.saveString("accessToken", accessToken.accessToken)
 		sharedPrefsHelper.saveLong("expiresIn", expiresIn)
-		sharedPrefsHelper.saveString("refreshToken", authToken.refreshToken)
+		sharedPrefsHelper.saveString("refreshToken", accessToken.refreshToken)
 		sharedPrefsHelper.saveBool("isLoggedIn", true)
 	}
 
