@@ -6,7 +6,9 @@ import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
 import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
 
-class AnimeRepositoryImpl(private val api: APIService) : AnimeRepository {
+class AnimeRepositoryImpl(
+	private val api: APIService
+) : AnimeRepository {
 	override suspend fun getSeasonalAnime(
 		year: Int,
 		season: String,

@@ -17,11 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.farukaygun.yorozuyalist.presentation.anime_list.views.AnimeListScreen
 import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
-import com.farukaygun.yorozuyalist.presentation.composables.views.AppBar
+import com.farukaygun.yorozuyalist.presentation.composables.app_bar.AppBar
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
+import com.farukaygun.yorozuyalist.presentation.manga_list.views.MangaListScreen
+import com.farukaygun.yorozuyalist.presentation.profile.views.ProfileScreen
 import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
 import org.koin.android.ext.android.inject
@@ -46,6 +50,9 @@ class MainActivity : ComponentActivity() {
 								navController = navController,
 								isVisible = searchBarState.isVisible,
 							)
+						},
+						bottomBar = {
+							BottomNavBar(navController = navController)
 						}
 					) { padding ->
 						NavHost(
@@ -71,6 +78,30 @@ class MainActivity : ComponentActivity() {
 								}
 
 								HomeScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.AnimeListScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								AnimeListScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.MangaListScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								MangaListScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.ProfileScreen.route,
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								ProfileScreen(navController = navController)
 							}
 
 							composable(

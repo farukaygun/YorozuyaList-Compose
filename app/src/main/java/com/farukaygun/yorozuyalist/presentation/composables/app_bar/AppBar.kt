@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.presentation.composables.views
+package com.farukaygun.yorozuyalist.presentation.composables.app_bar
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
