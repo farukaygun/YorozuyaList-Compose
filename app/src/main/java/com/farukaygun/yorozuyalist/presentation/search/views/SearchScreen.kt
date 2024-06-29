@@ -1,10 +1,13 @@
 package com.farukaygun.yorozuyalist.presentation.search.views
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -48,6 +51,7 @@ import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
+import com.farukaygun.yorozuyalist.presentation.composables.ListItemColumn
 import com.farukaygun.yorozuyalist.presentation.composables.views.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.search.SearchEvent
 import com.farukaygun.yorozuyalist.presentation.search.SearchViewModel
@@ -68,6 +72,20 @@ fun SearchScreen(
 			navController = navController,
 			viewModel = viewModel
 		)
+
+		if (state.isLoading) {
+			Box(
+				modifier = Modifier
+					.fillMaxSize(),
+				contentAlignment = Alignment.Center
+			) {
+				CircularProgressIndicator(
+					modifier = Modifier
+						.wrapContentHeight()
+						.align(Alignment.Center)
+				)
+			}
+		}
 
 		state.animeSearched?.data?.let {
 			SearchList(
@@ -164,10 +182,18 @@ fun SearchList(
 						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
 					})
 				}
-			}
 
-			if (viewModel.state.value.isLoading) {
-				CircularProgressIndicator()
+				if (viewModel.state.value.isLoadingMore) {
+					item {
+						Column(
+							modifier = Modifier.fillMaxWidth(),
+							verticalArrangement = Arrangement.Center,
+							horizontalAlignment = Alignment.CenterHorizontally
+						) {
+							CircularProgressIndicator()
+						}
+					}
+				}
 			}
 		}
 	}

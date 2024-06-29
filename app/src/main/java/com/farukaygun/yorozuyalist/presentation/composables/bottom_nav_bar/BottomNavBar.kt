@@ -1,58 +1,57 @@
 package com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.farukaygun.yorozuyalist.presentation.Screen.AnimeListScreen.getScreen
 
 @Composable
 fun BottomNavBar(
-	navController: NavController
+	navController: NavController,
+	bottomNavBarState: BottomNavBarState
 ) {
-	var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
-
-	val items = listOf(
-		BottomNavItem.Home,
-		BottomNavItem.UserAnimeList,
-		BottomNavItem.UserMangaList,
-		BottomNavItem.Profile
-	)
-
-	NavigationBar {
-		items.forEachIndexed { index, item ->
-			NavigationBarItem(
-				selected = selectedIndex == index,
-				onClick = {
-					selectedIndex = index
-					navController.navigate(item.route)
-				},
-				icon = {
-					Icon(
-						painter = painterResource(
-							id = if (selectedIndex == index) {
-								item.selectedIcon
-							} else {
-								item.unselectedIcon
-							}
-						),
-						contentDescription = item.label
-					)
-				},
-				label = {
-					Text(
-						text = item.label,
-					)
-				}
-			)
+	AnimatedVisibility(
+		visible = bottomNavBarState.isVisible,
+		enter = expandVertically(),
+		exit = shrinkVertically()
+	) {
+		NavigationBar {
+			bottomNavBarState.items.forEachIndexed { index, item ->
+				NavigationBarItem(
+					selected = bottomNavBarState.currentScreen?.route == item.route,
+					onClick = {
+						navController.navigate(item.route)
+						bottomNavBarState.currentScreen = getScreen(item.route)
+					},
+					icon = {
+						Icon(
+							painter = painterResource(
+								id = if (bottomNavBarState.currentScreen?.route == item.route) {
+									item.selectedIcon
+								} else {
+									item.unselectedIcon
+								}
+							),
+							contentDescription = item.label
+						)
+					},
+					label = {
+						Text(
+							text = item.label,
+						)
+					}
+				)
+			}
 		}
 	}
 }
@@ -60,5 +59,11 @@ fun BottomNavBar(
 @Composable
 @Preview
 fun BottomNavBarPreview() {
-	BottomNavBar(rememberNavController())
+	val navController = rememberNavController()
+	val scope = rememberCoroutineScope()
+
+	BottomNavBar(
+		navController = navController,
+		bottomNavBarState = BottomNavBarState(navController, scope)
+	)
 }

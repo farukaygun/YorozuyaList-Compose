@@ -1,5 +1,7 @@
-package com.farukaygun.yorozuyalist.presentation.home.views
+package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -7,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.model.Data
@@ -40,13 +44,26 @@ fun ListItemRow(
 		.width(100.dp),
 		horizontalAlignment = Alignment.CenterHorizontally) {
 
-		AsyncImage(
+		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(data.node.mainPicture.medium)
 				.crossfade(true)
-				.crossfade(500)
+				.crossfade(300)
 				.build(),
-			placeholder = painterResource(id = R.drawable.overflow),
+			loading = {
+				Column(
+					verticalArrangement = Arrangement.Center,
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+					CircularProgressIndicator()
+				}
+			},
+			error = {
+				Icon(
+					painter = painterResource(id = R.drawable.outline_broken_image_24px),
+					contentDescription = "Error icon",
+				)
+			},
 			contentDescription = data.node.title,
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
@@ -89,7 +106,7 @@ fun ListItemRowPreview(
 		),
 		listStatus = ListStatus(
 			status = "finished_airing",
-			score = 10,
+			score = "10",
 			numEpisodesWatched = 12,
 			isRewatching = false,
 			updatedAt = ""

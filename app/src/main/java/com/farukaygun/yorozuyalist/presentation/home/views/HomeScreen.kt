@@ -33,6 +33,7 @@ import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
+import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
 import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
@@ -50,7 +51,7 @@ fun HomeScreen(
 	LaunchedEffect(Unit) {
 		if (viewModel.isLoggedIn())
 			viewModel.onEvent(HomeEvent.InitRequestChain)
-		else navController.navigate(route = Screen.LoginScreen.route)
+	                 	else navController.navigate(route = Screen.LoginScreen.route)
 	}
 
 	Column(

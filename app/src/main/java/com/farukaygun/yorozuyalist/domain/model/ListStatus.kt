@@ -7,7 +7,7 @@ data class ListStatus(
 	val status: String,
 
 	@SerializedName("score")
-	val score: Int,
+	val score: String,
 
 	@SerializedName(value = "num_episodes_watched", alternate = ["num_chapters_read"])
 	val numEpisodesWatched: Int,

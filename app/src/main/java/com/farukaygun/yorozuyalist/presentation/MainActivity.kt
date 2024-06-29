@@ -18,13 +18,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.presentation.anime_list.views.AnimeListScreen
+import com.farukaygun.yorozuyalist.presentation.anime_list.views.MangaListScreen
 import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
 import com.farukaygun.yorozuyalist.presentation.composables.app_bar.AppBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomNavBarState
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
-import com.farukaygun.yorozuyalist.presentation.manga_list.views.MangaListScreen
 import com.farukaygun.yorozuyalist.presentation.profile.views.ProfileScreen
 import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
@@ -43,6 +44,7 @@ class MainActivity : ComponentActivity() {
 				) {
 					val navController = rememberNavController()
 					val searchBarState = rememberAppBarState(navController = navController)
+					val bottomNavBarState = rememberBottomNavBarState(navController = navController)
 
 					Scaffold(
 						topBar = {
@@ -52,7 +54,10 @@ class MainActivity : ComponentActivity() {
 							)
 						},
 						bottomBar = {
-							BottomNavBar(navController = navController)
+							BottomNavBar(
+								navController = navController,
+								bottomNavBarState = bottomNavBarState
+							)
 						}
 					) { padding ->
 						NavHost(
@@ -68,6 +73,7 @@ class MainActivity : ComponentActivity() {
 									viewModel = loginViewModel
 								)
 							}
+
 							composable(
 								route = Screen.HomeScreen.route,
 								popEnterTransition = { fadeIn() },

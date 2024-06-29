@@ -4,6 +4,8 @@ import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.AnimeUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Private
@@ -108,16 +110,78 @@ class APIServiceImpl(
 	override suspend fun getSearchedAnime(
 		url: String
 	): AnimeSearchedDto {
-
-		println("api getSearchedAnime url: $url")
-		println("token ${sharedPrefsHelper.getString("accessToken")}")
-
 		return client.get(url) {
 			header(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
 			parameter("fields", "id,title,main_picture,mean,media_type,num_episodes,start_season")
+		}.body()
+	}
+
+	override suspend fun getUserAnimeList(
+		status: String,
+		sort: String,
+		limit: Int,
+		offset: Int
+	): AnimeUserListDto {
+		return client.get(Constants.USER_ANIME_LIST_URL) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("status", status)
+			parameter("sort", sort)
+			parameter("limit", limit)
+			parameter("offset", offset)
+			parameter("fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
+			)
+		}.body()
+	}
+
+	override suspend fun getUserAnimeList(
+		url: String
+	): AnimeUserListDto {
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
+			)
+		}.body()
+	}
+
+	override suspend fun getUserMangaList(
+		status: String,
+		sort: String,
+		limit: Int,
+		offset: Int
+	): MangaUserListDto {
+		return client.get(Constants.USER_MANGA_LIST_URL) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("status", status)
+			parameter("sort", sort)
+			parameter("limit", limit)
+			parameter("offset", offset)
+			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
+			)
+		}.body()
+	}
+
+	override suspend fun getUserMangaList(
+		url: String
+	): MangaUserListDto {
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
+			)
 		}.body()
 	}
 }
