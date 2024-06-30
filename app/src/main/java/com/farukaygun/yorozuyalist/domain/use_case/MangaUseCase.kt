@@ -1,10 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.use_case
 
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeUserList
-import com.farukaygun.yorozuyalist.data.remote.dto.toMangaUserList
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.toMangaUserList
 import com.farukaygun.yorozuyalist.data.repository.MangaRepository
 import com.farukaygun.yorozuyalist.domain.model.MangaUserList
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.Sort
 import com.farukaygun.yorozuyalist.util.Status

@@ -43,7 +43,7 @@ sealed class Screen(
 	data object ProfileScreen : Screen(
 		route = "profile_screen",
 		isAppBarVisible = false,
-		isBottomNavBarVisible = false,
+		isBottomNavBarVisible = true,
 		title = "Profile"
 	)
 

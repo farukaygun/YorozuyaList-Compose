@@ -1,9 +1,9 @@
 package com.farukaygun.yorozuyalist.domain.use_case
 
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeSearched
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeSeasonal
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeSuggested
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeUserList
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSearched
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSeasonal
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSuggested
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeUserList
 import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSeasonal

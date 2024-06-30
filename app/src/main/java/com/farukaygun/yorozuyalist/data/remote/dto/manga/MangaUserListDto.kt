@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.data.remote.dto
+package com.farukaygun.yorozuyalist.data.remote.dto.manga
 
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.domain.model.MangaUserList

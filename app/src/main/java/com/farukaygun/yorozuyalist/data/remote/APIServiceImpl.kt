@@ -1,12 +1,13 @@
 package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSearchedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeUserListDto
-import com.farukaygun.yorozuyalist.data.remote.dto.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Private
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
@@ -182,6 +183,16 @@ class APIServiceImpl(
 			)
 			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
 			)
+		}.body()
+	}
+
+	override suspend fun getUserProfile(): UserDto {
+		return client.get("${Constants.BASE_URL}/users/@me") {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("fields", "anime_statistics")
 		}.body()
 	}
 }

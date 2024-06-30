@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.domain.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
-import com.farukaygun.yorozuyalist.data.remote.dto.MangaUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.repository.MangaRepository
 
 class MangaRepositoryImpl(
