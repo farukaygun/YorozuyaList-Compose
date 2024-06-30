@@ -66,9 +66,7 @@ class SearchViewModel(
 	}
 
 	private fun loadMore() {
-		if (_state.value.isLoading ||
-			_state.value.query.isEmpty()
-		) return
+		if (_state.value.query.isEmpty()) return
 
 		job = _state.value.animeSearched?.paging?.next?.let { nextPageUrl ->
 			animeUseCase.executeSearchedAnime(url = nextPageUrl)
@@ -89,7 +87,7 @@ class SearchViewModel(
 										)
 									}
 								},
-								isLoading = false,
+								isLoadingMore = false,
 								error = ""
 							)
 						}
@@ -97,13 +95,14 @@ class SearchViewModel(
 						is Resource.Error -> {
 							_state.value = _state.value.copy(
 								error = it.message
-									?: StringValue.StringResource(R.string.error_fetching).toString(),
-								isLoading = false
+									?: StringValue.StringResource(R.string.error_fetching)
+										.toString(),
+								isLoadingMore = false
 							)
 						}
 
 						is Resource.Loading -> {
-							_state.value = _state.value.copy(isLoading = true)
+							_state.value = _state.value.copy(isLoadingMore = true)
 						}
 					}
 				}.launchIn(viewModelScope)

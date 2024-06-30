@@ -7,6 +7,7 @@ data class SearchState(
 	val searchType: SearchType = SearchType.ANIME,
 	val animeSearched: AnimeSearched? = null,
 	val isLoading: Boolean = false,
+	val isLoadingMore: Boolean = false,
 	val error: String = ""
 )
 

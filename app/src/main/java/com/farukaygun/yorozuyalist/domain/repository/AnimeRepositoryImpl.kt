@@ -1,9 +1,10 @@
 package com.farukaygun.yorozuyalist.domain.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSearchedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
 import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
 
 class AnimeRepositoryImpl(
@@ -47,6 +48,28 @@ class AnimeRepositoryImpl(
 		url: String
 	): AnimeSearchedDto {
 		return api.getSearchedAnime(
+			url = url
+		)
+	}
+
+	override suspend fun getUserAnimeList(
+		status: String,
+		sort: String,
+		limit: Int,
+		offset: Int
+	): AnimeUserListDto {
+		return api.getUserAnimeList(
+			status = status,
+			sort = sort,
+			limit = limit,
+			offset = offset
+		)
+	}
+
+	override suspend fun getUserAnimeList(
+		url: String
+	): AnimeUserListDto {
+		return api.getUserAnimeList(
 			url = url
 		)
 	}

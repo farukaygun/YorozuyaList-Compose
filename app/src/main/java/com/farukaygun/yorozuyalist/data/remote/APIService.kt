@@ -1,10 +1,13 @@
 package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSearchedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSeasonalDto
-import com.farukaygun.yorozuyalist.data.remote.dto.AnimeSuggestedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 
 interface APIService {
 	suspend fun getAuthToken(
@@ -38,4 +41,29 @@ interface APIService {
 	suspend fun getSearchedAnime(
 		url: String
 	) : AnimeSearchedDto
+
+	suspend fun getUserAnimeList(
+		status: String,
+		sort: String,
+		limit: Int,
+		offset: Int
+	) : AnimeUserListDto
+
+	suspend fun getUserAnimeList(
+		url: String
+	) : AnimeUserListDto
+
+	suspend fun getUserMangaList(
+		status: String,
+		sort: String,
+		limit: Int,
+		offset: Int
+	) : MangaUserListDto
+
+	suspend fun getUserMangaList(
+		url: String
+	) : MangaUserListDto
+
+	suspend fun getUserProfile() : UserDto
+
 }

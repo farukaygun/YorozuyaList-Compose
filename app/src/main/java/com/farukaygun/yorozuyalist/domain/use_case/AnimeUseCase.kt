@@ -1,17 +1,23 @@
 package com.farukaygun.yorozuyalist.domain.use_case
 
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeSearched
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeSeasonal
-import com.farukaygun.yorozuyalist.data.remote.dto.toAnimeSuggested
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSearched
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSeasonal
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSuggested
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeUserList
 import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSeasonal
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSuggested
+import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.util.Resource
+import com.farukaygun.yorozuyalist.util.Sort
+import com.farukaygun.yorozuyalist.util.Status
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class AnimeUseCase(private val repository: AnimeRepository) {
+class AnimeUseCase(
+	private val repository: AnimeRepository
+) {
 	fun executeSeasonalAnime(
 		year: Int,
 		season: String,
@@ -82,6 +88,44 @@ class AnimeUseCase(private val repository: AnimeRepository) {
 			)
 
 			emit(Resource.Success(searchedAnime.toAnimeSearched()))
+		} catch (e: Exception) {
+			e.printStackTrace()
+		}
+	}
+
+	fun executeUserAnimeList(
+		status: String = Status.WATCHING.value,
+		sort: String = Sort.SCORE.value,
+		limit: Int = 10,
+		offset: Int = 0
+	) : Flow<Resource<AnimeUserList>> = flow {
+		try {
+			emit(Resource.Loading())
+
+			val userAnimeList = repository.getUserAnimeList(
+				status = status,
+				sort = sort,
+				limit = limit,
+				offset = offset
+			)
+
+			emit(Resource.Success(userAnimeList.toAnimeUserList()))
+		} catch (e: Exception) {
+			e.printStackTrace()
+		}
+	}
+
+	fun executeUserAnimeList(
+		url: String
+	) : Flow<Resource<AnimeUserList>> = flow {
+		try {
+			emit(Resource.Loading())
+
+			val userAnimeList = repository.getUserAnimeList(
+				url = url
+			)
+
+			emit(Resource.Success(userAnimeList.toAnimeUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}

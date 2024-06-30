@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.presentation.common
+package com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,14 +14,21 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class AppBarState(
+class BottomNavBarState(
 	navController: NavController,
 	scope: CoroutineScope
 ) {
-	private var currentScreen by mutableStateOf<Screen?>(null)
+	var currentScreen by mutableStateOf<Screen?>(null)
+
+	val items = listOf(
+		BottomNavItem.Home,
+		BottomNavItem.UserAnimeList,
+		BottomNavItem.UserMangaList,
+		BottomNavItem.Profile
+	)
 
 	val isVisible: Boolean
-		get() = currentScreen?.isAppBarVisible == true
+		get() = currentScreen?.isBottomNavBarVisible == true
 
 	init {
 		navController.currentBackStackEntryFlow
@@ -35,11 +42,11 @@ class AppBarState(
 }
 
 @Composable
-fun rememberAppBarState(
+fun rememberBottomNavBarState(
 	navController: NavController,
 	scope: CoroutineScope = rememberCoroutineScope()
 ) = remember {
-	AppBarState(
+	BottomNavBarState(
 		navController,
 		scope
 	)

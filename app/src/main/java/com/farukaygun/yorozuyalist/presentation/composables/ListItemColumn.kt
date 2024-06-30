@@ -1,5 +1,6 @@
-package com.farukaygun.yorozuyalist.presentation.search.views
+package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.model.Data
@@ -41,12 +43,12 @@ fun ListItemColumn(
 	data: Data,
 	onItemClick: (Data) -> Unit
 ) {
-	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "Unknown Title"
-	val mediaType = data.node.mediaType?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "Unknown Media Type"
-	val numEpisodes = data.node.numEpisodes?.toString().takeUnless { it.isNullOrEmpty() } ?: "Unknown"
+	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "N/A"
+	val mediaType = data.node.mediaType?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "N/A"
+	val numEpisodes = data.node.numEpisodes?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
 	val mainPictureUrl = data.node.mainPicture?.medium?.takeUnless { it.isEmpty() } ?: R.drawable.overflow
-	val season = data.node.startSeason?.season?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "Unknown Season"
-	val year = data.node.startSeason?.year?.toString().takeUnless { it.isNullOrEmpty() } ?: "Unknown Year"
+	val season = data.node.startSeason?.season?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "N/A"
+	val year = data.node.startSeason?.year?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
 	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
 
 	Row(
@@ -55,14 +57,26 @@ fun ListItemColumn(
 			.fillMaxWidth(),
 		verticalAlignment = Alignment.Top
 	) {
-
-		AsyncImage(
+		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(mainPictureUrl)
 				.crossfade(true)
-				.crossfade(500)
+				.crossfade(300)
 				.build(),
-			placeholder = painterResource(id = R.drawable.overflow),
+			loading = {
+				Column(
+					verticalArrangement = Arrangement.Center,
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+					CircularProgressIndicator()
+				}
+			},
+			error = {
+				Icon(
+					painter = painterResource(id = R.drawable.outline_broken_image_24px),
+					contentDescription = "Error icon",
+				)
+			},
 			contentDescription = title,
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
@@ -73,7 +87,7 @@ fun ListItemColumn(
 		Column(
 			modifier = Modifier.padding(
 				horizontal = 16.dp,
-				vertical = 8.dp
+				vertical = 4.dp
 			)
 		) {
 			Text(
@@ -176,7 +190,7 @@ fun ListItemColumnPreview(
 		),
 		listStatus = ListStatus(
 			status = "finished_airing",
-			score = 10,
+			score = "10",
 			numEpisodesWatched = 12,
 			isRewatching = false,
 			updatedAt = ""
