@@ -38,27 +38,3 @@ jobs:
         with:
           name: release-apk
           path: app/build/outputs/apk/release/app-release.apk
-
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v3
-        with:
-          tag_name: ${{ github.event.release.tag_name }}
-          release_name: ${{ github.event.release.tag_name }}
-          draft: true
-
-      - name: Upload debug APK to release
-        if: steps.create_release.outputs.id
-        uses: actions/upload-release-artifact@v3
-        with:
-          release_id: ${{ steps.create_release.outputs.id }}
-          asset_name: debug-apk
-          artifact_path: "${{ artifacts.debug-apk }}"  # Updated line
-
-      - name: Upload release APK to release
-        if: steps.create_release.outputs.id
-        uses: actions/upload-release-artifact@v3
-        with:
-          release_id: ${{ steps.create_release.outputs.id }}
-          asset_name: release-apk
-          artifact_path: "${{ artifacts.release-apk }}"  # Updated line
