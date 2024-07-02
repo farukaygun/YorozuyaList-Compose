@@ -53,7 +53,7 @@ jobs:
         with:
           release_id: ${{ steps.create_release.outputs.id }}
           asset_name: debug-apk
-          artifact_path: ${{ artifacts.debug-apk.archive_path }}
+          artifact_path: "${{ artifacts.debug-apk }}"  # Updated line
 
       - name: Upload release APK to release
         if: steps.create_release.outputs.id
@@ -61,4 +61,4 @@ jobs:
         with:
           release_id: ${{ steps.create_release.outputs.id }}
           asset_name: release-apk
-          artifact_path: ${{ artifacts.release-apk.archive_path }}
+          artifact_path: "${{ artifacts.release-apk }}"  # Updated line
