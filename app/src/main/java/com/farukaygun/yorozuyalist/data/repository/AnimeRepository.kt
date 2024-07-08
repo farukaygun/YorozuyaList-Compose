@@ -1,9 +1,9 @@
 package com.farukaygun.yorozuyalist.data.repository
 
+import com.farukaygun.yorozuyalist.data.remote.dto.UserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
 
 interface AnimeRepository {
 	suspend fun getSeasonalAnime(
@@ -32,9 +32,9 @@ interface AnimeRepository {
 		sort: String,
 		limit: Int,
 		offset: Int
-	): AnimeUserListDto
+	): UserListDto
 
 	suspend fun getUserAnimeList(
 		url: String
-	): AnimeUserListDto
+	): UserListDto
 }

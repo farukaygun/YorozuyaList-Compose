@@ -2,11 +2,10 @@ package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.UserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
-import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 
 interface APIService {
@@ -47,22 +46,22 @@ interface APIService {
 		sort: String,
 		limit: Int,
 		offset: Int
-	) : AnimeUserListDto
+	) : UserListDto
 
 	suspend fun getUserAnimeList(
 		url: String
-	) : AnimeUserListDto
+	) : UserListDto
 
 	suspend fun getUserMangaList(
 		status: String,
 		sort: String,
 		limit: Int,
 		offset: Int
-	) : MangaUserListDto
+	) : UserListDto
 
 	suspend fun getUserMangaList(
 		url: String
-	) : MangaUserListDto
+	) : UserListDto
 
 	suspend fun getUserProfile() : UserDto
 

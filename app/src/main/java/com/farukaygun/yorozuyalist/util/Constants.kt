@@ -12,6 +12,9 @@ object Constants {
 	const val CURRENTLY_AIRING = "currently_airing"
 	const val NOT_YET_AIRED = "not_yet_aired"
 	const val FINISHED_AIRING = "finished_airing"
+
+	// Screen params
+	const val USER_LIST_TYPE_PARAM = "LIST_TYPE"
 }
 
 enum class MediaType {
@@ -50,4 +53,9 @@ enum class Sort(val value: String) {
 	MANGA_START_DATE("manga_start_date"),
 	ANIME_ID("anime_id"),
 	MANGA_ID("manga_id"),
+}
+
+enum class ListType {
+	ANIME_LIST,
+	MANGA_LIST
 }

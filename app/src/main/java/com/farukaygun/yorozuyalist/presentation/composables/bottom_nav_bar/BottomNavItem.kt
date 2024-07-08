@@ -2,6 +2,7 @@ package com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar
 
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
+import com.farukaygun.yorozuyalist.util.ListType
 
 sealed class BottomNavItem(
 	val route: String,
@@ -17,17 +18,17 @@ sealed class BottomNavItem(
 	)
 
 	data object UserAnimeList : BottomNavItem(
-		route = Screen.AnimeListScreen.route,
+		route = Screen.UserListScreen.route + "/${ListType.ANIME_LIST.name}",
 		unselectedIcon = R.drawable.outline_movie_24px,
 		selectedIcon = R.drawable.filled_outline_movie_24px,
-		label = Screen.AnimeListScreen.title
+		label = Screen.UserListScreen.title
 	)
 
 	data object UserMangaList : BottomNavItem(
-		route = Screen.MangaListScreen.route,
+		route = Screen.UserListScreen.route + "/${ListType.MANGA_LIST.name}",
 		unselectedIcon = R.drawable.outline_book_24px,
 		selectedIcon = R.drawable.filled_outline_book_24px,
-		label = Screen.MangaListScreen.title
+		label = Screen.UserListScreen.title
 	)
 
 	data object Profile : BottomNavItem(

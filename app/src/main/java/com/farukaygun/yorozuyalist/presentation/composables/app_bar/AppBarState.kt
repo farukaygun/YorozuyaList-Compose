@@ -21,7 +21,7 @@ class AppBarState(
 	private var currentScreen by mutableStateOf<Screen?>(null)
 
 	val isVisible: Boolean
-		get() = currentScreen?.isAppBarVisible == true
+		get() = currentScreen?.isSearchBarVisible == true
 
 	init {
 		navController.currentBackStackEntryFlow

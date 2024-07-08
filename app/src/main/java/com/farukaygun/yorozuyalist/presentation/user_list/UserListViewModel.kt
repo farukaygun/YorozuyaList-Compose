@@ -1,11 +1,12 @@
-package com.farukaygun.yorozuyalist.presentation.anime_list
+package com.farukaygun.yorozuyalist.presentation.user_list
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
+import com.farukaygun.yorozuyalist.util.ListType
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
@@ -14,22 +15,28 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class AnimeListViewModel(
-	private val animeUseCase: AnimeUseCase
+class UserListViewModel(
+	private val animeUseCase: AnimeUseCase,
+	private val mangaUseCase: MangaUseCase
 ) : ViewModel() {
-	private val _state = mutableStateOf(AnimeListState())
-	val state: State<AnimeListState> = _state
+	private val _state = mutableStateOf(UserListState())
+	val state = _state
 
 	private var job: Job? = null
 
-	private fun getUserAnimeList() {
-		job = animeUseCase.executeUserAnimeList()
+	private fun getUserList() {
+		val getUserList = when (_state.value.type) {
+			ListType.ANIME_LIST -> animeUseCase.executeUserAnimeList()
+			ListType.MANGA_LIST -> mangaUseCase.executeUserMangaList()
+		}
+
+		job = getUserList
 			.flowOn(Dispatchers.IO)
 			.onEach {
 				when (it) {
 					is Resource.Success -> {
 						_state.value = _state.value.copy(
-							userAnimeList = it.data,
+							userList = it.data,
 							isLoading = false,
 							error = ""
 						)
@@ -50,20 +57,25 @@ class AnimeListViewModel(
 	}
 
 	private fun loadMore() {
-		job = _state.value.userAnimeList?.paging?.next?.let { nextPageUrl ->
-			animeUseCase.executeUserAnimeList(url = nextPageUrl)
+		job = _state.value.userList?.paging?.next?.let { nextPageUrl ->
+			val loadMore = when (_state.value.type) {
+				ListType.ANIME_LIST -> animeUseCase.executeUserAnimeList(url = nextPageUrl)
+				ListType.MANGA_LIST -> mangaUseCase.executeUserMangaList(url = nextPageUrl)
+			}
+
+			loadMore
 				.flowOn(Dispatchers.IO)
 				.onEach {
 					when (it) {
 						is Resource.Success -> {
-							val currentData = _state.value.userAnimeList?.data?.toMutableList()
+							val currentData = _state.value.userList?.data?.toMutableList()
 							val newData = it.data?.data
 							newData?.let { data -> currentData?.addAll(data) }
 
 							_state.value = _state.value.copy(
-								userAnimeList = it.data?.paging?.let { paging ->
+								userList = it.data?.paging?.let { paging ->
 									currentData?.let { data ->
-										_state.value.userAnimeList?.copy(
+										_state.value.userList?.copy(
 											data = data,
 											paging = paging
 										)
@@ -91,15 +103,11 @@ class AnimeListViewModel(
 		}
 	}
 
-	fun onEvent(event: AnimeListEvent) {
+	fun onEvent(event: UserListEvent) {
 		when (event) {
-			is AnimeListEvent.InitRequestChain -> {
-				getUserAnimeList()
-			}
-
-			is AnimeListEvent.LoadMore -> {
-				loadMore()
-			}
+			is UserListEvent.InitRequestChain -> getUserList()
+			is UserListEvent.LoadMore -> loadMore()
 		}
+
 	}
 }

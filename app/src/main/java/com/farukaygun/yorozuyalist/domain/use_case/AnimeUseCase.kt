@@ -3,12 +3,12 @@ package com.farukaygun.yorozuyalist.domain.use_case
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSearched
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSeasonal
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSuggested
-import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeUserList
+import com.farukaygun.yorozuyalist.data.remote.dto.toUserList
 import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
+import com.farukaygun.yorozuyalist.domain.model.UserList
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSeasonal
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSuggested
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.Sort
 import com.farukaygun.yorozuyalist.util.Status
@@ -98,7 +98,7 @@ class AnimeUseCase(
 		sort: String = Sort.SCORE.value,
 		limit: Int = 10,
 		offset: Int = 0
-	) : Flow<Resource<AnimeUserList>> = flow {
+	) : Flow<Resource<UserList>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -109,7 +109,7 @@ class AnimeUseCase(
 				offset = offset
 			)
 
-			emit(Resource.Success(userAnimeList.toAnimeUserList()))
+			emit(Resource.Success(userAnimeList.toUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}
@@ -117,7 +117,7 @@ class AnimeUseCase(
 
 	fun executeUserAnimeList(
 		url: String
-	) : Flow<Resource<AnimeUserList>> = flow {
+	) : Flow<Resource<UserList>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -125,7 +125,7 @@ class AnimeUseCase(
 				url = url
 			)
 
-			emit(Resource.Success(userAnimeList.toAnimeUserList()))
+			emit(Resource.Success(userAnimeList.toUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}

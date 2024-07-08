@@ -14,11 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.farukaygun.yorozuyalist.presentation.anime_list.views.AnimeListScreen
-import com.farukaygun.yorozuyalist.presentation.anime_list.views.MangaListScreen
+import androidx.navigation.navArgument
 import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
 import com.farukaygun.yorozuyalist.presentation.composables.app_bar.AppBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
@@ -28,7 +28,9 @@ import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
 import com.farukaygun.yorozuyalist.presentation.profile.views.ProfileScreen
 import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
+import com.farukaygun.yorozuyalist.presentation.user_list.views.UserListScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
+import com.farukaygun.yorozuyalist.util.Constants.USER_LIST_TYPE_PARAM
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -87,19 +89,17 @@ class MainActivity : ComponentActivity() {
 							}
 
 							composable(
-								route = Screen.AnimeListScreen.route,
+								route = Screen.UserListScreen.route + "/{${USER_LIST_TYPE_PARAM}}",
+								arguments = listOf(
+									navArgument(USER_LIST_TYPE_PARAM) {
+										type = NavType.StringType
+									}
+								),
 								enterTransition = { fadeIn() },
 								exitTransition = { fadeOut() }
 							) {
-								AnimeListScreen(navController = navController)
-							}
-
-							composable(
-								route = Screen.MangaListScreen.route,
-								enterTransition = { fadeIn() },
-								exitTransition = { fadeOut() }
-							) {
-								MangaListScreen(navController = navController)
+								val type = it.arguments?.getString(USER_LIST_TYPE_PARAM) ?: ""
+								UserListScreen(navController = navController, type = type)
 							}
 
 							composable(

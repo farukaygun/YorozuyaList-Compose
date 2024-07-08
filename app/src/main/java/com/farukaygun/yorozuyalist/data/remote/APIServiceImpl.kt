@@ -2,11 +2,10 @@ package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.UserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
-import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
-import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Private
@@ -125,7 +124,7 @@ class APIServiceImpl(
 		sort: String,
 		limit: Int,
 		offset: Int
-	): AnimeUserListDto {
+	): UserListDto {
 		return client.get(Constants.USER_ANIME_LIST_URL) {
 			header(
 				HttpHeaders.Authorization,
@@ -142,7 +141,7 @@ class APIServiceImpl(
 
 	override suspend fun getUserAnimeList(
 		url: String
-	): AnimeUserListDto {
+	): UserListDto {
 		return client.get(url) {
 			header(
 				HttpHeaders.Authorization,
@@ -158,7 +157,7 @@ class APIServiceImpl(
 		sort: String,
 		limit: Int,
 		offset: Int
-	): MangaUserListDto {
+	): UserListDto {
 		return client.get(Constants.USER_MANGA_LIST_URL) {
 			header(
 				HttpHeaders.Authorization,
@@ -175,7 +174,7 @@ class APIServiceImpl(
 
 	override suspend fun getUserMangaList(
 		url: String
-	): MangaUserListDto {
+	): UserListDto {
 		return client.get(url) {
 			header(
 				HttpHeaders.Authorization,

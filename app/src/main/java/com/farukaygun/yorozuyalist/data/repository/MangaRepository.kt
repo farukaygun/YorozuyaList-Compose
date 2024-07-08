@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.data.repository
 
-import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.UserListDto
 
 interface MangaRepository {
 	suspend fun getUserMangaList(
@@ -8,9 +8,9 @@ interface MangaRepository {
 		sort: String,
 		limit: Int,
 		offset: Int
-	): MangaUserListDto
+	): UserListDto
 
 	suspend fun getUserMangaList(
 		url: String
-	): MangaUserListDto
+	): UserListDto
 }

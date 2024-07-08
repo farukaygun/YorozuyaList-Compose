@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.presentation.anime_list.views
+package com.farukaygun.yorozuyalist.presentation.user_list.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,21 +28,26 @@ import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.model.Data
 import com.farukaygun.yorozuyalist.presentation.composables.UserListItemColumn
 import com.farukaygun.yorozuyalist.presentation.composables.views.OnBottomReached
-import com.farukaygun.yorozuyalist.presentation.manga_list.MangaListEvent
-import com.farukaygun.yorozuyalist.presentation.manga_list.MangaListViewModel
+import com.farukaygun.yorozuyalist.presentation.user_list.UserListEvent
+import com.farukaygun.yorozuyalist.presentation.user_list.UserListViewModel
+import com.farukaygun.yorozuyalist.util.ListType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
+
+// User list screen for user manga and anime lists.
 @Composable
-fun MangaListScreen(
+fun UserListScreen(
 	navController: NavController,
-	viewModel: MangaListViewModel = koinViewModel()
+	viewModel: UserListViewModel = koinViewModel(),
+	type: String
 ) {
 	val state = viewModel.state.value
 
 	LaunchedEffect(Unit) {
-		viewModel.onEvent(MangaListEvent.InitRequestChain)
+		viewModel.state.value = viewModel.state.value.copy(type = ListType.valueOf(type))
+		viewModel.onEvent(UserListEvent.InitRequestChain)
 	}
 
 	if (state.isLoading) {
@@ -60,19 +65,25 @@ fun MangaListScreen(
 	}
 
 	Column {
-		state.userMangaList?.data?.let {
-			MangaList(data = it, viewModel = viewModel)
+		state.userList?.data?.let {
+			UserList(
+				data = it,
+				viewModel = viewModel,
+				type = type
+			)
 		}
 	}
 }
 
 @Composable
-fun MangaList(
-	data: List<Data>, viewModel: MangaListViewModel
+fun UserList(
+	data: List<Data>,
+	viewModel: UserListViewModel,
+	type: String
 ) {
 	val listState = rememberLazyListState()
 	listState.OnBottomReached(buffer = 10) {
-		viewModel.onEvent(MangaListEvent.LoadMore)
+		viewModel.onEvent(UserListEvent.LoadMore)
 	}
 
 	Surface(
@@ -111,7 +122,7 @@ fun MangaList(
 
 @Composable
 @Preview
-fun MangaListScreenPreview() {
+fun AnimeListScreenPreview() {
 	val context = LocalContext.current
 
 	KoinApplication(application = {
@@ -120,8 +131,6 @@ fun MangaListScreenPreview() {
 			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
 		)
 	}) {
-		MangaListScreen(
-			navController = rememberNavController()
-		)
+		UserListScreen(navController = rememberNavController(), type = ListType.ANIME_LIST.name)
 	}
 }

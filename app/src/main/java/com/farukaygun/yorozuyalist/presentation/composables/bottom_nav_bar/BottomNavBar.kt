@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.farukaygun.yorozuyalist.presentation.Screen.AnimeListScreen.getScreen
+import com.farukaygun.yorozuyalist.presentation.Screen.UserListScreen.getScreen
 
 @Composable
 fun BottomNavBar(

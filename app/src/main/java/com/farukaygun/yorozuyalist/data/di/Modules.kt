@@ -15,12 +15,11 @@ import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.UserUseCase
-import com.farukaygun.yorozuyalist.presentation.anime_list.AnimeListViewModel
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
-import com.farukaygun.yorozuyalist.presentation.manga_list.MangaListViewModel
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileViewModel
 import com.farukaygun.yorozuyalist.presentation.search.SearchViewModel
+import com.farukaygun.yorozuyalist.presentation.user_list.UserListViewModel
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -34,8 +33,7 @@ val apiServiceModule = module {
 val viewModelModule = module {
 	viewModel { LoginViewModel(get(), get()) }
 	viewModel { HomeViewModel(get(), get(), get()) }
-	viewModel { AnimeListViewModel(get()) }
-	viewModel { MangaListViewModel(get()) }
+	viewModel { UserListViewModel(get(), get()) }
 	viewModel { ProfileViewModel(get()) }
 	viewModel { SearchViewModel(get()) }
 }

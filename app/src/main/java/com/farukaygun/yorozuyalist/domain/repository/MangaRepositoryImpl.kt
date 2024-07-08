@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.domain.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
-import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.UserListDto
 import com.farukaygun.yorozuyalist.data.repository.MangaRepository
 
 class MangaRepositoryImpl(
@@ -12,7 +12,7 @@ class MangaRepositoryImpl(
 		sort: String,
 		limit: Int,
 		offset: Int
-	): MangaUserListDto {
+	): UserListDto {
 		return api.getUserMangaList(
 			status = status,
 			sort = sort,
@@ -23,7 +23,7 @@ class MangaRepositoryImpl(
 
 	override suspend fun getUserMangaList(
 		url: String
-	): MangaUserListDto {
+	): UserListDto {
 		return api.getUserMangaList(
 			url = url
 		)
