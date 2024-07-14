@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.presentation.user_list
+package com.farukaygun.yorozuyalist.presentation.grid_list
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
@@ -8,37 +8,44 @@ import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.getYearAndSeason
+import com.farukaygun.yorozuyalist.util.GridListType
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.StringValue
-import com.farukaygun.yorozuyalist.util.UserListType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class UserListViewModel(
+class GridListViewModel(
 	private val animeUseCase: AnimeUseCase,
 	private val mangaUseCase: MangaUseCase
 ) : ViewModel() {
-	private val _state = mutableStateOf(UserListState())
+	private val _state = mutableStateOf(GridListState())
 	val state = _state
 
 	private var job: Job? = null
 
-	private fun getUserList() {
-		val getUserList = when (_state.value.type) {
-			UserListType.ANIME_LIST -> animeUseCase.executeUserAnimeList()
-			UserListType.MANGA_LIST -> mangaUseCase.executeUserMangaList()
+	private fun getList() {
+		val (year, season) = getYearAndSeason()
+		val getList = when (_state.value.type) {
+			GridListType.SUGGESTED_ANIME_LIST -> animeUseCase.executeSuggestedAnime()
+			GridListType.SEASONAL_ANIME_LIST -> animeUseCase.executeSeasonalAnime(
+				year,
+				season.value
+			)
 		}
 
-		job = getUserList
+		println("getList: $getList")
+
+		job = getList
 			.flowOn(Dispatchers.IO)
 			.onEach {
 				when (it) {
 					is Resource.Success -> {
 						_state.value = _state.value.copy(
-							userList = it.data,
+							gridList = it.data,
 							isLoading = false,
 							error = ""
 						)
@@ -59,10 +66,10 @@ class UserListViewModel(
 	}
 
 	private fun loadMore() {
-		job = _state.value.userList?.paging?.next?.let { nextPageUrl ->
+		job = _state.value.gridList?.paging?.next?.let { nextPageUrl ->
 			val loadMore = when (_state.value.type) {
-				UserListType.ANIME_LIST -> animeUseCase.executeUserAnimeList(url = nextPageUrl)
-				UserListType.MANGA_LIST -> mangaUseCase.executeUserMangaList(url = nextPageUrl)
+				GridListType.SUGGESTED_ANIME_LIST -> animeUseCase.executeSuggestedAnime(url = nextPageUrl)
+				GridListType.SEASONAL_ANIME_LIST -> animeUseCase.executeSeasonalAnime(url = nextPageUrl)
 			}
 
 			loadMore
@@ -70,12 +77,12 @@ class UserListViewModel(
 				.onEach {
 					when (it) {
 						is Resource.Success -> {
-							val currentData = _state.value.userList?.data?.toMutableStateList()
+							val currentData = _state.value.gridList?.data?.toMutableStateList()
 							val newData = it.data?.data
 							newData?.let { data -> currentData?.addAll(data) }
 
 							_state.value = _state.value.copy(
-								userList = it.data?.paging?.let { paging ->
+								gridList = it.data?.paging?.let { paging ->
 									currentData?.let { data ->
 										AnimeUserList(
 											data = data,
@@ -105,11 +112,10 @@ class UserListViewModel(
 		}
 	}
 
-	fun onEvent(event: UserListEvent) {
+	fun onEvent(event: GridListEvent) {
 		when (event) {
-			is UserListEvent.InitRequestChain -> getUserList()
-			is UserListEvent.LoadMore -> loadMore()
+			GridListEvent.InitRequestChain -> getList()
+			GridListEvent.LoadMore -> loadMore()
 		}
-
 	}
 }

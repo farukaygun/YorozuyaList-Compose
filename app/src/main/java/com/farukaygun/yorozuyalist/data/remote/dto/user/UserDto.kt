@@ -21,7 +21,7 @@ data class UserDto(
 	val picture: String,
 )
 
-fun UserDto.toUser() : User {
+fun UserDto.toUser(): User {
 	return User(
 		userAnimeStatistics = userAnimeStatistics,
 		birthday = birthday,

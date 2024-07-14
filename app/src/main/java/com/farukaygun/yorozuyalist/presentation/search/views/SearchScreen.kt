@@ -111,7 +111,11 @@ fun SearchBar(
 	) {
 		TextField(
 			value = query,
-			onValueChange = { query = it },
+			onValueChange = {
+				query = it
+				if (query.text.length > 2)
+					viewModel.onEvent(SearchEvent.Search(query.text))
+			},
 			modifier = Modifier
 				.fillMaxWidth()
 				.focusRequester(focusRequester),
@@ -137,7 +141,6 @@ fun SearchBar(
 			keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
 			keyboardActions = KeyboardActions(onSearch = {
 				keyboardController?.hide()
-				viewModel.onEvent(SearchEvent.Search(query.text))
 			}),
 			singleLine = true,
 			colors = TextFieldDefaults.colors(
@@ -164,16 +167,12 @@ fun SearchList(
 		viewModel.scrollToTop.value = false
 	}
 
-	Surface(
-		modifier = Modifier.fillMaxSize()
-	) {
-		Box(
-			modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-		) {
+	Surface {
+		Box {
 			LazyColumn(
-				state = listState, modifier = Modifier
-					.fillMaxWidth()
-					.padding(8.dp)
+				state = listState,
+				modifier = Modifier.padding(8.dp),
+				verticalArrangement = Arrangement.SpaceBetween
 			) {
 
 				items(data) { anime ->
@@ -185,7 +184,7 @@ fun SearchList(
 				if (viewModel.state.value.isLoadingMore) {
 					item {
 						Column(
-							modifier = Modifier.fillMaxWidth(),
+							modifier = Modifier.padding(16.dp),
 							verticalArrangement = Arrangement.Center,
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {

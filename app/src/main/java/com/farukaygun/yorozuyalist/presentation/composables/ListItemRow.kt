@@ -36,12 +36,14 @@ import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
 @Composable
 fun ListItemRow(
 	data: Data,
-	onItemClick : (Data) -> Unit
+	onItemClick: (Data) -> Unit
 ) {
-	Column(modifier = Modifier
-		.padding(8.dp)
-		.width(100.dp),
-		horizontalAlignment = Alignment.CenterHorizontally) {
+	Column(
+		modifier = Modifier
+			.padding(8.dp)
+			.width(100.dp),
+		horizontalAlignment = Alignment.CenterHorizontally
+	) {
 
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
@@ -77,6 +79,7 @@ fun ListItemRow(
 			textAlign = TextAlign.Center,
 			maxLines = 2,
 			overflow = TextOverflow.Ellipsis,
+			modifier = Modifier.width(100.dp),
 			color = MaterialTheme.colorScheme.onSurface,
 		)
 	}

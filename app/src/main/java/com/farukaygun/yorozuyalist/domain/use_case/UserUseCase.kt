@@ -12,7 +12,7 @@ class UserUseCase(
 ) {
 	fun executeUser(
 
-	) : Flow<Resource<User>> = flow {
+	): Flow<Resource<User>> = flow {
 		try {
 			emit(Resource.Loading())
 

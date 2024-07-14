@@ -2,10 +2,11 @@ package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
-import com.farukaygun.yorozuyalist.data.remote.dto.UserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Private
@@ -76,6 +77,21 @@ class APIServiceImpl(
 		}.body()
 	}
 
+	override suspend fun getSeasonalAnime(
+		url: String
+	): AnimeSeasonalDto {
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter(
+				"fields",
+				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics"
+			)
+		}.body()
+	}
+
 	override suspend fun getSuggestedAnime(
 		limit: Int,
 		offset: Int
@@ -87,6 +103,17 @@ class APIServiceImpl(
 			)
 			parameter("limit", limit)
 			parameter("offset", offset)
+		}.body()
+	}
+
+	override suspend fun getSuggestedAnime(
+		url: String
+	): AnimeSuggestedDto {
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
 		}.body()
 	}
 
@@ -124,7 +151,7 @@ class APIServiceImpl(
 		sort: String,
 		limit: Int,
 		offset: Int
-	): UserListDto {
+	): AnimeUserListDto {
 		return client.get(Constants.USER_ANIME_LIST_URL) {
 			header(
 				HttpHeaders.Authorization,
@@ -134,20 +161,22 @@ class APIServiceImpl(
 			parameter("sort", sort)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter("fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
+			parameter(
+				"fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
 			)
 		}.body()
 	}
 
 	override suspend fun getUserAnimeList(
 		url: String
-	): UserListDto {
+	): AnimeUserListDto {
 		return client.get(url) {
 			header(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
-			parameter("fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
+			parameter(
+				"fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
 			)
 		}.body()
 	}
@@ -157,7 +186,7 @@ class APIServiceImpl(
 		sort: String,
 		limit: Int,
 		offset: Int
-	): UserListDto {
+	): MangaUserListDto {
 		return client.get(Constants.USER_MANGA_LIST_URL) {
 			header(
 				HttpHeaders.Authorization,
@@ -167,20 +196,22 @@ class APIServiceImpl(
 			parameter("sort", sort)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
+			parameter(
+				"fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
 			)
 		}.body()
 	}
 
 	override suspend fun getUserMangaList(
 		url: String
-	): UserListDto {
+	): MangaUserListDto {
 		return client.get(url) {
 			header(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
-			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
+			parameter(
+				"fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
 			)
 		}.body()
 	}

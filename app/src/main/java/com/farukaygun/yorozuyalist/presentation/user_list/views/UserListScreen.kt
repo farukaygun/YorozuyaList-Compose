@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +29,7 @@ import com.farukaygun.yorozuyalist.presentation.composables.UserListItemColumn
 import com.farukaygun.yorozuyalist.presentation.composables.views.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListEvent
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListViewModel
-import com.farukaygun.yorozuyalist.util.ListType
+import com.farukaygun.yorozuyalist.util.UserListType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
@@ -46,7 +45,7 @@ fun UserListScreen(
 	val state = viewModel.state.value
 
 	LaunchedEffect(Unit) {
-		viewModel.state.value = viewModel.state.value.copy(type = ListType.valueOf(type))
+		viewModel.state.value = viewModel.state.value.copy(type = UserListType.valueOf(type))
 		viewModel.onEvent(UserListEvent.InitRequestChain)
 	}
 
@@ -69,7 +68,6 @@ fun UserListScreen(
 			UserList(
 				data = it,
 				viewModel = viewModel,
-				type = type
 			)
 		}
 	}
@@ -78,24 +76,19 @@ fun UserListScreen(
 @Composable
 fun UserList(
 	data: List<Data>,
-	viewModel: UserListViewModel,
-	type: String
+	viewModel: UserListViewModel
 ) {
 	val listState = rememberLazyListState()
 	listState.OnBottomReached(buffer = 10) {
 		viewModel.onEvent(UserListEvent.LoadMore)
 	}
 
-	Surface(
-		modifier = Modifier.fillMaxSize()
-	) {
-		Box(
-			modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-		) {
+	Surface {
+		Box {
 			LazyColumn(
-				state = listState, modifier = Modifier
-					.fillMaxWidth()
-					.padding(8.dp)
+				state = listState,
+				modifier = Modifier.padding(8.dp),
+				verticalArrangement = Arrangement.SpaceBetween
 			) {
 
 				items(data) { anime ->
@@ -107,7 +100,7 @@ fun UserList(
 				if (viewModel.state.value.isLoadingMore) {
 					item {
 						Column(
-							modifier = Modifier.fillMaxWidth(),
+							modifier = Modifier.padding(16.dp),
 							verticalArrangement = Arrangement.Center,
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
@@ -131,6 +124,6 @@ fun AnimeListScreenPreview() {
 			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
 		)
 	}) {
-		UserListScreen(navController = rememberNavController(), type = ListType.ANIME_LIST.name)
+		UserListScreen(navController = rememberNavController(), type = UserListType.ANIME_LIST.name)
 	}
 }

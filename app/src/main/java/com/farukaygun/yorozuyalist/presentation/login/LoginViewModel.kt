@@ -43,7 +43,8 @@ class LoginViewModel(
 					getAccessToken(context, code)
 				} else {
 					_state.value = _state.value.copy(
-						error = StringValue.StringResource(R.string.login_code_error).asString(context)
+						error = StringValue.StringResource(R.string.login_code_error)
+							.asString(context)
 					)
 				}
 			}
@@ -64,11 +65,14 @@ class LoginViewModel(
 						error = ""
 					)
 				}
+
 				is Resource.Error -> {
 					_state.value = _state.value.copy(
-						error = it.message ?: StringValue.StringResource(R.string.user_login_error).asString(context),
+						error = it.message ?: StringValue.StringResource(R.string.user_login_error)
+							.asString(context),
 					)
 				}
+
 				is Resource.Loading -> {
 					_state.value = _state.value.copy(isLoading = true)
 				}

@@ -12,7 +12,7 @@ data class MangaUserListDto(
 	val paging: Paging
 )
 
-fun MangaUserListDto.toMangaUserList() : MangaUserList {
+fun MangaUserListDto.toMangaUserList(): MangaUserList {
 	return MangaUserList(
 		data = data,
 		paging = paging

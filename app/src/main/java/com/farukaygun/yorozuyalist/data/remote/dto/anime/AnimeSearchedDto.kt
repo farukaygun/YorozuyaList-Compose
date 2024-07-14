@@ -12,7 +12,7 @@ data class AnimeSearchedDto(
 	val paging: Paging
 )
 
-fun AnimeSearchedDto.toAnimeSearched() : AnimeSearched {
+fun AnimeSearchedDto.toAnimeSearched(): AnimeSearched {
 	return AnimeSearched(
 		data = data,
 		paging = paging

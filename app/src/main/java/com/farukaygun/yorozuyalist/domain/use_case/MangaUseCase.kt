@@ -1,8 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.use_case
 
-import com.farukaygun.yorozuyalist.data.remote.dto.toUserList
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.toMangaUserList
 import com.farukaygun.yorozuyalist.data.repository.MangaRepository
-import com.farukaygun.yorozuyalist.domain.model.UserList
+import com.farukaygun.yorozuyalist.domain.model.MangaUserList
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.Sort
 import com.farukaygun.yorozuyalist.util.Status
@@ -17,7 +17,7 @@ class MangaUseCase(
 		sort: String = Sort.UPDATED_AT.value,
 		limit: Int = 10,
 		offset: Int = 0
-	): Flow<Resource<UserList>> = flow {
+	): Flow<Resource<MangaUserList>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -28,7 +28,7 @@ class MangaUseCase(
 				offset = offset
 			)
 
-			emit(Resource.Success(userMangaList.toUserList()))
+			emit(Resource.Success(userMangaList.toMangaUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}
@@ -36,7 +36,7 @@ class MangaUseCase(
 
 	fun executeUserMangaList(
 		url: String
-	) : Flow<Resource<UserList>> = flow {
+	): Flow<Resource<MangaUserList>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -44,7 +44,7 @@ class MangaUseCase(
 				url = url
 			)
 
-			emit(Resource.Success(userMangaList.toUserList()))
+			emit(Resource.Success(userMangaList.toMangaUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}

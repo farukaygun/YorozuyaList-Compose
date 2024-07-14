@@ -2,12 +2,10 @@ package com.farukaygun.yorozuyalist.presentation.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -20,8 +18,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,30 +32,20 @@ import com.farukaygun.yorozuyalist.domain.model.Ranking
 import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
 import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
 
-// If I delete the safe call, it gives a null pointer exception error when loadMore triggered.
 @Suppress("UNNECESSARY_SAFE_CALL")
 @Composable
-fun ListItemColumn(
+fun GridListItem(
 	data: Data,
 	onItemClick: (Data) -> Unit
 ) {
 	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "N/A"
-	val mediaType =
-		data.node.mediaType?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "N/A"
-	val numEpisodes = data.node.numEpisodes?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
 	val mainPictureUrl = data.node.mainPicture?.medium?.takeUnless { it.isEmpty() }
 		?: R.drawable.outline_broken_image_24px
-	val season =
-		data.node.startSeason?.season?.takeUnless { it.isEmpty() }?.capitalize(Locale.current)
-			?: "N/A"
-	val year = data.node.startSeason?.year?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
-	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
 
-	Row(
+	Column(
 		modifier = Modifier
 			.padding(8.dp)
 			.fillMaxWidth(),
-		verticalAlignment = Alignment.Top
 	) {
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
@@ -88,91 +74,22 @@ fun ListItemColumn(
 				.size(100.dp, 150.dp)
 		)
 
-		Column(
-			modifier = Modifier.padding(
-				horizontal = 16.dp,
-				vertical = 4.dp
-			)
-		) {
-			Text(
-				text = title,
-				textAlign = TextAlign.Start,
-				maxLines = 2,
-				overflow = TextOverflow.Ellipsis,
-				color = MaterialTheme.colorScheme.onSurface,
-				style = MaterialTheme.typography.titleMedium
-			)
+		Text(
+			text = title,
+			textAlign = TextAlign.Start,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			modifier = Modifier.width(100.dp),
+			color = MaterialTheme.colorScheme.onSurface,
+			style = MaterialTheme.typography.titleMedium
+		)
 
-			Spacer(modifier = Modifier.height(8.dp))
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.outline_tv_24px),
-					contentDescription = "Media type icon",
-					modifier = Modifier.padding(end = 4.dp)
-				)
-
-				Text(
-					text = "$mediaType ($numEpisodes episodes)",
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.bodyMedium
-				)
-			}
-
-			Spacer(modifier = Modifier.height(8.dp))
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.outline_calendar_month_24px),
-					contentDescription = "Season icon",
-					modifier = Modifier.padding(end = 4.dp)
-				)
-
-				Text(
-					text = "$season $year",
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.bodyMedium
-				)
-			}
-
-			Spacer(modifier = Modifier.height(8.dp))
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.outline_filled_grade_24px),
-					contentDescription = "Mean score icon",
-					modifier = Modifier.padding(end = 4.dp)
-				)
-
-				Text(
-					text = meanScore,
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.bodyMedium
-				)
-			}
-		}
 	}
 }
 
-
 @Composable
 @Preview
-fun ListItemColumnPreview(
+fun GridListItemPreview(
 ) {
 	val data = Data(
 		node = Node(
@@ -203,5 +120,5 @@ fun ListItemColumnPreview(
 			rank = 1,
 		)
 	)
-	ListItemColumn(data = data, onItemClick = {})
+	GridListItem(data = data, onItemClick = {})
 }

@@ -256,10 +256,12 @@ fun AnimeStatisticsSection(state: ProfileState, data: User) {
 				chartData.slices.forEach { slice ->
 					AssistChip(
 						onClick = { /*TODO*/ },
-						label = { Text(
-							text = "${slice.value.toInt()} ${slice.label}",
-							fontWeight = FontWeight.Bold,
-						)},
+						label = {
+							Text(
+								text = "${slice.value.toInt()} ${slice.label}",
+								fontWeight = FontWeight.Bold,
+							)
+						},
 						colors = AssistChipDefaults.assistChipColors(
 							labelColor = MaterialTheme.colorScheme.onPrimary,
 							containerColor = slice.color

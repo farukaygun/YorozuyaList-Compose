@@ -32,30 +32,40 @@ class ProfileViewModel(
 					is Resource.Success -> {
 						val tempStatList = mutableListOf<Stat>()
 						it.data?.let { data ->
-							tempStatList.add(Stat(
-								type = Status.WATCHING,
-								value = data.userAnimeStatistics.numItemsWatching
-							))
+							tempStatList.add(
+								Stat(
+									type = Status.WATCHING,
+									value = data.userAnimeStatistics.numItemsWatching
+								)
+							)
 
-							tempStatList.add(Stat(
-								type = Status.COMPLETED,
-								value = data.userAnimeStatistics.numItemsCompleted
-							))
+							tempStatList.add(
+								Stat(
+									type = Status.COMPLETED,
+									value = data.userAnimeStatistics.numItemsCompleted
+								)
+							)
 
-							tempStatList.add(Stat(
-								type = Status.ON_HOLD,
-								value = data.userAnimeStatistics.numItemsOnHold
-							))
+							tempStatList.add(
+								Stat(
+									type = Status.ON_HOLD,
+									value = data.userAnimeStatistics.numItemsOnHold
+								)
+							)
 
-							tempStatList.add(Stat(
-								type = Status.DROPPED,
-								value = data.userAnimeStatistics.numItemsDropped
-							))
+							tempStatList.add(
+								Stat(
+									type = Status.DROPPED,
+									value = data.userAnimeStatistics.numItemsDropped
+								)
+							)
 
-							tempStatList.add(Stat(
-								type = Status.PLAN_TO_WATCH,
-								value = data.userAnimeStatistics.numItemsPlanToWatch
-							))
+							tempStatList.add(
+								Stat(
+									type = Status.PLAN_TO_WATCH,
+									value = data.userAnimeStatistics.numItemsPlanToWatch
+								)
+							)
 						}
 
 						_state.value = _state.value.copy(

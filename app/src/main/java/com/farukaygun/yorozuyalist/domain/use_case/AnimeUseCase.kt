@@ -3,12 +3,12 @@ package com.farukaygun.yorozuyalist.domain.use_case
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSearched
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSeasonal
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeSuggested
-import com.farukaygun.yorozuyalist.data.remote.dto.toUserList
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.toAnimeUserList
 import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
-import com.farukaygun.yorozuyalist.domain.model.UserList
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSeasonal
 import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSuggested
+import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.Sort
 import com.farukaygun.yorozuyalist.util.Status
@@ -21,7 +21,7 @@ class AnimeUseCase(
 	fun executeSeasonalAnime(
 		year: Int,
 		season: String,
-		limit: Int = 10
+		limit: Int = 20
 	): Flow<Resource<AnimeSeasonal>> = flow {
 		try {
 			emit(Resource.Loading())
@@ -38,8 +38,24 @@ class AnimeUseCase(
 		}
 	}
 
+	fun executeSeasonalAnime(
+		url: String
+	): Flow<Resource<AnimeSeasonal>> = flow {
+		try {
+			emit(Resource.Loading())
+
+			val seasonalAnime = repository.getSeasonalAnime(
+				url = url
+			)
+
+			emit(Resource.Success(seasonalAnime.toAnimeSeasonal()))
+		} catch (e: Exception) {
+			e.printStackTrace()
+		}
+	}
+
 	fun executeSuggestedAnime(
-		limit: Int = 10,
+		limit: Int = 20,
 		offset: Int = 0
 	): Flow<Resource<AnimeSuggested>> = flow {
 		try {
@@ -56,11 +72,27 @@ class AnimeUseCase(
 		}
 	}
 
+	fun executeSuggestedAnime(
+		url: String
+	): Flow<Resource<AnimeSuggested>> = flow {
+		try {
+			emit(Resource.Loading())
+
+			val suggestedAnime = repository.getSuggestedAnime(
+				url = url
+			)
+
+			emit(Resource.Success(suggestedAnime.toAnimeSuggested()))
+		} catch (e: Exception) {
+			e.printStackTrace()
+		}
+	}
+
 	fun executeSearchedAnime(
 		query: String,
 		limit: Int = 8,
 		offset: Int = 0
-	) : Flow<Resource<AnimeSearched>> = flow {
+	): Flow<Resource<AnimeSearched>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -78,7 +110,7 @@ class AnimeUseCase(
 
 	fun executeSearchedAnime(
 		url: String
-	) : Flow<Resource<AnimeSearched>> = flow {
+	): Flow<Resource<AnimeSearched>> = flow {
 		println("usecase executeSearchedAnime url: $url")
 		try {
 			emit(Resource.Loading())
@@ -98,7 +130,7 @@ class AnimeUseCase(
 		sort: String = Sort.SCORE.value,
 		limit: Int = 10,
 		offset: Int = 0
-	) : Flow<Resource<UserList>> = flow {
+	): Flow<Resource<AnimeUserList>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -109,7 +141,7 @@ class AnimeUseCase(
 				offset = offset
 			)
 
-			emit(Resource.Success(userAnimeList.toUserList()))
+			emit(Resource.Success(userAnimeList.toAnimeUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}
@@ -117,7 +149,7 @@ class AnimeUseCase(
 
 	fun executeUserAnimeList(
 		url: String
-	) : Flow<Resource<UserList>> = flow {
+	): Flow<Resource<AnimeUserList>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -125,7 +157,7 @@ class AnimeUseCase(
 				url = url
 			)
 
-			emit(Resource.Success(userAnimeList.toUserList()))
+			emit(Resource.Success(userAnimeList.toAnimeUserList()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}

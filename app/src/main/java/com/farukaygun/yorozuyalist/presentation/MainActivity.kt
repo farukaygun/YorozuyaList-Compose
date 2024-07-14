@@ -23,6 +23,7 @@ import com.farukaygun.yorozuyalist.presentation.common.rememberAppBarState
 import com.farukaygun.yorozuyalist.presentation.composables.app_bar.AppBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomNavBarState
+import com.farukaygun.yorozuyalist.presentation.grid_list.views.GridListScreen
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
@@ -30,7 +31,7 @@ import com.farukaygun.yorozuyalist.presentation.profile.views.ProfileScreen
 import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.presentation.user_list.views.UserListScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
-import com.farukaygun.yorozuyalist.util.Constants.USER_LIST_TYPE_PARAM
+import com.farukaygun.yorozuyalist.util.Constants.SCREEN_TYPE_PARAM
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -89,16 +90,16 @@ class MainActivity : ComponentActivity() {
 							}
 
 							composable(
-								route = Screen.UserListScreen.route + "/{${USER_LIST_TYPE_PARAM}}",
+								route = Screen.UserListScreen.route + "/{${SCREEN_TYPE_PARAM}}",
 								arguments = listOf(
-									navArgument(USER_LIST_TYPE_PARAM) {
+									navArgument(SCREEN_TYPE_PARAM) {
 										type = NavType.StringType
 									}
 								),
 								enterTransition = { fadeIn() },
 								exitTransition = { fadeOut() }
 							) {
-								val type = it.arguments?.getString(USER_LIST_TYPE_PARAM) ?: ""
+								val type = it.arguments?.getString(SCREEN_TYPE_PARAM) ?: ""
 								UserListScreen(navController = navController, type = type)
 							}
 
@@ -116,6 +117,20 @@ class MainActivity : ComponentActivity() {
 								exitTransition = { fadeOut() }
 							) {
 								SearchScreen(navController = navController)
+							}
+
+							composable(
+								route = Screen.GridListScreen.route + "/{${SCREEN_TYPE_PARAM}}",
+								arguments = listOf(
+									navArgument(SCREEN_TYPE_PARAM) {
+										type = NavType.StringType
+									}
+								),
+								enterTransition = { fadeIn() },
+								exitTransition = { fadeOut() }
+							) {
+								val type = it.arguments?.getString(SCREEN_TYPE_PARAM) ?: ""
+								GridListScreen(navController = navController, type = type)
 							}
 						}
 					}

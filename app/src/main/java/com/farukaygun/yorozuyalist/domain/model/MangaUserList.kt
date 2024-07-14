@@ -1,10 +1,11 @@
 package com.farukaygun.yorozuyalist.domain.model
 
+import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
 import com.google.gson.annotations.SerializedName
 
 data class MangaUserList(
 	@SerializedName("data")
-	val data: List<Data>,
+	override val data: List<Data>,
 	@SerializedName("paging")
-	val paging: Paging
-)
+	override val paging: Paging
+) : MediaList

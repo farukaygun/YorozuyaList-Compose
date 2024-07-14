@@ -15,7 +15,7 @@ data class AnimeSeasonalDto(
 	val season: Season,
 )
 
-fun AnimeSeasonalDto.toAnimeSeasonal() : AnimeSeasonal {
+fun AnimeSeasonalDto.toAnimeSeasonal(): AnimeSeasonal {
 	return AnimeSeasonal(
 		data = data,
 		paging = paging,

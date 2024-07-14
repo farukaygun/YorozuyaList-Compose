@@ -14,7 +14,7 @@ android {
 		minSdk = 26
 		targetSdk = 35
 		versionCode = 1
-		versionName = "0.5"
+		versionName = "0.6"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -73,7 +73,7 @@ dependencies {
 
 	// navigation
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
-	implementation("androidx.navigation:navigation-compose:2.8.0-beta04")
+	implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
 
 	// Ktor
 	implementation("io.ktor:ktor-client-core:$ktorVersion")

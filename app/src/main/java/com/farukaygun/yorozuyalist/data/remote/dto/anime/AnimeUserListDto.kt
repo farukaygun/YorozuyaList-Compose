@@ -12,9 +12,9 @@ class AnimeUserListDto(
 	val paging: Paging
 )
 
-	fun AnimeUserListDto.toAnimeUserList() : AnimeUserList {
-		return AnimeUserList(
-			data = data,
-			paging = paging
-		)
-	}
+fun AnimeUserListDto.toAnimeUserList(): AnimeUserList {
+	return AnimeUserList(
+		data = data,
+		paging = paging
+	)
+}

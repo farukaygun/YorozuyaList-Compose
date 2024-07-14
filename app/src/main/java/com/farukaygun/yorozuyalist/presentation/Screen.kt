@@ -41,6 +41,14 @@ sealed class Screen(
 		title = "Profile"
 	)
 
+	data object GridListScreen : Screen(
+		route = "grid_list_screen",
+		isSearchBarVisible = false,
+		isBottomNavBarVisible = true,
+		title = "Grid List"
+
+	)
+
 	fun getScreen(route: String?): Screen? = when {
 		LoginScreen.route == route -> LoginScreen
 		HomeScreen.route == route -> HomeScreen

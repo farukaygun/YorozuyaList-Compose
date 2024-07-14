@@ -1,5 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
@@ -11,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,13 +20,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
@@ -37,6 +35,7 @@ import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
 import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
+import com.farukaygun.yorozuyalist.util.GridListType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
@@ -51,7 +50,7 @@ fun HomeScreen(
 	LaunchedEffect(Unit) {
 		if (viewModel.isLoggedIn())
 			viewModel.onEvent(HomeEvent.InitRequestChain)
-        else navController.navigate(route = Screen.LoginScreen.route)
+		else navController.navigate(route = Screen.LoginScreen.route)
 	}
 
 	Column(
@@ -66,18 +65,25 @@ fun HomeScreen(
 		HomeScreenSection(
 			data = state.animeSeasonalList,
 			state = state,
-			title = "Seasonal Anime"
+			title = "Seasonal Anime",
+			onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
 		)
 		HomeScreenSection(
 			data = state.animeSuggestionList,
 			state = state,
-			title = "Suggested Anime"
+			title = "Suggested Anime",
+			onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
 		)
 	}
 }
 
 @Composable
-fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
+fun HomeScreenSection(
+	data: List<Data>,
+	state: HomeState,
+	title: String,
+	onClick: () -> Unit = {}
+) {
 	Surface {
 		Box(
 			modifier = Modifier
@@ -86,7 +92,7 @@ fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
 
 			) {
 			Column {
-				SectionTitle(title)
+				SectionTitle(title = title, onClick = onClick)
 
 				if (state.isLoading) {
 					Box(
@@ -109,11 +115,12 @@ fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
 }
 
 @Composable
-fun SectionTitle(title: String) {
+fun SectionTitle(title: String, onClick: () -> Unit = {}) {
 	Box(
 		modifier = Modifier
 			.padding(8.dp)
 			.fillMaxWidth()
+			.clickable { onClick() }
 	) {
 		Text(
 			text = title,
@@ -122,11 +129,12 @@ fun SectionTitle(title: String) {
 			style = MaterialTheme.typography.titleLarge,
 			modifier = Modifier.align(Alignment.CenterStart),
 		)
-		Icon(
-			painter = painterResource(id = R.drawable.outline_arrow_forward_24),
-			contentDescription = "More",
-			modifier = Modifier.align(Alignment.CenterEnd),
-			tint = MaterialTheme.colorScheme.onSurface,
+		Text(
+			text = "MORE",
+			color = MaterialTheme.colorScheme.onSurface,
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.titleMedium,
+			modifier = Modifier.align(Alignment.BottomEnd),
 		)
 	}
 }
