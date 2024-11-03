@@ -1,5 +1,8 @@
 package com.farukaygun.yorozuyalist.data.repository
 
+import androidx.annotation.IntRange
+import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
@@ -36,7 +39,7 @@ interface AnimeRepository {
 	): AnimeSearchedDto
 
 	suspend fun getUserAnimeList(
-		status: String,
+		status: String?,
 		sort: String,
 		limit: Int,
 		offset: Int
@@ -45,4 +48,27 @@ interface AnimeRepository {
 	suspend fun getUserAnimeList(
 		url: String
 	): AnimeUserListDto
+
+	suspend fun getAnimeDetail(
+		id: String
+	): AnimeDetailDto
+
+	suspend fun updateMyAnimeListItem(
+		id: Int,
+		status: String?,
+		episodeCount: Int?,
+		@IntRange(0,10) score: Int?,
+		startDate: String?,
+		finishDate: String?,
+		tags: String?,
+		priority: Int?,
+		isRewatching: Boolean?,
+		@IntRange(0, 5) rewatchCount: Int?,
+		@IntRange(0, 2) rewatchValue: Int?,
+		comments: String?
+	): MyListStatusDto
+
+	suspend fun deleteMyAnimeListItem(
+		id: Int
+	): Boolean
 }

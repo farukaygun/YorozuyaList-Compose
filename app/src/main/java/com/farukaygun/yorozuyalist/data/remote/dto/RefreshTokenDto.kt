@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.data.remote.dto
 
-import com.farukaygun.yorozuyalist.domain.model.RefreshToken
+import com.farukaygun.yorozuyalist.domain.models.RefreshToken
 import com.google.gson.annotations.SerializedName
 
 data class RefreshTokenDto(

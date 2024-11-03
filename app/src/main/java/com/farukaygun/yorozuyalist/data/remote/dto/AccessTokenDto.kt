@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.data.remote.dto
 
-import com.farukaygun.yorozuyalist.domain.model.AccessToken
+import com.farukaygun.yorozuyalist.domain.models.AccessToken
 import com.google.gson.annotations.SerializedName
 
 data class AccessTokenDto(

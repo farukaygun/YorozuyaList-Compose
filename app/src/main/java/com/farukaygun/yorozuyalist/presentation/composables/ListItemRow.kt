@@ -1,14 +1,11 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,61 +23,91 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.ListStatus
-import com.farukaygun.yorozuyalist.domain.model.Node
-import com.farukaygun.yorozuyalist.domain.model.Ranking
-import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
-import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.MainPicture
+import com.farukaygun.yorozuyalist.domain.models.Node
+import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
+import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
+import com.farukaygun.yorozuyalist.domain.models.enums.Season
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
+
+private const val IMAGE_WIDTH = 100
+private const val IMAGE_HEIGHT = 150
 
 @Composable
 fun ListItemRow(
-	data: Data,
-	onItemClick: (Data) -> Unit
+	node: Node,
+	onItemClick: () -> Unit
 ) {
 	Column(
 		modifier = Modifier
-			.padding(8.dp)
-			.width(100.dp),
-		horizontalAlignment = Alignment.CenterHorizontally
+			.width(IMAGE_WIDTH.dp)
+			.clickable { onItemClick() },
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
-				.data(data.node.mainPicture.medium)
+				.data(node.mainPicture.medium)
 				.crossfade(true)
 				.crossfade(300)
 				.build(),
 			loading = {
-				Column(
-					verticalArrangement = Arrangement.Center,
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					CircularProgressIndicator()
-				}
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+				)
 			},
+//			loading = {
+//				Column(
+//					verticalArrangement = Arrangement.Center,
+//					horizontalAlignment = Alignment.CenterHorizontally
+//				) {
+//					CircularProgressIndicator()
+//				}
+//			},
 			error = {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_broken_image_24px),
+					painter = painterResource(id = R.drawable.broken_image_24px),
 					contentDescription = "Error icon",
 				)
 			},
-			contentDescription = data.node.title,
+			contentDescription = node.title,
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
-		Spacer(modifier = Modifier.height(8.dp))
-
 		Text(
-			text = data.node.title,
-			textAlign = TextAlign.Center,
+			text = node.title,
+			textAlign = TextAlign.Start,
 			maxLines = 2,
 			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier.width(100.dp),
-			color = MaterialTheme.colorScheme.onSurface,
+			modifier = Modifier.width(IMAGE_WIDTH.dp),
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodyMedium
+		)
+	}
+}
+
+@Composable
+fun ShimmerEffectItemRow() {
+	Column(
+		horizontalAlignment = Alignment.CenterHorizontally,
+		verticalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+		)
+
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, 40.dp)
 		)
 	}
 }
@@ -89,33 +116,26 @@ fun ListItemRow(
 @Preview
 fun ListItemRowPreview(
 ) {
-	val data = Data(
-		node = Node(
-			id = 52991,
-			title = "Sousou no Frieren",
-			mainPicture = MainPicture(
-				medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
-				large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
-			),
-			status = "finished_airing",
-			mean = "9.38",
-			mediaType = "tv",
-			startSeason = StartSeason(
-				year = 2023,
-				season = "Fall"
-			),
-			numListUsers = 701406
+	val data = Node(
+		id = 52991,
+		title = "Sousou no Frieren",
+		mainPicture = MainPicture(
+			medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
+			large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
 		),
-		listStatus = ListStatus(
-			status = "finished_airing",
-			score = "10",
-			numEpisodesWatched = 12,
-			isRewatching = false,
-			updatedAt = ""
+		status = "finished_airing",
+		mean = "9.38",
+		mediaType = MediaType.TV,
+		startSeason = StartSeason(
+			year = 2023,
+			season = Season.FALL
 		),
-		ranking = Ranking(
-			rank = 1,
-		)
+		numListUsers = 701406,
+		numEpisodes = 12,
+		broadcast = Broadcast(
+			dayOfTheWeek = "Saturday",
+			startTime = "00:00"
+		),
 	)
-	ListItemRow(data = data, onItemClick = {})
+	ListItemRow(node = data, onItemClick = {})
 }

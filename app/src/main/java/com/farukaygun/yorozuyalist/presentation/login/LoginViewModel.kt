@@ -2,41 +2,34 @@ package com.farukaygun.yorozuyalist.presentation.login
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.AccessToken
+import com.farukaygun.yorozuyalist.domain.models.AccessToken
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
+import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Constants
-import com.farukaygun.yorozuyalist.util.Constants.YOROZUYA_PAGELINK
-import com.farukaygun.yorozuyalist.util.CustomExtensions.openCustomTab
+import com.farukaygun.yorozuyalist.util.Constants.YOROZUYA_PAGE_LINK
+import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.openCustomTab
 import com.farukaygun.yorozuyalist.util.Private
-import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
 import com.farukaygun.yorozuyalist.util.Util
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
 
 class LoginViewModel(
 	private val loginUseCase: LoginUseCase,
 	private val sharedPrefsHelper: SharedPrefsHelper
-) : ViewModel() {
-	private val _state = mutableStateOf(LoginState())
-	val state: State<LoginState> = _state
+) : BaseViewModel<LoginState>() {
+	override val _state = mutableStateOf(LoginState())
 
 	private val codeVerifier = Util.generateCodeChallenge()
 	private val authState = "login"
 	private val loginUrl =
 		"${Constants.OAUTH2_URL}authorize?response_type=code&client_id=${Private.CLIENT_ID}&code_challenge=${codeVerifier}&state=${authState}"
 
-	private var job: Job? = null
-
-	fun parseIntentData(context: Context, intent: Intent?) {
-		if (intent?.data?.toString()?.startsWith(YOROZUYA_PAGELINK) == true) {
+	private fun parseIntentData(context: Context, intent: Intent?) {
+		if (intent?.data?.toString()?.startsWith(YOROZUYA_PAGE_LINK) == true) {
 			intent.data?.let {
 				val code = it.getQueryParameter("code")
 				if (code != null) {
@@ -52,35 +45,32 @@ class LoginViewModel(
 	}
 
 	private fun getAccessToken(context: Context, code: String) {
-		job = loginUseCase.executeAuthToken(
+		jobs += loginUseCase.executeAuthToken(
 			code,
 			Private.CLIENT_ID,
 			codeVerifier,
-		).onEach {
-			when (it) {
-				is Resource.Success -> {
+		)
+			.flowOn(Dispatchers.IO)
+			.handleResource(
+				onSuccess = { accessToken ->
 					_state.value = _state.value.copy(
-						accessToken = it.data,
+						accessToken = accessToken,
 						isLoading = false,
 						error = ""
 					)
-				}
-
-				is Resource.Error -> {
+				},
+				onError = {
 					_state.value = _state.value.copy(
-						error = it.message ?: StringValue.StringResource(R.string.user_login_error)
+						error = it ?: StringValue.StringResource(R.string.user_login_error)
 							.asString(context),
+						isLoading = false
 					)
-				}
-
-				is Resource.Loading -> {
-					_state.value = _state.value.copy(isLoading = true)
-				}
-			}
-		}.launchIn(viewModelScope)
+				},
+				onLoading = { _state.value = _state.value.copy(isLoading = true) }
+			)
 	}
 
-	fun saveToken(accessToken: AccessToken) {
+	private fun saveToken(accessToken: AccessToken) {
 		val expiresIn = System.currentTimeMillis() + accessToken.expiresIn * 1000
 
 		sharedPrefsHelper.saveString("accessToken", accessToken.accessToken)
@@ -93,6 +83,14 @@ class LoginViewModel(
 		when (event) {
 			is LoginEvent.Login -> {
 				event.context.openCustomTab(loginUrl)
+			}
+
+			is LoginEvent.ParseIntentData -> {
+				parseIntentData(event.context, event.intent)
+			}
+
+			is LoginEvent.SaveToken -> {
+				saveToken(event.accesToken)
 			}
 		}
 	}

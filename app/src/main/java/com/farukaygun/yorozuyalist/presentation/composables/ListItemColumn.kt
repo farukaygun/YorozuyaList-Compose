@@ -1,15 +1,12 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,46 +17,48 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.yml.charts.common.extensions.isNotNull
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.ListStatus
-import com.farukaygun.yorozuyalist.domain.model.Node
-import com.farukaygun.yorozuyalist.domain.model.Ranking
-import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
-import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.MainPicture
+import com.farukaygun.yorozuyalist.domain.models.MyListStatus
+import com.farukaygun.yorozuyalist.domain.models.Node
+import com.farukaygun.yorozuyalist.domain.models.Ranking
+import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
+import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
+import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
+import com.farukaygun.yorozuyalist.domain.models.enums.Season
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 
-// If I delete the safe call, it gives a null pointer exception error when loadMore triggered.
-@Suppress("UNNECESSARY_SAFE_CALL")
+private const val IMAGE_WIDTH = 100
+private const val IMAGE_HEIGHT = 150
+
 @Composable
 fun ListItemColumn(
 	data: Data,
-	onItemClick: (Data) -> Unit
+	onItemClick: () -> Unit
 ) {
-	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "N/A"
-	val mediaType =
-		data.node.mediaType?.takeUnless { it.isEmpty() }?.capitalize(Locale.current) ?: "N/A"
-	val numEpisodes = data.node.numEpisodes?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
-	val mainPictureUrl = data.node.mainPicture?.medium?.takeUnless { it.isEmpty() }
-		?: R.drawable.outline_broken_image_24px
-	val season =
-		data.node.startSeason?.season?.takeUnless { it.isEmpty() }?.capitalize(Locale.current)
-			?: "N/A"
-	val year = data.node.startSeason?.year?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
+	val title = data.node.title
+	val mediaType = data.node.mediaType?.format()
+	val numEpisodes = if (data.node.numEpisodes > 0) "(${data.node.numEpisodes} episodes)" else ""
+	val mainPictureUrl = data.node.mainPicture.medium
+	val season = data.node.startSeason?.season?.format() ?: "Unknown"
+	val year = data.node.startSeason?.year?.toString()
 	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
 
 	Row(
 		modifier = Modifier
-			.padding(8.dp)
-			.fillMaxWidth(),
-		verticalAlignment = Alignment.Top
+			.fillMaxWidth()
+			.clickable { onItemClick() },
+		verticalAlignment = Alignment.Top,
+		horizontalArrangement = Arrangement.spacedBy(16.dp)
 	) {
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
@@ -67,17 +66,17 @@ fun ListItemColumn(
 				.crossfade(true)
 				.crossfade(300)
 				.build(),
-			loading = {
-				Column(
-					verticalArrangement = Arrangement.Center,
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					CircularProgressIndicator()
-				}
-			},
+//			loading = {
+//				Column(
+//					verticalArrangement = Arrangement.Center,
+//					horizontalAlignment = Alignment.CenterHorizontally
+//				) {
+//					CircularProgressIndicator()
+//				}
+//			},
 			error = {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_broken_image_24px),
+					painter = painterResource(id = R.drawable.broken_image_24px),
 					contentDescription = "Error icon",
 				)
 			},
@@ -85,14 +84,11 @@ fun ListItemColumn(
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
 		Column(
-			modifier = Modifier.padding(
-				horizontal = 16.dp,
-				vertical = 4.dp
-			)
+			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			Text(
 				text = title,
@@ -103,19 +99,17 @@ fun ListItemColumn(
 				style = MaterialTheme.typography.titleMedium
 			)
 
-			Spacer(modifier = Modifier.height(8.dp))
-
 			Row(
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_tv_24px),
+					painter = painterResource(id = R.drawable.tv_24px),
 					contentDescription = "Media type icon",
-					modifier = Modifier.padding(end = 4.dp)
 				)
 
 				Text(
-					text = "$mediaType ($numEpisodes episodes)",
+					text = if (mediaType.isNotNull()) "$mediaType $numEpisodes" else "Unknown",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -124,19 +118,17 @@ fun ListItemColumn(
 				)
 			}
 
-			Spacer(modifier = Modifier.height(8.dp))
-
 			Row(
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_calendar_month_24px),
+					painter = painterResource(id = R.drawable.calendar_month_24px),
 					contentDescription = "Season icon",
-					modifier = Modifier.padding(end = 4.dp)
 				)
 
 				Text(
-					text = "$season $year",
+					text = if (year != null) "$season $year" else "N/A",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -145,15 +137,13 @@ fun ListItemColumn(
 				)
 			}
 
-			Spacer(modifier = Modifier.height(8.dp))
-
 			Row(
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_filled_grade_24px),
+					painter = painterResource(id = R.drawable.grade_24px),
 					contentDescription = "Mean score icon",
-					modifier = Modifier.padding(end = 4.dp)
 				)
 
 				Text(
@@ -169,6 +159,61 @@ fun ListItemColumn(
 	}
 }
 
+@Composable
+fun ShimmerEffectItemColumn() {
+	Row(
+		modifier = Modifier
+			.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(16.dp),
+		verticalAlignment = Alignment.Top
+	) {
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+		)
+
+		Column(
+			verticalArrangement = Arrangement.spacedBy(8.dp)
+		) {
+			ShimmerEffect(
+				modifier = Modifier
+					.clip(RoundedCornerShape(10.dp))
+					.size(300.dp, 40.dp)
+			)
+
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, 24.dp)
+				)
+			}
+
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, 24.dp)
+				)
+			}
+
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, 24.dp)
+				)
+			}
+		}
+	}
+}
 
 @Composable
 @Preview
@@ -184,24 +229,36 @@ fun ListItemColumnPreview(
 			),
 			status = "finished_airing",
 			mean = "9.38",
-			mediaType = "tv",
+			mediaType = MediaType.TV,
 			startSeason = StartSeason(
 				year = 2023,
-				season = "Fall"
+				season = Season.FALL
 			),
-			numListUsers = 701406
-
+			numListUsers = 701406,
+			numEpisodes = 12,
+			broadcast = Broadcast(
+				dayOfTheWeek = "Saturday",
+				startTime = "00:00"
+			),
 		),
-		listStatus = ListStatus(
-			status = "finished_airing",
-			score = "10",
+		myListStatus = MyListStatus(
+			status = MyListMediaStatus.WATCHING,
+			score = 10,
 			numEpisodesWatched = 12,
 			isRewatching = false,
-			updatedAt = ""
+			updatedAt = "",
+			startDate = "",
+			finishDate = "",
+			numTimesRewatched = 0,
+			rewatchValue = 0,
+			tags = emptyList(),
+			priority = 0,
+			comments = ""
 		),
 		ranking = Ranking(
 			rank = 1,
-		)
+		),
+		rankingType = "Score"
 	)
 	ListItemColumn(data = data, onItemClick = {})
 }

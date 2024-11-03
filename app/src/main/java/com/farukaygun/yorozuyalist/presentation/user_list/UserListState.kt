@@ -1,12 +1,13 @@
 package com.farukaygun.yorozuyalist.presentation.user_list
 
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
-import com.farukaygun.yorozuyalist.util.UserListType
+import com.farukaygun.yorozuyalist.util.ScreenType
 
 data class UserListState(
-	var userList: MediaList? = null,
+	val userList: MediaList? = null,
 	val isLoading: Boolean = false,
 	val isLoadingMore: Boolean = false,
 	val error: String = "",
-	val type: UserListType = UserListType.ANIME_LIST
+	val type: ScreenType = ScreenType.ANIME,
+	val filter: String? = null
 )

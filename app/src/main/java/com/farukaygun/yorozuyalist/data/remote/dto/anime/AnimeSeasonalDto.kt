@@ -1,9 +1,8 @@
 package com.farukaygun.yorozuyalist.data.remote.dto.anime
 
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.Paging
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSeasonal
-import com.farukaygun.yorozuyalist.domain.model.anime.Season
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.Paging
+import com.farukaygun.yorozuyalist.domain.models.anime.AnimeSeasonal
 import com.google.gson.annotations.SerializedName
 
 data class AnimeSeasonalDto(
@@ -12,13 +11,13 @@ data class AnimeSeasonalDto(
 	@SerializedName("paging")
 	val paging: Paging,
 	@SerializedName("season")
-	val season: Season,
+	val season: SeasonDto,
 )
 
 fun AnimeSeasonalDto.toAnimeSeasonal(): AnimeSeasonal {
 	return AnimeSeasonal(
 		data = data,
 		paging = paging,
-		season = season
+		season = season.toSeason()
 	)
 }

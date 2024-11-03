@@ -1,8 +1,8 @@
 package com.farukaygun.yorozuyalist.data.remote.dto.anime
 
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.Paging
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.Paging
+import com.farukaygun.yorozuyalist.domain.models.anime.AnimeUserList
 import com.google.gson.annotations.SerializedName
 
 class AnimeUserListDto(

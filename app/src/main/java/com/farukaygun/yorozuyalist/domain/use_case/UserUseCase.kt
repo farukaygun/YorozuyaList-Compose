@@ -2,7 +2,7 @@ package com.farukaygun.yorozuyalist.domain.use_case
 
 import com.farukaygun.yorozuyalist.data.remote.dto.user.toUser
 import com.farukaygun.yorozuyalist.data.repository.UserRepository
-import com.farukaygun.yorozuyalist.domain.model.user.User
+import com.farukaygun.yorozuyalist.domain.models.user.User
 import com.farukaygun.yorozuyalist.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -21,6 +21,7 @@ class UserUseCase(
 			emit(Resource.Success(userProfile.toUser()))
 		} catch (e: Exception) {
 			e.printStackTrace()
+			emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
 		}
 	}
 }

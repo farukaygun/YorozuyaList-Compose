@@ -1,30 +1,29 @@
 package com.farukaygun.yorozuyalist.presentation.grid_list.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.farukaygun.yorozuyalist.domain.model.Data
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.GridListItem
-import com.farukaygun.yorozuyalist.presentation.composables.views.OnBottomReached
+import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectGridList
 import com.farukaygun.yorozuyalist.presentation.grid_list.GridListEvent
 import com.farukaygun.yorozuyalist.presentation.grid_list.GridListViewModel
 import com.farukaygun.yorozuyalist.util.GridListType
+import com.farukaygun.yorozuyalist.util.ScreenType
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -36,36 +35,32 @@ fun GridListScreen(
 	val state = viewModel.state.value
 
 	LaunchedEffect(Unit) {
-		viewModel.state.value = viewModel.state.value.copy(type = GridListType.valueOf(type))
+		viewModel.updateType(GridListType.valueOf(type))
 		viewModel.onEvent(GridListEvent.InitRequestChain)
 	}
 
-	if (state.isLoading) {
-		Box(
-			modifier = Modifier
-				.fillMaxSize(),
-			contentAlignment = Alignment.Center
-		) {
-			CircularProgressIndicator(
-				modifier = Modifier
-					.wrapContentHeight()
-					.align(Alignment.Center)
+	Column(
+		modifier = Modifier
+			.padding(16.dp)
+	) {
+		if (!state.isLoading && state.gridList?.data?.isNotEmpty() == true) {
+			GridList(
+				navController = navController,
+				data = state.gridList.data,
+				viewModel = viewModel
 			)
+		} else {
+			ShimmerEffectGridList()
 		}
 	}
 
-	Column {
-		state.gridList?.data?.let {
-			GridList(
-				data = it,
-				viewModel = viewModel
-			)
-		}
-	}
+	if (state.error.isNotEmpty())
+		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
 fun GridList(
+	navController: NavController,
 	data: List<Data>,
 	viewModel: GridListViewModel,
 ) {
@@ -74,32 +69,17 @@ fun GridList(
 		viewModel.onEvent(GridListEvent.LoadMore)
 	}
 
-	Surface {
-		Column(modifier = Modifier.padding(16.dp)) {
-			LazyVerticalGrid(
-				state = listState,
-				columns = GridCells.FixedSize(110.dp),
-				horizontalArrangement = Arrangement.SpaceBetween,
-			) {
-				items(data) { anime ->
-					GridListItem(data = anime, onItemClick = {
-						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
-					})
-				}
-
-				if (viewModel.state.value.isLoadingMore) {
-					item(
-						span = { GridItemSpan(maxLineSpan) }
-					) {
-						Column(
-							modifier = Modifier.padding(16.dp),
-							verticalArrangement = Arrangement.Center,
-							horizontalAlignment = Alignment.CenterHorizontally
-						) {
-							CircularProgressIndicator()
-						}
-					}
-				}
+	Box {
+		LazyVerticalGrid(
+			state = listState,
+			columns = GridCells.Adaptive(minSize = 100.dp),
+			horizontalArrangement = Arrangement.SpaceAround,
+			verticalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			items(data) { anime ->
+				GridListItem(data = anime, onItemClick = {
+					navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+				})
 			}
 		}
 	}

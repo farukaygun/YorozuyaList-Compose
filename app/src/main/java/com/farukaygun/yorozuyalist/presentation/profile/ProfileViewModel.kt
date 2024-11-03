@@ -1,95 +1,83 @@
 package com.farukaygun.yorozuyalist.presentation.profile
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Stat
+import com.farukaygun.yorozuyalist.domain.models.Stat
+import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
 import com.farukaygun.yorozuyalist.domain.use_case.UserUseCase
-import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.Status
+import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 class ProfileViewModel(
 	private val user: UserUseCase
-) : ViewModel() {
-	private val _state = mutableStateOf(ProfileState())
-	val state: State<ProfileState> = _state
+) : BaseViewModel<ProfileState>() {
+	override val _state = mutableStateOf(ProfileState())
 
-	private var job: Job? = null
+	init {
+		onEvent(ProfileEvent.InitRequestChain)
+	}
 
 	private fun getUserProfile() {
-		job = user.executeUser()
+		jobs += user.executeUser()
 			.flowOn(Dispatchers.IO)
-			.onEach {
-				when (it) {
-					is Resource.Success -> {
-						val tempStatList = mutableListOf<Stat>()
-						it.data?.let { data ->
-							tempStatList.add(
-								Stat(
-									type = Status.WATCHING,
-									value = data.userAnimeStatistics.numItemsWatching
-								)
+			.handleResource(
+				onSuccess = { userData ->
+					val tempStatList = mutableListOf<Stat>()
+					userData?.let { data ->
+						tempStatList.add(
+							Stat(
+								type = MyListMediaStatus.WATCHING,
+								value = data.userAnimeStatistics.numItemsWatching
 							)
+						)
 
-							tempStatList.add(
-								Stat(
-									type = Status.COMPLETED,
-									value = data.userAnimeStatistics.numItemsCompleted
-								)
+						tempStatList.add(
+							Stat(
+								type = MyListMediaStatus.COMPLETED,
+								value = data.userAnimeStatistics.numItemsCompleted
 							)
+						)
 
-							tempStatList.add(
-								Stat(
-									type = Status.ON_HOLD,
-									value = data.userAnimeStatistics.numItemsOnHold
-								)
+						tempStatList.add(
+							Stat(
+								type = MyListMediaStatus.ON_HOLD,
+								value = data.userAnimeStatistics.numItemsOnHold
 							)
+						)
 
-							tempStatList.add(
-								Stat(
-									type = Status.DROPPED,
-									value = data.userAnimeStatistics.numItemsDropped
-								)
+						tempStatList.add(
+							Stat(
+								type = MyListMediaStatus.DROPPED,
+								value = data.userAnimeStatistics.numItemsDropped
 							)
+						)
 
-							tempStatList.add(
-								Stat(
-									type = Status.PLAN_TO_WATCH,
-									value = data.userAnimeStatistics.numItemsPlanToWatch
-								)
+						tempStatList.add(
+							Stat(
+								type = MyListMediaStatus.PLAN_TO_WATCH,
+								value = data.userAnimeStatistics.numItemsPlanToWatch
 							)
-						}
-
-						_state.value = _state.value.copy(
-							profileData = it.data,
-							animeStats = tempStatList,
-							isLoading = false,
-							error = ""
 						)
 					}
 
-					is Resource.Error -> {
-						_state.value = _state.value.copy(
-							error = it.message
-								?: StringValue.StringResource(R.string.error_fetching).toString(),
-							isLoading = false
-						)
-					}
-
-					is Resource.Loading -> {
-						_state.value = _state.value.copy(isLoading = true)
-					}
-				}
-			}.launchIn(viewModelScope)
-
+					_state.value = _state.value.copy(
+						profileData = userData,
+						animeStats = tempStatList,
+						isLoading = false,
+						error = ""
+					)
+				},
+				onError = {
+					_state.value = _state.value.copy(
+						error = it ?: StringValue.StringResource(R.string.error_fetching)
+							.toString(),
+						isLoading = false
+					)
+				},
+				onLoading = { _state.value = _state.value.copy(isLoading = true) }
+			)
 	}
 
 	fun onEvent(event: ProfileEvent) {

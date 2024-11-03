@@ -1,7 +1,10 @@
 package com.farukaygun.yorozuyalist.presentation
 
+import com.farukaygun.yorozuyalist.util.ScreenType
+
 sealed class Screen(
 	val route: String,
+	val navArg: String = "",
 	val isSearchBarVisible: Boolean = false,
 	val isBottomNavBarVisible: Boolean = false,
 	val title: String = ""
@@ -27,11 +30,20 @@ sealed class Screen(
 		title = "Search"
 	)
 
-	data object UserListScreen : Screen(
-		route = "user_list_screen",
+	data object UserAnimeListScreen : Screen(
+		route = "user_anime_list_screen",
+		navArg = "/${ScreenType.ANIME}",
 		isSearchBarVisible = true,
 		isBottomNavBarVisible = true,
-		title = "User List"
+		title = "Anime List"
+	)
+
+	data object UserMangaListScreen : Screen(
+		route = "user_manga_list_screen",
+		navArg = "/${ScreenType.MANGA}",
+		isSearchBarVisible = true,
+		isBottomNavBarVisible = true,
+		title = "Manga List"
 	)
 
 	data object ProfileScreen : Screen(
@@ -49,12 +61,22 @@ sealed class Screen(
 
 	)
 
-	fun getScreen(route: String?): Screen? = when {
-		LoginScreen.route == route -> LoginScreen
-		HomeScreen.route == route -> HomeScreen
-		UserListScreen.route == route || route?.startsWith(UserListScreen.route) == true -> UserListScreen
-		ProfileScreen.route == route -> ProfileScreen
-		SearchScreen.route == route -> SearchScreen
-		else -> null
+	data object DetailScreen : Screen(
+		route = "detail_screen",
+		isSearchBarVisible = false,
+		isBottomNavBarVisible = false,
+		title = "Detail"
+	)
+
+	fun getScreen(route: String?): Screen? {
+		return when {
+			LoginScreen.route == route -> LoginScreen
+			HomeScreen.route == route -> HomeScreen
+			route?.startsWith(UserAnimeListScreen.route) == true -> UserAnimeListScreen
+			route?.startsWith(UserMangaListScreen.route) == true -> UserMangaListScreen
+			ProfileScreen.route == route -> ProfileScreen
+			SearchScreen.route == route -> SearchScreen
+			else -> null
+		}
 	}
 }

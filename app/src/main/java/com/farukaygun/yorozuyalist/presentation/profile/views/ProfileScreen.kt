@@ -1,5 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.profile.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,8 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
@@ -42,50 +40,39 @@ import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
-import com.farukaygun.yorozuyalist.domain.model.user.User
-import com.farukaygun.yorozuyalist.presentation.profile.ProfileEvent
-import com.farukaygun.yorozuyalist.presentation.profile.ProfileState
+import com.farukaygun.yorozuyalist.domain.models.user.User
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileViewModel
+import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
+import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToAbbreviatedDate
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
 @Composable
 fun ProfileScreen(
-	navController: NavController,
 	viewModel: ProfileViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
 
-	LaunchedEffect(Unit) {
-		viewModel.onEvent(ProfileEvent.InitRequestChain)
+	if (state.profileData != null && !state.isLoading) {
+		Column(
+			verticalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			UserInfoSection(data = state.profileData)
+
+			HorizontalDivider(
+				color = MaterialTheme.colorScheme.onBackground,
+				thickness = 1.dp,
+			)
+
+			AnimeStatisticsSection(data = state.profileData)
+		}
+	} else {
+		ShimmerEffectProfileScreen()
 	}
 
-	Column {
-		state.profileData?.let {
-			UserInfoSection(data = it)
-		}
-
-		HorizontalDivider(
-			color = MaterialTheme.colorScheme.onBackground,
-			thickness = 1.dp,
-			modifier = Modifier.padding(vertical = 16.dp)
-		)
-
-		state.profileData?.let {
-			AnimeStatisticsSection(state = state, data = it)
-		}
-
-		HorizontalDivider(
-			color = MaterialTheme.colorScheme.onBackground,
-			thickness = 1.dp,
-			modifier = Modifier.padding(vertical = 16.dp)
-		)
-
-		state.profileData?.let {
-
-		}
-	}
+	if (state.error.isNotEmpty())
+		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
@@ -93,7 +80,9 @@ fun UserInfoSection(data: User) {
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(horizontal = 32.dp, vertical = 16.dp)
+			.padding(16.dp),
+		horizontalArrangement = Arrangement.spacedBy(32.dp),
+		verticalAlignment = Alignment.CenterVertically
 	) {
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
@@ -111,7 +100,7 @@ fun UserInfoSection(data: User) {
 			},
 			error = {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_broken_image_24px),
+					painter = painterResource(id = R.drawable.broken_image_24px),
 					contentDescription = "Error icon",
 					tint = MaterialTheme.colorScheme.onBackground
 				)
@@ -124,25 +113,23 @@ fun UserInfoSection(data: User) {
 		)
 
 		Column(
-			modifier = Modifier
-				.padding(horizontal = 16.dp, vertical = 4.dp),
+			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			Text(
 				text = data.name,
-				modifier = Modifier
-					.padding(start = 12.dp, bottom = 16.dp),
 				color = MaterialTheme.colorScheme.onBackground,
 				style = MaterialTheme.typography.titleLarge,
 				fontWeight = FontWeight.Bold
 
 			)
-			Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_location_on_24px),
+					painter = painterResource(id = R.drawable.location_on_24px),
 					contentDescription = "Season icon",
-					modifier = Modifier.padding(end = 8.dp),
 					tint = MaterialTheme.colorScheme.onBackground
-
 				)
 
 				Text(
@@ -152,45 +139,46 @@ fun UserInfoSection(data: User) {
 					overflow = TextOverflow.Ellipsis,
 					color = MaterialTheme.colorScheme.onBackground,
 					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.padding(top = 2.dp)
 				)
 			}
 
-			Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_cake_24px),
+					painter = painterResource(id = R.drawable.cake_24px),
 					contentDescription = "Season icon",
-					modifier = Modifier.padding(end = 8.dp),
 					tint = MaterialTheme.colorScheme.onBackground
 				)
 
 				Text(
-					text = data.birthday,
+					text = data.birthday.formatDate(),
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					color = MaterialTheme.colorScheme.onBackground,
 					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.padding(top = 2.dp)
 				)
 			}
 
-			Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalAlignment = Alignment.CenterVertically
+			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_calendar_month_24px),
+					painter = painterResource(id = R.drawable.calendar_month_24px),
 					contentDescription = "Register date icon",
-					modifier = Modifier.padding(end = 8.dp),
 					tint = MaterialTheme.colorScheme.onBackground
 				)
 
 				Text(
-					text = data.joinedAt,
+					text = data.joinedAt.formatToAbbreviatedDate(),
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
 					color = MaterialTheme.colorScheme.onSurface,
 					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.padding(top = 2.dp)
 				)
 			}
 		}
@@ -198,7 +186,7 @@ fun UserInfoSection(data: User) {
 }
 
 @Composable
-fun AnimeStatisticsSection(state: ProfileState, data: User) {
+fun AnimeStatisticsSection(data: User) {
 	val chartData = PieChartData(
 		slices = listOf(
 			PieChartData.Slice(
@@ -213,7 +201,7 @@ fun AnimeStatisticsSection(state: ProfileState, data: User) {
 			),
 			PieChartData.Slice(
 				value = data.userAnimeStatistics.numItemsOnHold.toFloat(),
-				color = Color(0xFFFFEB3B),
+				color = Color(0xFFFFD700),
 				label = "On Hold"
 			),
 			PieChartData.Slice(
@@ -248,7 +236,9 @@ fun AnimeStatisticsSection(state: ProfileState, data: User) {
 
 		Row(
 			modifier = Modifier
-				.fillMaxWidth()
+				.fillMaxWidth(),
+			horizontalArrangement = Arrangement.SpaceEvenly,
+			verticalAlignment = Alignment.CenterVertically
 		) {
 			DonutChart(chartData)
 
@@ -259,7 +249,8 @@ fun AnimeStatisticsSection(state: ProfileState, data: User) {
 						label = {
 							Text(
 								text = "${slice.value.toInt()} ${slice.label}",
-								fontWeight = FontWeight.Bold,
+								style = MaterialTheme.typography.bodyMedium,
+								color = MaterialTheme.colorScheme.onPrimary
 							)
 						},
 						colors = AssistChipDefaults.assistChipColors(
@@ -279,17 +270,18 @@ private fun DonutChart(data: PieChartData) {
 		isAnimationEnable = true,
 		animationDuration = 1000,
 		labelVisible = true,
-		isClickOnSliceEnabled = false,
+		isClickOnSliceEnabled = true,
 		labelType = PieChartConfig.LabelType.VALUE,
+		labelColor = MaterialTheme.colorScheme.onBackground,
 		isSumVisible = true,
-		strokeWidth = 64f,
-		chartPadding = 32,
+		strokeWidth = 32f,
+		chartPadding = 16,
 		backgroundColor = MaterialTheme.colorScheme.background,
 	)
 
 	DonutPieChart(
 		modifier = Modifier
-			.height(250.dp),
+			.height(175.dp),
 		pieChartConfig = donutChartConfig,
 		pieChartData = data,
 	)
@@ -309,8 +301,6 @@ fun PreviewProfileScreen() {
 			apiServiceModule
 		)
 	}) {
-		ProfileScreen(
-			navController = rememberNavController()
-		)
+		ProfileScreen()
 	}
 }

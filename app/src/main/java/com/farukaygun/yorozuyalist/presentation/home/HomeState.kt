@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.presentation.home
 
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.RefreshToken
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.RefreshToken
 
 data class HomeState(
 	val animeTodayList: List<Data> = emptyList(),
@@ -9,6 +9,6 @@ data class HomeState(
 	val animeSuggestionList: List<Data> = emptyList(),
 	var refreshToken: RefreshToken? = null,
 	var isLoggedIn: Boolean = false,
-	val isLoading: Boolean = false,
+	var isLoading: Boolean = false,
 	val error: String = ""
 )

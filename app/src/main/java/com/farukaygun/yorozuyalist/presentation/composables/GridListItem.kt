@@ -1,18 +1,16 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -25,27 +23,35 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.ListStatus
-import com.farukaygun.yorozuyalist.domain.model.Node
-import com.farukaygun.yorozuyalist.domain.model.Ranking
-import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
-import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.MainPicture
+import com.farukaygun.yorozuyalist.domain.models.MyListStatus
+import com.farukaygun.yorozuyalist.domain.models.Node
+import com.farukaygun.yorozuyalist.domain.models.Ranking
+import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
+import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
+import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
+import com.farukaygun.yorozuyalist.domain.models.enums.Season
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 
-@Suppress("UNNECESSARY_SAFE_CALL")
+private const val IMAGE_WIDTH = 100
+private const val IMAGE_HEIGHT = 150
+
 @Composable
 fun GridListItem(
 	data: Data,
-	onItemClick: (Data) -> Unit
+	onItemClick: () -> Unit
 ) {
-	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "N/A"
-	val mainPictureUrl = data.node.mainPicture?.medium?.takeUnless { it.isEmpty() }
-		?: R.drawable.outline_broken_image_24px
+	val title = data.node.title
+	val mainPictureUrl = data.node.mainPicture.medium.takeUnless { it.isEmpty() }
+		?: R.drawable.broken_image_24px
 
 	Column(
 		modifier = Modifier
-			.padding(8.dp)
-			.fillMaxWidth(),
+			.wrapContentWidth()
+			.clickable { onItemClick() },
+		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
@@ -53,17 +59,17 @@ fun GridListItem(
 				.crossfade(true)
 				.crossfade(300)
 				.build(),
-			loading = {
-				Column(
-					verticalArrangement = Arrangement.Center,
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					CircularProgressIndicator()
-				}
-			},
+//			loading = {
+//				Column(
+//					verticalArrangement = Arrangement.Center,
+//					horizontalAlignment = Alignment.CenterHorizontally
+//				) {
+//					CircularProgressIndicator()
+//				}
+//			},
 			error = {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_broken_image_24px),
+					painter = painterResource(id = R.drawable.broken_image_24px),
 					contentDescription = "Error icon",
 				)
 			},
@@ -71,7 +77,7 @@ fun GridListItem(
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
 		Text(
@@ -79,11 +85,31 @@ fun GridListItem(
 			textAlign = TextAlign.Start,
 			maxLines = 2,
 			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier.width(100.dp),
-			color = MaterialTheme.colorScheme.onSurface,
-			style = MaterialTheme.typography.titleMedium
+			modifier = Modifier.width(IMAGE_WIDTH.dp),
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodyMedium
+		)
+	}
+}
+
+@Composable
+fun ShimmerEffectGridListItem() {
+	Column(
+		modifier = Modifier
+			.wrapContentWidth(),
+		verticalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, 40.dp)
+		)
 	}
 }
 
@@ -101,24 +127,37 @@ fun GridListItemPreview(
 			),
 			status = "finished_airing",
 			mean = "9.38",
-			mediaType = "tv",
+			mediaType = MediaType.TV,
 			startSeason = StartSeason(
 				year = 2023,
-				season = "Fall"
+				season = Season.FALL
 			),
-			numListUsers = 701406
-
+			numListUsers = 701406,
+			numEpisodes = 12,
+			broadcast = Broadcast(
+				dayOfTheWeek = "Saturday",
+				startTime = "00:00"
+			),
 		),
-		listStatus = ListStatus(
-			status = "finished_airing",
-			score = "10",
+		myListStatus = MyListStatus(
+			status = MyListMediaStatus.WATCHING,
+			score = 10,
 			numEpisodesWatched = 12,
 			isRewatching = false,
-			updatedAt = ""
+			updatedAt = "",
+			startDate = "",
+			finishDate = "",
+			numTimesRewatched = 0,
+			rewatchValue = 0,
+			tags = emptyList(),
+			priority = 0,
+			comments = ""
 		),
 		ranking = Ranking(
 			rank = 1,
-		)
+
+			),
+		rankingType = "Score"
 	)
 	GridListItem(data = data, onItemClick = {})
 }

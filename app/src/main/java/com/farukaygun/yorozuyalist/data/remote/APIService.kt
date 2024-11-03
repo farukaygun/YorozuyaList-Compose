@@ -1,11 +1,14 @@
 package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
+import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 
@@ -51,7 +54,7 @@ interface APIService {
 	): AnimeSearchedDto
 
 	suspend fun getUserAnimeList(
-		status: String,
+		status: String?,
 		sort: String,
 		limit: Int,
 		offset: Int
@@ -62,7 +65,7 @@ interface APIService {
 	): AnimeUserListDto
 
 	suspend fun getUserMangaList(
-		status: String,
+		status: String?,
 		sort: String,
 		limit: Int,
 		offset: Int
@@ -74,4 +77,50 @@ interface APIService {
 
 	suspend fun getUserProfile(): UserDto
 
+	suspend fun getAnimeDetail(
+		id: String
+	): AnimeDetailDto
+
+	suspend fun getMangaDetail(
+		id: String
+	) : MangaDetailDto
+
+	suspend fun updateMyAnimeListItem(
+		id: Int,
+		status: String?,
+		episodeCount: Int?,
+		score: Int?,
+		startDate: String?,
+		finishDate: String?,
+		tags: String?,
+		priority: Int?,
+		isRewatching: Boolean?,
+		rewatchCount: Int?,
+		rewatchValue: Int?,
+		comments: String?
+	) : MyListStatusDto
+
+	suspend fun updateMyMangaListItem(
+		id: Int,
+		status: String?,
+		chapterCount: Int?,
+		volumeCount: Int?,
+		score: Int?,
+		startDate: String?,
+		finishDate: String?,
+		tags: String?,
+		priority: Int?,
+		isRereading: Boolean?,
+		rereadCount: Int?,
+		rereadValue: Int?,
+		comments: String?
+	) : MyListStatusDto
+
+	suspend fun deleteMyAnimeListItem(
+		id: Int
+	): Boolean
+
+	suspend fun deleteMyMangaListItem(
+		id: Int
+	): Boolean
 }

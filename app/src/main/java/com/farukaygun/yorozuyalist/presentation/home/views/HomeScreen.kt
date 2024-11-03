@@ -1,20 +1,21 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -29,17 +30,19 @@ import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
-import com.farukaygun.yorozuyalist.domain.model.Data
+import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectHorizontalList
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
-import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
 import com.farukaygun.yorozuyalist.util.GridListType
+import com.farukaygun.yorozuyalist.util.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
 	navController: NavController,
@@ -48,125 +51,142 @@ fun HomeScreen(
 	val state = viewModel.state.value
 
 	LaunchedEffect(Unit) {
-		if (viewModel.isLoggedIn())
-			viewModel.onEvent(HomeEvent.InitRequestChain)
-		else navController.navigate(route = Screen.LoginScreen.route)
+		if (!viewModel.isLoggedIn())
+			navController.navigate(route = Screen.LoginScreen.route)
 	}
 
-	Column(
-		modifier = Modifier
-			.verticalScroll(rememberScrollState())
+	PullToRefreshBox(
+		isRefreshing = state.isLoading, //state.isLoadingTodayAnime || state.isLoadingSeasonalAnime || state.isLoadingSuggestedAnime,
+		onRefresh = { viewModel.onEvent(event = HomeEvent.InitRequestChain) },
+		state = rememberPullToRefreshState(),
+		modifier = Modifier.padding(16.dp)
 	) {
-		HomeScreenSection(
-			data = state.animeTodayList,
-			state = state,
-			title = "Today"
-		)
-		HomeScreenSection(
-			data = state.animeSeasonalList,
-			state = state,
-			title = "Seasonal Anime",
-			onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
-		)
-		HomeScreenSection(
-			data = state.animeSuggestionList,
-			state = state,
-			title = "Suggested Anime",
-			onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
-		)
+		Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+			HomeScreenSection(
+				navController = navController,
+				data = state.animeTodayList,
+				isLoading = state.isLoading,
+				title = "Today",
+				isMoreVisible = false
+			)
+			HomeScreenSection(
+				navController = navController,
+				data = state.animeSeasonalList,
+				isLoading = state.isLoading,
+				title = "Seasonal Anime",
+				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
+			)
+			HomeScreenSection(
+				navController = navController,
+				data = state.animeSuggestionList,
+				isLoading = state.isLoading,
+				title = "Suggested Anime",
+				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
+			)
+		}
 	}
+
+	if (state.error.isNotEmpty())
+		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
 fun HomeScreenSection(
+	navController: NavController,
 	data: List<Data>,
-	state: HomeState,
+	isLoading: Boolean,
 	title: String,
-	onClick: () -> Unit = {}
+	onClick: () -> Unit = {},
+	isMoreVisible: Boolean = true
 ) {
-	Surface {
-		Box(
-			modifier = Modifier
-				.padding(horizontal = 16.dp, vertical = 8.dp),
-			contentAlignment = Alignment.Center,
+	Box(
+		contentAlignment = Alignment.Center,
+		modifier = Modifier
+			.padding(bottom = 8.dp)
+	) {
+		Column {
+			SectionTitle(
+				title = title,
+				onClick = onClick,
+				isMoreVisible = isMoreVisible
+			)
 
-			) {
-			Column {
-				SectionTitle(title = title, onClick = onClick)
-
-				if (state.isLoading) {
-					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.defaultMinSize(minHeight = 170.dp),
-						contentAlignment = Alignment.Center
-					) {
-						CircularProgressIndicator(
-							modifier = Modifier
-								.wrapContentHeight()
-								.align(Alignment.Center)
-						)
-					}
-				}
-				HorizontalList(data)
+			if (!isLoading && data.isNotEmpty()) {
+				HorizontalList(
+					navController = navController,
+					animeList = data
+				)
+			} else {
+				ShimmerEffectHorizontalList()
 			}
 		}
 	}
 }
 
 @Composable
-fun SectionTitle(title: String, onClick: () -> Unit = {}) {
+fun SectionTitle(
+	title: String,
+	onClick: () -> Unit = {},
+	isMoreVisible: Boolean = true
+) {
 	Box(
 		modifier = Modifier
-			.padding(8.dp)
 			.fillMaxWidth()
-			.clickable { onClick() }
+			.clickable(
+				interactionSource = null,
+				indication = null,
+				onClick = { if (isMoreVisible) onClick() }
+			)
 	) {
 		Text(
 			text = title,
 			color = MaterialTheme.colorScheme.onSurface,
 			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.titleLarge,
+			style = MaterialTheme.typography.titleMedium,
 			modifier = Modifier.align(Alignment.CenterStart),
 		)
-		Text(
-			text = "MORE",
-			color = MaterialTheme.colorScheme.onSurface,
-			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.titleMedium,
-			modifier = Modifier.align(Alignment.BottomEnd),
-		)
-	}
-}
 
-@Composable
-fun HorizontalList(animeList: List<Data>) {
-	Surface(
-		modifier = Modifier
-			.fillMaxWidth()
-	) {
-		Box(
-			modifier = Modifier
-				.fillMaxWidth(),
-			contentAlignment = Alignment.Center
-		) {
-			LazyRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(8.dp)
-			) {
-				items(animeList) { anime ->
-					ListItemRow(data = anime, onItemClick = {
-						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
-					})
-				}
-			}
+		if (isMoreVisible) {
+			Text(
+				text = "MORE",
+				color = MaterialTheme.colorScheme.onSurface,
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.titleSmall,
+				modifier = Modifier.align(Alignment.BottomEnd),
+			)
 		}
 	}
 }
 
 @Composable
+fun HorizontalList(
+	navController: NavController,
+	animeList: List<Data>
+) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth(),
+		contentAlignment = Alignment.Center
+	) {
+		LazyRow(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(vertical = 8.dp),
+			horizontalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			items(animeList) { anime ->
+				ListItemRow(node = anime.node,
+					onItemClick = {
+						navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+					}
+				)
+			}
+		}
+	}
+}
+
 @Preview
+@Composable
 fun HomeScreenPreview() {
 	val context = LocalContext.current
 

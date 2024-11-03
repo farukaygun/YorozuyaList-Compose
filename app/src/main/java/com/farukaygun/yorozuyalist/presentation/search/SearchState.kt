@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.search
 
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeSearched
+import com.farukaygun.yorozuyalist.domain.models.anime.AnimeSearched
 
 data class SearchState(
 	val query: String = "",

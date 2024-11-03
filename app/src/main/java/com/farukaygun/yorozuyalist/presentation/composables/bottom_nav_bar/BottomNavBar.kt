@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.farukaygun.yorozuyalist.presentation.Screen.UserListScreen.getScreen
+import com.farukaygun.yorozuyalist.presentation.Screen.UserAnimeListScreen.getScreen
 
 @Composable
 fun BottomNavBar(
@@ -26,28 +26,37 @@ fun BottomNavBar(
 		exit = shrinkVertically()
 	) {
 		NavigationBar {
-			bottomNavBarState.items.forEachIndexed { index, item ->
+			bottomNavBarState.items.forEachIndexed { _, bottomNavItem ->
 				NavigationBarItem(
-					selected = bottomNavBarState.currentScreen?.route == item.route,
+					selected = bottomNavBarState.currentScreen?.route == bottomNavItem.screen.route,
 					onClick = {
-						navController.navigate(item.route)
-						bottomNavBarState.currentScreen = getScreen(item.route)
+						val route = bottomNavItem.screen.route + bottomNavItem.screen.navArg
+						navController.navigate(route) {
+							navController.graph.startDestinationRoute?.let {
+								popUpTo(it) {
+									saveState = true
+								}
+								launchSingleTop = true
+								restoreState = true
+							}
+						}
+						bottomNavBarState.currentScreen = getScreen(bottomNavItem.screen.route)
 					},
 					icon = {
 						Icon(
 							painter = painterResource(
-								id = if (bottomNavBarState.currentScreen?.route == item.route) {
-									item.selectedIcon
+								id = if (bottomNavItem.screen.route == bottomNavBarState.currentScreen?.route) {
+									bottomNavItem.selectedIcon
 								} else {
-									item.unselectedIcon
+									bottomNavItem.unselectedIcon
 								}
 							),
-							contentDescription = item.label
+							contentDescription = bottomNavItem.screen.title
 						)
 					},
 					label = {
 						Text(
-							text = item.label,
+							text = bottomNavItem.screen.title,
 						)
 					}
 				)

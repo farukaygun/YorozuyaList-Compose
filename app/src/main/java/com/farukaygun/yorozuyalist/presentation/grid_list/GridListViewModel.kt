@@ -1,32 +1,27 @@
 package com.farukaygun.yorozuyalist.presentation.grid_list
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.anime.AnimeUserList
+import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
+import com.farukaygun.yorozuyalist.domain.models.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
+import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.getYearAndSeason
 import com.farukaygun.yorozuyalist.util.GridListType
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 class GridListViewModel(
 	private val animeUseCase: AnimeUseCase,
 	private val mangaUseCase: MangaUseCase
-) : ViewModel() {
-	private val _state = mutableStateOf(GridListState())
-	val state = _state
+) : BaseViewModel<GridListState>() {
+	override val _state = mutableStateOf(GridListState())
 
-	private var job: Job? = null
-
+	@Suppress("UNCHECKED_CAST")
 	private fun getList() {
 		val (year, season) = getYearAndSeason()
 		val getList = when (_state.value.type) {
@@ -35,81 +30,76 @@ class GridListViewModel(
 				year,
 				season.value
 			)
-		}
+		} as Flow<Resource<MediaList>>
 
-		println("getList: $getList")
-
-		job = getList
+		jobs += getList
 			.flowOn(Dispatchers.IO)
-			.onEach {
-				when (it) {
-					is Resource.Success -> {
-						_state.value = _state.value.copy(
-							gridList = it.data,
-							isLoading = false,
-							error = ""
-						)
-					}
-
-					is Resource.Error -> {
-						_state.value = _state.value.copy(
-							error = it.message
-								?: StringValue.StringResource(R.string.error_fetching).toString(),
-						)
-					}
-
-					is Resource.Loading -> {
-						_state.value = _state.value.copy(isLoading = true)
-					}
+			.handleResource(
+				onSuccess = { animeList ->
+					_state.value = _state.value.copy(
+						gridList = animeList,
+						isLoading = false,
+						error = ""
+					)
+				},
+				onError = { error ->
+					_state.value = _state.value.copy(
+						error = error
+							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						isLoading = false
+					)
+				},
+				onLoading = {
+					_state.value = _state.value.copy(isLoading = true)
 				}
-			}.launchIn(viewModelScope)
+			)
 	}
 
+	@Suppress("UNCHECKED_CAST")
 	private fun loadMore() {
-		job = _state.value.gridList?.paging?.next?.let { nextPageUrl ->
+		_state.value.gridList?.paging?.next?.let { nextPageUrl ->
 			val loadMore = when (_state.value.type) {
 				GridListType.SUGGESTED_ANIME_LIST -> animeUseCase.executeSuggestedAnime(url = nextPageUrl)
 				GridListType.SEASONAL_ANIME_LIST -> animeUseCase.executeSeasonalAnime(url = nextPageUrl)
-			}
+			} as Flow<Resource<MediaList>>
 
-			loadMore
+			jobs += loadMore
 				.flowOn(Dispatchers.IO)
-				.onEach {
-					when (it) {
-						is Resource.Success -> {
-							val currentData = _state.value.gridList?.data?.toMutableStateList()
-							val newData = it.data?.data
-							newData?.let { data -> currentData?.addAll(data) }
+				.handleResource(
+					onSuccess = { animeList ->
+						val currentData = _state.value.gridList?.data?.toMutableList() ?: mutableListOf()
+						val newData = animeList?.data ?: emptyList()
+						val mergedData = (currentData + newData).distinctBy { media -> media.node.id }
 
-							_state.value = _state.value.copy(
-								gridList = it.data?.paging?.let { paging ->
-									currentData?.let { data ->
-										AnimeUserList(
-											data = data,
-											paging = paging
-										)
-									}
-								},
-								isLoadingMore = false,
-								error = ""
-							)
-						}
-
-						is Resource.Error -> {
-							_state.value = _state.value.copy(
-								error = it.message
-									?: StringValue.StringResource(R.string.error_fetching)
-										.toString(),
-								isLoadingMore = false
-							)
-						}
-
-						is Resource.Loading -> {
-							_state.value = _state.value.copy(isLoadingMore = true)
-						}
+						_state.value = _state.value.copy(
+							gridList = animeList?.paging?.let { paging ->
+								AnimeUserList(
+									data = mergedData,
+									paging = paging
+								)
+							},
+							isLoadingMore = false,
+							error = ""
+						)
+					},
+					onError = { error ->
+						_state.value = _state.value.copy(
+							error = error
+								?: StringValue.StringResource(R.string.error_fetching).toString(),
+							isLoadingMore = false
+						)
+					},
+					onLoading = {
+						_state.value = _state.value.copy(isLoadingMore = true)
 					}
-				}.launchIn(viewModelScope)
+				)
 		}
+	}
+
+	fun updateType(type: GridListType) {
+		_state.value = _state.value.copy(
+			type = type
+		)
 	}
 
 	fun onEvent(event: GridListEvent) {
