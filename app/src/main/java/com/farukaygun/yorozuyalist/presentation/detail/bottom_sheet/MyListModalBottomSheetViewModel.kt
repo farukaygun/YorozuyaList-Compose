@@ -10,6 +10,7 @@ import com.farukaygun.yorozuyalist.domain.models.manga.MangaDetail
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
+import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToISODate
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.ScreenType
@@ -40,8 +41,8 @@ class MyListModalBottomSheetViewModel(
 			mediaDetail = mediaDetail,
 			selectedStatus = myListStatus?.status,
 			score = myListStatus?.score ?: 0,
-			startDate = myListStatus?.startDate,
-			finishDate = myListStatus?.finishDate,
+			startDate = myListStatus?.startDate?.formatDate(),
+			finishDate = myListStatus?.finishDate?.formatDate(),
 			tags = myListStatus?.tags?.joinToString() ?: "",
 			priority = myListStatus?.priority ?: 0,
 			comments = myListStatus?.comments ?: "",

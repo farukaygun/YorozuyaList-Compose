@@ -382,11 +382,13 @@ fun DateRangePicker() {
 	DatePickerField(
 		selectedDate = state.startDate,
 		onDateSelected = { viewModel.onEvent(MyListBottomSheetEvent.UpdateStartDate(it)) },
+		onClear = { viewModel.onEvent(MyListBottomSheetEvent.UpdateStartDate("")) },
 		label = "Start Date"
 	)
 	DatePickerField(
 		selectedDate = state.finishDate,
 		onDateSelected = { viewModel.onEvent(MyListBottomSheetEvent.UpdateFinishDate(it)) },
+		onClear = { viewModel.onEvent(MyListBottomSheetEvent.UpdateFinishDate("")) },
 		label = "End Date"
 	)
 }

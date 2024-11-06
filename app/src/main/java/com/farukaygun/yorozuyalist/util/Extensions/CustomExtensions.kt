@@ -57,6 +57,8 @@ object CustomExtensions {
 	}
 
 	fun String.formatToISODate(): String {
+		if (this.isEmpty()) return ""
+
 		val customFormat = LocalDate.Format {
 			dayOfMonth(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
 		}
