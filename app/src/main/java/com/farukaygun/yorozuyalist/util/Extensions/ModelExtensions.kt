@@ -1,8 +1,6 @@
 package com.farukaygun.yorozuyalist.util.Extensions
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.intl.Locale
 import co.yml.charts.common.extensions.isNotNull
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeDetail
@@ -51,7 +49,7 @@ object ModelExtensions {
 	}
 
 	fun Broadcast.formatBroadcast() = if (dayOfTheWeek.isNotEmpty() && startTime.isNotEmpty()) {
-		"${dayOfTheWeek.capitalize(Locale.current)} $startTime"
+		"${dayOfTheWeek.replaceFirstChar { it.uppercase() }} $startTime"
 	} else {
 		"N/A"
 	}

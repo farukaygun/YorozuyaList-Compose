@@ -10,10 +10,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
-import java.util.Locale
 
 object CustomExtensions {
 	/** Open link in Chrome Custom Tabs */
@@ -26,14 +26,24 @@ object CustomExtensions {
 	}
 
 	fun Number.localizeNumber(): String {
-		return DecimalFormat.getNumberInstance(Locale.getDefault()).format(this)
+		return DecimalFormat.getNumberInstance(java.util.Locale.getDefault()).format(this)
 	}
 
 	fun String.formatDate(): String {
-		val customFormat = LocalDate.Format {
+		val ymdFormat = LocalDate.Format {
 			dayOfMonth(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
 		}
-		return LocalDate.parse(this).format(customFormat)
+
+		val ymFormat = DateTimeComponents.Format {
+			year(); char('-'); monthNumber()
+		}
+
+		return if (this.length == 10)
+ 			LocalDate.parse(this).format(ymdFormat)
+		else {
+			val date = ymFormat.parse(this)
+			return "${date.month?.name?.lowercase()?.replaceFirstChar { it.uppercase() }} ${date.year}"
+		}
 	}
 
 	fun String.formatToAbbreviatedDate(): String {
