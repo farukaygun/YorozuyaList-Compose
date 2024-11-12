@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -30,7 +29,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
-import com.farukaygun.yorozuyalist.presentation.common.SearchBarState
 
 @Composable
 fun SearchBar(

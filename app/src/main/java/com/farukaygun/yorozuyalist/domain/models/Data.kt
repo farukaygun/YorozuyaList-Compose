@@ -10,5 +10,5 @@ data class Data(
 	@SerializedName("ranking_type")
 	var rankingType: String?,
 	@SerializedName("list_status")
-	val myListStatus: MyListStatus,
+	val myListStatus: MyListStatus?,
 )

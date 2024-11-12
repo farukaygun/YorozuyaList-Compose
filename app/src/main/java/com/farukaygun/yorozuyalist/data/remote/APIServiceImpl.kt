@@ -2,6 +2,7 @@ package com.farukaygun.yorozuyalist.data.remote
 
 import androidx.annotation.IntRange
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto
 import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeDetailDto
@@ -362,5 +363,59 @@ class APIServiceImpl(
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
 		}.status.isSuccess()
+	}
+
+	override suspend fun getAnimeRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int,
+	): MediaRankingDto {
+		return client.get("${Constants.ANIME_URL}/ranking") {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("ranking_type", rankingType)
+			parameter("limit", limit)
+			parameter("offset", offset)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users")
+		}.body()
+	}
+
+	override suspend fun getAnimeRanking(url: String): MediaRankingDto {
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users")
+		}.body()
+	}
+
+	override suspend fun getMangaRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int,
+	): MediaRankingDto {
+		return client.get("${Constants.MANGA_URL}/ranking") {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("ranking_type", rankingType)
+			parameter("limit", limit)
+			parameter("offset", offset)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users")
+		}.body()
+	}
+
+	override suspend fun getMangaRanking(url: String): MediaRankingDto {
+		return client.get(url) {
+			header(
+				HttpHeaders.Authorization,
+				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
+			)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users")
+		}.body()
 	}
 }

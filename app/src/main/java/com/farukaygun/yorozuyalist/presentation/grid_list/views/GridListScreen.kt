@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.GridListItem
+import com.farukaygun.yorozuyalist.presentation.composables.GridListItemWithRank
 import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectGridList
 import com.farukaygun.yorozuyalist.presentation.grid_list.GridListEvent
@@ -76,10 +77,21 @@ fun GridList(
 			horizontalArrangement = Arrangement.SpaceAround,
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
+			val type = viewModel.state.value.type
 			items(data) { anime ->
-				GridListItem(data = anime, onItemClick = {
-					navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
-				})
+				when (type) {
+					GridListType.SUGGESTED_ANIME_LIST, GridListType.SEASONAL_ANIME_LIST -> {
+						GridListItem(data = anime, onItemClick = {
+							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+						})
+					}
+
+					GridListType.RANKING_ANIME_LIST, GridListType.RANKING_MANGA_LIST -> {
+						GridListItemWithRank(data = anime, onItemClick = {
+							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+						})
+					}
+				}
 			}
 		}
 	}
