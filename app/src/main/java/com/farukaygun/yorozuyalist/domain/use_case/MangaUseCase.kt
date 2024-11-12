@@ -2,8 +2,10 @@ package com.farukaygun.yorozuyalist.domain.use_case
 
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.toMangaDetail
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.toMangaUserList
+import com.farukaygun.yorozuyalist.data.remote.dto.toMediaRanking
 import com.farukaygun.yorozuyalist.data.remote.dto.toMyListStatus
 import com.farukaygun.yorozuyalist.data.repository.MangaRepository
+import com.farukaygun.yorozuyalist.domain.models.MediaRanking
 import com.farukaygun.yorozuyalist.domain.models.MyListStatus
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaDetail
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaUserList
@@ -124,6 +126,44 @@ class MangaUseCase(
 			)
 
 			emit(Resource.Success(result))
+		} catch (e: Exception) {
+			e.printStackTrace()
+			emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
+		}
+	}
+
+	fun executeGetMangaRanking(
+		rankingType: String,
+		limit: Int = 20,
+		offset: Int = 0
+	): Flow<Resource<MediaRanking>> = flow {
+		try {
+			emit(Resource.Loading())
+
+			val mangaRanking = repository.getMangaRanking(
+				rankingType = rankingType,
+				limit = limit,
+				offset = offset
+			)
+
+			emit(Resource.Success(mangaRanking.toMediaRanking()))
+		} catch (e: Exception) {
+			e.printStackTrace()
+			emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))
+		}
+	}
+
+	fun executeGetMangaRanking(
+		url: String
+	): Flow<Resource<MediaRanking>> = flow {
+		try {
+			emit(Resource.Loading())
+
+			val mangaRanking = repository.getMangaRanking(
+				url = url
+			)
+
+			emit(Resource.Success(mangaRanking.toMediaRanking()))
 		} catch (e: Exception) {
 			e.printStackTrace()
 			emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred"))

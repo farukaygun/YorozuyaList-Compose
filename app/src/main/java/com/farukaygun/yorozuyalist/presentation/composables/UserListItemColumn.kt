@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +56,7 @@ fun UserListItemColumn(
 	val season = data.node.startSeason?.season?.format() ?: "Unknown"
 	val year = data.node.startSeason?.year?.toString()
 	val meanScore = data.node.mean ?: "Unknown"
-	val userScore = data.myListStatus.score
+	val userScore = data.myListStatus?.score
 
 	Row(
 		modifier = Modifier
@@ -93,13 +94,13 @@ fun UserListItemColumn(
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.clip(RoundedCornerShape(10.dp))
-					.size(100.dp, 150.dp)
+					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 			)
 
 			Box(contentAlignment = Alignment.BottomStart) {
 				Row(
 					modifier = Modifier
-						.background(MaterialTheme.colorScheme.surfaceVariant)
+						.background(MaterialTheme.colorScheme.primary)
 						.padding(4.dp),
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -108,12 +109,13 @@ fun UserListItemColumn(
 						text = userScore.toString(),
 						style = MaterialTheme.typography.bodyMedium,
 						textAlign = TextAlign.Center,
-						color = MaterialTheme.colorScheme.onSurface
+						color = MaterialTheme.colorScheme.onPrimary,
+						fontWeight = FontWeight.Bold
 					)
 					Icon(
 						painter = painterResource(id = R.drawable.grade_16px),
 						contentDescription = "Grade",
-						tint = MaterialTheme.colorScheme.onBackground
+						tint = MaterialTheme.colorScheme.onPrimary
 					)
 				}
 			}

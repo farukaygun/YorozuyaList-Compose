@@ -155,8 +155,7 @@ fun GridListItemPreview(
 		),
 		ranking = Ranking(
 			rank = 1,
-
-			),
+		),
 		rankingType = "Score"
 	)
 	GridListItem(data = data, onItemClick = {})

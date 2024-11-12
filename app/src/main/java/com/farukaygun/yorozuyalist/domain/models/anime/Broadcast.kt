@@ -6,5 +6,5 @@ data class Broadcast(
 	@SerializedName("day_of_the_week")
 	val dayOfTheWeek: String,
 	@SerializedName("start_time")
-	val startTime: String,
+	val startTime: String?,
 )

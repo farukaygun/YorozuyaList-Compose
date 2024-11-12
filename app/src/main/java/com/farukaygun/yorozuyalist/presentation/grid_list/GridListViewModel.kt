@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeUserList
+import com.farukaygun.yorozuyalist.domain.models.enums.RankingType
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
@@ -27,9 +28,11 @@ class GridListViewModel(
 		val getList = when (_state.value.type) {
 			GridListType.SUGGESTED_ANIME_LIST -> animeUseCase.executeSuggestedAnime()
 			GridListType.SEASONAL_ANIME_LIST -> animeUseCase.executeSeasonalAnime(
-				year,
-				season.value
+				year = year,
+				season = season.value
 			)
+			GridListType.RANKING_ANIME_LIST -> animeUseCase.executeGetAnimeRanking(rankingType = RankingType.ALL.value)
+			GridListType.RANKING_MANGA_LIST -> mangaUseCase.executeGetMangaRanking(rankingType = RankingType.ALL.value)
 		} as Flow<Resource<MediaList>>
 
 		jobs += getList
@@ -61,6 +64,8 @@ class GridListViewModel(
 			val loadMore = when (_state.value.type) {
 				GridListType.SUGGESTED_ANIME_LIST -> animeUseCase.executeSuggestedAnime(url = nextPageUrl)
 				GridListType.SEASONAL_ANIME_LIST -> animeUseCase.executeSeasonalAnime(url = nextPageUrl)
+				GridListType.RANKING_ANIME_LIST -> animeUseCase.executeGetAnimeRanking(url = nextPageUrl)
+				GridListType.RANKING_MANGA_LIST -> mangaUseCase.executeGetMangaRanking(url = nextPageUrl)
 			} as Flow<Resource<MediaList>>
 
 			jobs += loadMore

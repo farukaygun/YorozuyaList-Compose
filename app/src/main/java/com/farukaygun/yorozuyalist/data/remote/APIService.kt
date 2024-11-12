@@ -1,6 +1,7 @@
 package com.farukaygun.yorozuyalist.data.remote
 
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
+import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto
 import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeDetailDto
@@ -123,4 +124,24 @@ interface APIService {
 	suspend fun deleteMyMangaListItem(
 		id: Int
 	): Boolean
+
+	suspend fun getAnimeRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int,
+	) : MediaRankingDto
+
+	suspend fun getAnimeRanking(
+		url: String
+	) : MediaRankingDto
+
+	suspend fun getMangaRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int,
+	) : MediaRankingDto
+
+	suspend fun getMangaRanking(
+		url: String
+	) : MediaRankingDto
 }

@@ -48,7 +48,7 @@ object ModelExtensions {
 		else -> "N/A"
 	}
 
-	fun Broadcast.formatBroadcast() = if (dayOfTheWeek.isNotEmpty() && startTime.isNotEmpty()) {
+	fun Broadcast.formatBroadcast() = if (dayOfTheWeek.isNotEmpty() && startTime?.isNotEmpty() == true) {
 		"${dayOfTheWeek.replaceFirstChar { it.uppercase() }} $startTime"
 	} else {
 		"N/A"

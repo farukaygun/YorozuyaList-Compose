@@ -2,6 +2,7 @@ package com.farukaygun.yorozuyalist.domain.repository
 
 import androidx.annotation.IntRange
 import com.farukaygun.yorozuyalist.data.remote.APIService
+import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto
 import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
@@ -136,6 +137,26 @@ class AnimeRepositoryImpl(
 	): Boolean {
 		return api.deleteMyAnimeListItem(
 			id = id
+		)
+	}
+
+	override suspend fun getAnimeRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int
+	): MediaRankingDto {
+		return api.getAnimeRanking(
+			rankingType = rankingType,
+			limit = limit,
+			offset = offset
+		)
+	}
+
+	override suspend fun getAnimeRanking(
+		url: String
+	): MediaRankingDto {
+		return api.getAnimeRanking(
+			url = url
 		)
 	}
 }

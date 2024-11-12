@@ -1,6 +1,7 @@
 package com.farukaygun.yorozuyalist.domain.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
+import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto
 import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
@@ -76,6 +77,26 @@ class MangaRepositoryImpl(
 	): Boolean {
 		return api.deleteMyMangaListItem(
 			id = id
+		)
+	}
+
+	override suspend fun getMangaRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int
+	): MediaRankingDto {
+		return api.getMangaRanking(
+			rankingType = rankingType,
+			limit = limit,
+			offset = offset
+		)
+	}
+
+	override suspend fun getMangaRanking(
+		url: String
+	): MediaRankingDto {
+		return api.getMangaRanking(
+			url = url
 		)
 	}
 }

@@ -14,7 +14,7 @@ data class DataDto(
 	var rankingType: String? = null,
 
 	@SerializedName("list_status")
-	val myListStatus: MyListStatusDto,
+	val myListStatus: MyListStatusDto?,
 )
 
 fun DataDto.toData(): Data {
@@ -22,6 +22,6 @@ fun DataDto.toData(): Data {
 		node = node.toNode(),
 		ranking = ranking?.toRanking(),
 		rankingType = rankingType,
-		myListStatus = myListStatus.toMyListStatus()
+		myListStatus = myListStatus?.toMyListStatus()
 	)
 }

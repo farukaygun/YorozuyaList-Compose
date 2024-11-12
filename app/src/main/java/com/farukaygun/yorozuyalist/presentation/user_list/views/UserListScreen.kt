@@ -105,7 +105,7 @@ fun MyListStatusFilterChips(
 		} else {
 			when (status) {
 				MyListMediaStatus.WATCHING, MyListMediaStatus.READING -> R.drawable.play_circle_24px
-				MyListMediaStatus.PLAN_TO_WATCH, MyListMediaStatus.PLAN_TO_READ -> R.drawable.schedule_24px
+				MyListMediaStatus.PLAN_TO_WATCH, MyListMediaStatus.PLAN_TO_READ -> R.drawable.schedule_16px
 				MyListMediaStatus.COMPLETED -> R.drawable.check_circle_24px
 				MyListMediaStatus.ON_HOLD -> R.drawable.pause_circle_24px
 				MyListMediaStatus.DROPPED -> R.drawable.delete_24px

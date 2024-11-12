@@ -1,5 +1,6 @@
 package com.farukaygun.yorozuyalist.data.repository
 
+import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto
 import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
@@ -39,4 +40,14 @@ interface MangaRepository {
 	suspend fun deleteMyMangaListItem(
 		id: Int
 	): Boolean
+
+	suspend fun getMangaRanking(
+		rankingType: String,
+		limit: Int,
+		offset: Int
+	): MediaRankingDto
+
+	suspend fun getMangaRanking(
+		url: String
+	): MediaRankingDto
 }
