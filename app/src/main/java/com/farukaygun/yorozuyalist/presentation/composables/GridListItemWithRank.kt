@@ -1,21 +1,28 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +46,7 @@ private const val IMAGE_WIDTH = 100
 private const val IMAGE_HEIGHT = 150
 
 @Composable
-fun GridListItem(
+fun GridListItemWithRank(
 	data: Data,
 	onItemClick: () -> Unit
 ) {
@@ -53,31 +60,55 @@ fun GridListItem(
 			.clickable { onItemClick() },
 		verticalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		SubcomposeAsyncImage(
-			model = ImageRequest.Builder(LocalContext.current)
-				.data(mainPictureUrl)
-				.crossfade(true)
-				.crossfade(300)
-				.build(),
-			loading = {
-				ShimmerEffect(
-					modifier = Modifier
-						.clip(RoundedCornerShape(10.dp))
-						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-				)
-			},
-			error = {
-				Icon(
-					painter = painterResource(id = R.drawable.broken_image_24px),
-					contentDescription = "Error icon",
-				)
-			},
-			contentDescription = title,
-			contentScale = ContentScale.Crop,
+		Surface(
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
 				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-		)
+		) {
+			SubcomposeAsyncImage(
+				model = ImageRequest.Builder(LocalContext.current)
+					.data(mainPictureUrl)
+					.crossfade(true)
+					.crossfade(300)
+					.build(),
+				loading = {
+					ShimmerEffect(
+						modifier = Modifier
+							.clip(RoundedCornerShape(10.dp))
+							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+					)
+				},
+				error = {
+					Icon(
+						painter = painterResource(id = R.drawable.broken_image_24px),
+						contentDescription = "Error icon",
+					)
+				},
+				contentDescription = title,
+				contentScale = ContentScale.Crop,
+				modifier = Modifier
+					.clip(RoundedCornerShape(10.dp))
+					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+			)
+
+			Box(contentAlignment = Alignment.BottomStart) {
+				Row(
+					modifier = Modifier
+						.background(MaterialTheme.colorScheme.primary)
+						.padding(4.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					Text(
+						text = "#${data.ranking?.rank}",
+						style = MaterialTheme.typography.bodyMedium,
+						textAlign = TextAlign.Center,
+						color = MaterialTheme.colorScheme.onPrimary,
+						fontWeight = FontWeight.Bold
+					)
+				}
+			}
+		}
 
 		Text(
 			text = title,
@@ -92,7 +123,7 @@ fun GridListItem(
 }
 
 @Composable
-fun ShimmerEffectGridListItem() {
+fun ShimmerEffectGridListItemWithRank() {
 	Column(
 		modifier = Modifier
 			.wrapContentWidth(),
@@ -114,7 +145,7 @@ fun ShimmerEffectGridListItem() {
 
 @Composable
 @Preview
-fun GridListItemPreview(
+fun GridListItemWithRankPreview(
 ) {
 	val data = Data(
 		node = Node(
@@ -157,5 +188,5 @@ fun GridListItemPreview(
 		),
 		rankingType = "Score"
 	)
-	GridListItem(data = data, onItemClick = {})
+	GridListItemWithRank(data = data, onItemClick = {})
 }

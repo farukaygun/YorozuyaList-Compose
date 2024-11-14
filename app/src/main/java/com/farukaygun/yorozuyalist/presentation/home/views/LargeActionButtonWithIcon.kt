@@ -38,13 +38,14 @@ fun LargeActionButtonWithIcon(
 			Icon(
 				painter = painterResource(id = icon),
 				contentDescription = "Large action button icon",
-				tint = MaterialTheme.colorScheme.onPrimaryContainer
+				tint = MaterialTheme.colorScheme.onPrimary
 			)
 
 			Text(
 				text = text,
 				textAlign = TextAlign.Center,
 				style = MaterialTheme.typography.bodyMedium,
+				color = MaterialTheme.colorScheme.onPrimary,
 				modifier = Modifier.weight(1f)
 			)
 		}

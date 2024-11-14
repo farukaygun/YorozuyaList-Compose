@@ -3,6 +3,7 @@ package com.farukaygun.yorozuyalist.util
 import com.farukaygun.yorozuyalist.domain.interfaces.Formattable
 
 object Constants {
+	const val HOME_URL = "https://myanimelist.net"
 	const val OAUTH2_URL = "https://myanimelist.net/v1/oauth2/"
 	const val BASE_URL = "https://api.myanimelist.net/v2"
 	const val MANGA_URL = "${BASE_URL}/manga"

@@ -59,14 +59,6 @@ fun ListItemRow(
 						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 				)
 			},
-//			loading = {
-//				Column(
-//					verticalArrangement = Arrangement.Center,
-//					horizontalAlignment = Alignment.CenterHorizontally
-//				) {
-//					CircularProgressIndicator()
-//				}
-//			},
 			error = {
 				Icon(
 					painter = painterResource(id = R.drawable.broken_image_24px),
