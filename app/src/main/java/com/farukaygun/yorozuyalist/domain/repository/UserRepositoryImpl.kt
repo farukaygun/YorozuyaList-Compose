@@ -7,7 +7,7 @@ import com.farukaygun.yorozuyalist.data.repository.UserRepository
 class UserRepositoryImpl(
 	private val api: APIService
 ) : UserRepository {
-	override suspend fun getUserProfile() : UserDto {
+	override suspend fun getUserProfile(): UserDto {
 		return api.getUserProfile()
 	}
 }

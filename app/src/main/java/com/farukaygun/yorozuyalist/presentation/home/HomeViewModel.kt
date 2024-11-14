@@ -1,25 +1,21 @@
 package com.farukaygun.yorozuyalist.presentation.home
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.RefreshToken
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.RefreshToken
+import com.farukaygun.yorozuyalist.domain.models.enums.MediaStatus
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
+import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.getYearAndSeason
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.weekDayJapan
-import com.farukaygun.yorozuyalist.util.Constants
-import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -29,11 +25,12 @@ class HomeViewModel(
 	private val loginUseCase: LoginUseCase,
 	private val animeUseCase: AnimeUseCase,
 	private val sharedPrefsHelper: SharedPrefsHelper
-) : ViewModel() {
-	private val _state = mutableStateOf(HomeState())
-	val state: State<HomeState> = _state
+) : BaseViewModel<HomeState>() {
+	override val _state = mutableStateOf(HomeState())
 
-	private var job: Job? = null
+	init {
+		onEvent(HomeEvent.InitRequestChain)
+	}
 
 	fun isLoggedIn(): Boolean {
 		val accessToken = sharedPrefsHelper.getString("accessToken")
@@ -68,38 +65,41 @@ class HomeViewModel(
 		return true
 	}
 
+	private suspend fun initRequestChain() {
+		_state.value = _state.value.copy(isLoading = true)
+
+		getTodayAnime()
+		getSeasonalAnime()
+		getSuggestedAnime()
+
+		jobs.forEach { it.join() }
+		_state.value = _state.value.copy(isLoading = false)
+	}
+
 	private fun getRefreshToken() {
 		val grantType = "refresh_token"
 		val refreshToken = sharedPrefsHelper.getString("refreshToken")
-		job = loginUseCase.executeRefreshToken(
+
+		jobs += loginUseCase.executeRefreshToken(
 			grantType,
 			refreshToken
 		)
 			.flowOn(Dispatchers.IO)
-			.onEach {
-				when (it) {
-					is Resource.Success -> {
-						_state.value = HomeState(
-							refreshToken = it.data,
-							isLoading = false,
-							error = ""
-						)
-					}
-
-					is Resource.Error -> {
-						_state.value = HomeState(
-							error = it.message
-								?: StringValue.StringResource(R.string.token_refresh_error)
-									.toString(),
-							isLoading = false
-						)
-					}
-
-					is Resource.Loading -> {
-						_state.value = HomeState(isLoading = true)
-					}
+			.handleResource(
+				onSuccess = { token ->
+					_state.value = _state.value.copy(
+						refreshToken = token,
+						error = ""
+					)
+				},
+				onError = { error ->
+					_state.value = _state.value.copy(
+						error = error
+							?: StringValue.StringResource(R.string.token_refresh_error).toString(),
+						isLoading = false
+					)
 				}
-			}.launchIn(viewModelScope)
+			)
 	}
 
 	private fun saveRefreshToken(refreshToken: RefreshToken) {
@@ -124,106 +124,80 @@ class HomeViewModel(
 		val (year, season) = getYearAndSeason()
 		val animeList = mutableListOf<Data>()
 
-		job = animeUseCase.executeSeasonalAnime(year, season.value, limit)
+		jobs += animeUseCase.executeSeasonalAnime(year, season.value, limit)
 			.flowOn(Dispatchers.IO)
-			.onEach {
-				when (it) {
-					is Resource.Success -> {
-						it.data?.data?.forEach { anime ->
-							if (anime.node.broadcast?.dayOfTheWeek.equals(
-									weekDayJapan.toString(),
-									true
-								) && anime.node.status == Constants.CURRENTLY_AIRING
-							)
-								animeList.add(anime)
-						}
-
-						animeList.let { animeList ->
-							_state.value = _state.value.copy(
-								animeTodayList = animeList,
-								isLoading = false,
-								error = ""
-							)
-						}
-					}
-
-					is Resource.Error -> {
-						_state.value = HomeState(
-							error = it.message
-								?: StringValue.StringResource(R.string.error_fetching).toString(),
+			.handleResource(
+				onSuccess = { animeData ->
+					animeData?.data?.forEach { anime ->
+						if (anime.node.broadcast?.dayOfTheWeek.equals(
+								weekDayJapan.toString(),
+								true
+							) && anime.node.status == MediaStatus.CURRENTLY_AIRING.formatForApi()
+						)
+							animeList.add(anime)
+					}.apply {
+						_state.value = _state.value.copy(
+							animeTodayList = animeList,
+							error = ""
 						)
 					}
-
-					is Resource.Loading -> {
-						_state.value = _state.value.copy(isLoading = true)
-					}
+				},
+				onError = { error ->
+					_state.value = HomeState(
+						error = error
+							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						isLoading = false
+					)
 				}
-			}.launchIn(viewModelScope)
+			)
 	}
 
 
 	private fun getSeasonalAnime() {
 		val (year, season) = getYearAndSeason()
-		job = animeUseCase.executeSeasonalAnime(year, season.value)
+
+		jobs += animeUseCase.executeSeasonalAnime(year, season.value)
 			.flowOn(Dispatchers.IO)
-			.onEach {
-				when (it) {
-					is Resource.Success -> {
-						_state.value = _state.value.copy(
-							animeSeasonalList = it.data?.data ?: emptyList(),
-							isLoading = false,
-							error = ""
-						)
-					}
-
-					is Resource.Error -> {
-						_state.value = _state.value.copy(
-							error = it.message
-								?: StringValue.StringResource(R.string.error_fetching).toString(),
-						)
-					}
-
-					is Resource.Loading -> {
-						_state.value = _state.value.copy(isLoading = true)
-					}
+			.handleResource(
+				onSuccess = { animeData ->
+					_state.value = _state.value.copy(
+						animeSeasonalList = animeData?.data ?: emptyList(),
+						error = ""
+					)
+				},
+				onError = { error ->
+					_state.value = _state.value.copy(
+						error = error
+							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						isLoading = false
+					)
 				}
-			}.launchIn(viewModelScope)
+			)
 	}
 
 	private fun getSuggestedAnime() {
-		job = animeUseCase.executeSuggestedAnime()
+		jobs += animeUseCase.executeSuggestedAnime()
 			.flowOn(Dispatchers.IO)
-			.onEach {
-				when (it) {
-					is Resource.Success -> {
-						_state.value = _state.value.copy(
-							animeSuggestionList = it.data?.data ?: emptyList(),
-							isLoading = false,
-							error = ""
-						)
-					}
-
-					is Resource.Error -> {
-						_state.value = _state.value.copy(
-							error = it.message
-								?: StringValue.StringResource(R.string.error_fetching).toString(),
-						)
-					}
-
-					is Resource.Loading -> {
-						_state.value = _state.value.copy(isLoading = true)
-					}
+			.handleResource(
+				onSuccess = { animeData ->
+					_state.value = _state.value.copy(
+						animeSuggestionList = animeData?.data ?: emptyList(),
+						error = ""
+					)
+				},
+				onError = { error ->
+					_state.value = _state.value.copy(
+						error = error
+							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						isLoading = false
+					)
 				}
-			}.launchIn(viewModelScope)
+			)
 	}
 
 	fun onEvent(event: HomeEvent) {
 		when (event) {
-			is HomeEvent.InitRequestChain -> {
-				getTodayAnime()
-				getSeasonalAnime()
-				getSuggestedAnime()
-			}
+			is HomeEvent.InitRequestChain -> viewModelScope.launch { initRequestChain() }
 		}
 	}
 }

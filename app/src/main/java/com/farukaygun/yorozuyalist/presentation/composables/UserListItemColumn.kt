@@ -1,17 +1,15 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,53 +21,54 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.yml.charts.common.extensions.isNotNull
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.model.Data
-import com.farukaygun.yorozuyalist.domain.model.ListStatus
-import com.farukaygun.yorozuyalist.domain.model.Node
-import com.farukaygun.yorozuyalist.domain.model.Ranking
-import com.farukaygun.yorozuyalist.domain.model.anime.MainPicture
-import com.farukaygun.yorozuyalist.domain.model.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.MainPicture
+import com.farukaygun.yorozuyalist.domain.models.MyListStatus
+import com.farukaygun.yorozuyalist.domain.models.Node
+import com.farukaygun.yorozuyalist.domain.models.Ranking
+import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
+import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
+import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
+import com.farukaygun.yorozuyalist.domain.models.enums.Season
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 
-// If I delete the safe call, it gives a null pointer exception error when loadMore triggered.
-@Suppress("UNNECESSARY_SAFE_CALL")
+private const val IMAGE_WIDTH = 100
+private const val IMAGE_HEIGHT = 150
+
 @Composable
 fun UserListItemColumn(
 	data: Data,
-	onItemClick: (Data) -> Unit
+	onItemClick: () -> Unit
 ) {
-	val title = data.node.title?.takeUnless { it.isEmpty() } ?: "N/A"
-	val mediaType = data.node.mediaType?.takeUnless { it.isEmpty() }?.capitalize(Locale.current)
-		?: "N/A"
-	val numEpisodes =
-		data.node.numEpisodes?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
-	val mainPictureUrl =
-		data.node.mainPicture?.medium?.takeUnless { it.isEmpty() } ?: R.drawable.overflow
-	val season =
-		data.node.startSeason?.season?.takeUnless { it.isEmpty() }?.capitalize(Locale.current)
-			?: "N/A"
-	val year =
-		data.node.startSeason?.year?.toString().takeUnless { it.isNullOrEmpty() } ?: "N/A"
-	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
-	val userScore = data.listStatus.score?.takeUnless { it.isEmpty() } ?: "N/A"
+	val title = data.node.title
+	val mediaType = data.node.mediaType?.format()
+	val numEpisodes = if (data.node.numEpisodes > 0) "(${data.node.numEpisodes} episodes)" else ""
+	val mainPictureUrl = data.node.mainPicture.medium
+	val season = data.node.startSeason?.season?.format() ?: "Unknown"
+	val year = data.node.startSeason?.year?.toString()
+	val meanScore = data.node.mean ?: "Unknown"
+	val userScore = data.myListStatus?.score
 
 	Row(
 		modifier = Modifier
-			.padding(8.dp)
-			.fillMaxWidth(),
+			.fillMaxWidth()
+			.clickable { onItemClick() },
+		horizontalArrangement = Arrangement.spacedBy(16.dp)
 	) {
 		Surface(
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 				.background(MaterialTheme.colorScheme.surface)
 		) {
 			SubcomposeAsyncImage(
@@ -79,16 +78,15 @@ fun UserListItemColumn(
 					.crossfade(300)
 					.build(),
 				loading = {
-					Column(
-						verticalArrangement = Arrangement.Center,
-						horizontalAlignment = Alignment.CenterHorizontally
-					) {
-						CircularProgressIndicator()
-					}
+					ShimmerEffect(
+						modifier = Modifier
+							.clip(RoundedCornerShape(10.dp))
+							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+					)
 				},
 				error = {
 					Icon(
-						painter = painterResource(id = R.drawable.outline_broken_image_24px),
+						painter = painterResource(id = R.drawable.broken_image_24px),
 						contentDescription = "Error icon",
 					)
 				},
@@ -96,37 +94,35 @@ fun UserListItemColumn(
 				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.clip(RoundedCornerShape(10.dp))
-					.size(100.dp, 150.dp)
+					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 			)
 
 			Box(contentAlignment = Alignment.BottomStart) {
 				Row(
 					modifier = Modifier
-						.background(MaterialTheme.colorScheme.surfaceVariant)
-						.padding(horizontal = 4.dp, vertical = 4.dp),
-					verticalAlignment = Alignment.CenterVertically
+						.background(MaterialTheme.colorScheme.primary)
+						.padding(4.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
 				) {
 					Text(
-						text = userScore,
-						modifier = Modifier.padding(horizontal = 4.dp),
+						text = userScore.toString(),
 						style = MaterialTheme.typography.bodyMedium,
 						textAlign = TextAlign.Center,
-						color = MaterialTheme.colorScheme.onSurface
+						color = MaterialTheme.colorScheme.onPrimary,
+						fontWeight = FontWeight.Bold
 					)
 					Icon(
-						painter = painterResource(id = R.drawable.outline_filled_grade_16px),
+						painter = painterResource(id = R.drawable.grade_16px),
 						contentDescription = "Grade",
-						tint = MaterialTheme.colorScheme.onBackground
+						tint = MaterialTheme.colorScheme.onPrimary
 					)
 				}
 			}
 		}
 
 		Column(
-			modifier = Modifier.padding(
-				horizontal = 16.dp,
-				vertical = 4.dp
-			)
+			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			Text(
 				text = title,
@@ -137,19 +133,17 @@ fun UserListItemColumn(
 				style = MaterialTheme.typography.titleMedium
 			)
 
-			Spacer(modifier = Modifier.height(8.dp))
-
 			Row(
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_tv_24px),
+					painter = painterResource(id = R.drawable.tv_24px),
 					contentDescription = "Media type icon",
-					modifier = Modifier.padding(end = 4.dp)
 				)
 
 				Text(
-					text = "$mediaType ($numEpisodes episodes)",
+					text = if (mediaType.isNotNull()) "$mediaType $numEpisodes" else "Unknown",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -158,19 +152,17 @@ fun UserListItemColumn(
 				)
 			}
 
-			Spacer(modifier = Modifier.height(8.dp))
-
 			Row(
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_calendar_month_24px),
+					painter = painterResource(id = R.drawable.calendar_month_24px),
 					contentDescription = "Season icon",
-					modifier = Modifier.padding(end = 4.dp)
 				)
 
 				Text(
-					text = "$season $year",
+					text = if (year != null) "$season $year" else "N/A",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -179,15 +171,13 @@ fun UserListItemColumn(
 				)
 			}
 
-			Spacer(modifier = Modifier.height(8.dp))
-
 			Row(
-				verticalAlignment = Alignment.CenterVertically
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.outline_filled_grade_24px),
+					painter = painterResource(id = R.drawable.grade_24px),
 					contentDescription = "Mean score icon",
-					modifier = Modifier.padding(end = 4.dp)
 				)
 
 				Text(
@@ -203,7 +193,6 @@ fun UserListItemColumn(
 	}
 }
 
-
 @Composable
 @Preview
 fun UserListItemColumnPreview(
@@ -218,24 +207,36 @@ fun UserListItemColumnPreview(
 			),
 			status = "finished_airing",
 			mean = "9.38",
-			mediaType = "tv",
+			mediaType = MediaType.TV,
 			startSeason = StartSeason(
 				year = 2023,
-				season = "Fall"
+				season = Season.FALL
 			),
-			numListUsers = 701406
-
+			numListUsers = 701406,
+			numEpisodes = 12,
+			broadcast = Broadcast(
+				dayOfTheWeek = "Saturday",
+				startTime = "00:00"
+			),
 		),
-		listStatus = ListStatus(
-			status = "finished_airing",
-			score = "10",
+		myListStatus = MyListStatus(
+			status = MyListMediaStatus.WATCHING,
+			score = 10,
 			numEpisodesWatched = 12,
 			isRewatching = false,
-			updatedAt = ""
+			updatedAt = "",
+			startDate = "",
+			finishDate = "",
+			numTimesRewatched = 0,
+			rewatchValue = 0,
+			tags = emptyList(),
+			priority = 0,
+			comments = ""
 		),
 		ranking = Ranking(
 			rank = 1,
-		)
+		),
+		rankingType = "Score"
 	)
 	UserListItemColumn(data = data, onItemClick = {})
 }

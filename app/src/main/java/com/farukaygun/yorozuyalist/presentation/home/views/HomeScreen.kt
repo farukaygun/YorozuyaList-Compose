@@ -1,26 +1,30 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,16 +35,19 @@ import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
-import com.farukaygun.yorozuyalist.domain.model.Data
+import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectHorizontalList
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
-import com.farukaygun.yorozuyalist.presentation.home.HomeState
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
+import com.farukaygun.yorozuyalist.util.GridListType
+import com.farukaygun.yorozuyalist.util.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
 	navController: NavController,
@@ -49,116 +56,198 @@ fun HomeScreen(
 	val state = viewModel.state.value
 
 	LaunchedEffect(Unit) {
-		if (viewModel.isLoggedIn())
-			viewModel.onEvent(HomeEvent.InitRequestChain)
-        else navController.navigate(route = Screen.LoginScreen.route)
+		if (!viewModel.isLoggedIn())
+			navController.navigate(route = Screen.LoginScreen.route)
 	}
 
-	Column(
-		modifier = Modifier
-			.verticalScroll(rememberScrollState())
+	PullToRefreshBox(
+		isRefreshing = state.isLoading,
+		onRefresh = { viewModel.onEvent(event = HomeEvent.InitRequestChain) },
+		state = rememberPullToRefreshState(),
+		modifier = Modifier.padding(16.dp)
 	) {
-		HomeScreenSection(
-			data = state.animeTodayList,
-			state = state,
-			title = "Today"
+		Column(
+			modifier = Modifier
+				.verticalScroll(rememberScrollState()),
+			verticalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			HomeLargeActionButtons(navController = navController)
+
+			HomeScreenSection(
+				navController = navController,
+				data = state.animeTodayList,
+				isLoading = state.isLoading,
+				title = "Today",
+				icon = R.drawable.schedule_24px,
+				isMoreVisible = false
+			)
+			HomeScreenSection(
+				navController = navController,
+				data = state.animeSeasonalList,
+				isLoading = state.isLoading,
+				title = "Seasonal Anime",
+				icon = R.drawable.calendar_month_24px,
+				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
+			)
+			HomeScreenSection(
+				navController = navController,
+				data = state.animeSuggestionList,
+				isLoading = state.isLoading,
+				title = "Suggested Anime",
+				icon = R.drawable.for_you_24px,
+				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
+			)
+		}
+	}
+
+	if (state.error.isNotEmpty())
+		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+}
+
+@Composable
+fun HomeLargeActionButtons(navController: NavController) {
+	Row(
+		modifier = Modifier
+			.fillMaxWidth(),
+		horizontalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		LargeActionButtonWithIcon(
+			text = "Anime Ranking",
+			icon = R.drawable.movie_24px,
+			onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.RANKING_ANIME_LIST.name}") },
+			modifier = Modifier.weight(1f)
 		)
-		HomeScreenSection(
-			data = state.animeSeasonalList,
-			state = state,
-			title = "Seasonal Anime"
-		)
-		HomeScreenSection(
-			data = state.animeSuggestionList,
-			state = state,
-			title = "Suggested Anime"
+
+		LargeActionButtonWithIcon(
+			text = "Manga Ranking",
+			icon = R.drawable.book_24px,
+			onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.RANKING_MANGA_LIST.name}") },
+			modifier = Modifier.weight(1f)
 		)
 	}
 }
 
 @Composable
-fun HomeScreenSection(data: List<Data>, state: HomeState, title: String) {
-	Surface {
-		Box(
-			modifier = Modifier
-				.padding(horizontal = 16.dp, vertical = 8.dp),
-			contentAlignment = Alignment.Center,
+fun HomeScreenSection(
+	navController: NavController,
+	data: List<Data>,
+	isLoading: Boolean,
+	title: String,
+	icon: Int,
+	onClick: () -> Unit = {},
+	isMoreVisible: Boolean = true
+) {
+	Box(
+		contentAlignment = Alignment.Center
+	) {
+		Column {
+			SectionTitle(
+				title = title,
+				onClick = onClick,
+				icon = icon,
+				isMoreVisible = isMoreVisible
+			)
 
-			) {
-			Column {
-				SectionTitle(title)
-
-				if (state.isLoading) {
-					Box(
-						modifier = Modifier
-							.fillMaxWidth()
-							.defaultMinSize(minHeight = 170.dp),
-						contentAlignment = Alignment.Center
-					) {
-						CircularProgressIndicator(
-							modifier = Modifier
-								.wrapContentHeight()
-								.align(Alignment.Center)
-						)
-					}
-				}
-				HorizontalList(data)
+			if (!isLoading && data.isNotEmpty()) {
+				HorizontalList(
+					navController = navController,
+					animeList = data
+				)
+			} else {
+				ShimmerEffectHorizontalList()
 			}
 		}
 	}
 }
 
 @Composable
-fun SectionTitle(title: String) {
+fun SectionTitle(
+	title: String,
+	icon: Int,
+	onClick: () -> Unit = {},
+	isMoreVisible: Boolean = true
+) {
 	Box(
 		modifier = Modifier
-			.padding(8.dp)
 			.fillMaxWidth()
+			.clickable(
+				interactionSource = null,
+				indication = null,
+				onClick = { if (isMoreVisible) onClick() }
+			)
 	) {
-		Text(
-			text = title,
-			color = MaterialTheme.colorScheme.onSurface,
-			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.titleLarge,
+		Row(
 			modifier = Modifier.align(Alignment.CenterStart),
-		)
-		Icon(
-			painter = painterResource(id = R.drawable.outline_arrow_forward_24),
-			contentDescription = "More",
-			modifier = Modifier.align(Alignment.CenterEnd),
-			tint = MaterialTheme.colorScheme.onSurface,
-		)
-	}
-}
-
-@Composable
-fun HorizontalList(animeList: List<Data>) {
-	Surface(
-		modifier = Modifier
-			.fillMaxWidth()
-	) {
-		Box(
-			modifier = Modifier
-				.fillMaxWidth(),
-			contentAlignment = Alignment.Center
+			verticalAlignment = Alignment.CenterVertically,
+			horizontalArrangement = Arrangement.spacedBy(4.dp)
 		) {
-			LazyRow(
-				modifier = Modifier
-					.fillMaxWidth()
-					.padding(8.dp)
+			Icon(
+				painter = painterResource(id = icon),
+				contentDescription = "Today title icon",
+			)
+
+			Text(
+				text = title,
+				color = MaterialTheme.colorScheme.onBackground,
+				textAlign = TextAlign.Center,
+				style = MaterialTheme.typography.titleMedium,
+				fontWeight = FontWeight.Bold
+			)
+		}
+
+		if (isMoreVisible) {
+			Row(
+				modifier = Modifier.align(Alignment.BottomEnd),
+				verticalAlignment = Alignment.CenterVertically,
+				horizontalArrangement = Arrangement.spacedBy(4.dp)
 			) {
-				items(animeList) { anime ->
-					ListItemRow(data = anime, onItemClick = {
-						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
-					})
-				}
+				Text(
+					text = "MORE",
+					color = MaterialTheme.colorScheme.onBackground,
+					textAlign = TextAlign.Center,
+					style = MaterialTheme.typography.titleSmall,
+					fontWeight = FontWeight.Bold
+				)
+
+				Icon(
+					painter = painterResource(id = R.drawable.arrow_forward_16px),
+					contentDescription = "More icon",
+					tint = MaterialTheme.colorScheme.onBackground
+				)
 			}
 		}
 	}
 }
 
 @Composable
+fun HorizontalList(
+	navController: NavController,
+	animeList: List<Data>
+) {
+	Box(
+		modifier = Modifier
+			.fillMaxWidth(),
+		contentAlignment = Alignment.Center
+	) {
+		LazyRow(
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(vertical = 8.dp),
+			horizontalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			items(animeList) { anime ->
+				ListItemRow(node = anime.node,
+					onItemClick = {
+						navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+					}
+				)
+			}
+		}
+	}
+}
+
 @Preview
+@Composable
 fun HomeScreenPreview() {
 	val context = LocalContext.current
 

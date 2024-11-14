@@ -6,4 +6,5 @@
     <string name="token_refresh_error">Token yenilenirken hata oluştu!</string>
     <string name="error_fetching">Verileri getirirken hata oluştu!</string>
     <string name="login_code_error">Kullanıcı girişinde hata oluştu: \'code\' parametresi bulunamadı.</string>
+    <string name="media_image">Medya görüntüsü</string>
 </resources>

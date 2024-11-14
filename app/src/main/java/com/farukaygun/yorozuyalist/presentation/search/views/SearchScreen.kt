@@ -1,12 +1,10 @@
 package com.farukaygun.yorozuyalist.presentation.search.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -18,7 +16,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -49,18 +46,22 @@ import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
-import com.farukaygun.yorozuyalist.domain.model.Data
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemColumn
-import com.farukaygun.yorozuyalist.presentation.composables.views.OnBottomReached
+import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectVerticalList
 import com.farukaygun.yorozuyalist.presentation.search.SearchEvent
 import com.farukaygun.yorozuyalist.presentation.search.SearchViewModel
+import com.farukaygun.yorozuyalist.util.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
 @Composable
 fun SearchScreen(
-	navController: NavController, viewModel: SearchViewModel = koinViewModel()
+	navController: NavController,
+	viewModel: SearchViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
 
@@ -72,32 +73,26 @@ fun SearchScreen(
 			viewModel = viewModel
 		)
 
-		if (state.isLoading) {
-			Box(
-				modifier = Modifier
-					.fillMaxSize(),
-				contentAlignment = Alignment.Center
-			) {
-				CircularProgressIndicator(
-					modifier = Modifier
-						.wrapContentHeight()
-						.align(Alignment.Center)
-				)
-			}
-		}
 
-		state.animeSearched?.data?.let {
+		if (!state.isLoading && state.animeSearched?.data?.isNotEmpty() == true) {
 			SearchList(
-				data = it,
+				navController = navController,
+				data = state.animeSearched.data,
 				viewModel = viewModel
 			)
+		} else if (state.isLoading) {
+			ShimmerEffectVerticalList()
 		}
 	}
+
+	if (state.error.isNotEmpty())
+		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
 }
 
 @Composable
 fun SearchBar(
-	navController: NavController, viewModel: SearchViewModel
+	navController: NavController,
+	viewModel: SearchViewModel
 ) {
 	var query by rememberSaveable(stateSaver = TextFieldValue.Saver) {
 		mutableStateOf(TextFieldValue())
@@ -111,7 +106,12 @@ fun SearchBar(
 	) {
 		TextField(
 			value = query,
-			onValueChange = { query = it },
+			onValueChange = {
+				query = it
+				// if at least 3 non whitespace characters are entered, search
+				if (Regex("\\S{3,}").matches(query.text))
+					viewModel.onEvent(SearchEvent.Search(query.text))
+			},
 			modifier = Modifier
 				.fillMaxWidth()
 				.focusRequester(focusRequester),
@@ -121,23 +121,22 @@ fun SearchBar(
 					modifier = Modifier
 						.weight(1f)
 						.alpha(.5f),
-					color = MaterialTheme.colorScheme.onSurfaceVariant,
+					color = MaterialTheme.colorScheme.onBackground,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			},
 			leadingIcon = {
 				IconButton(onClick = { navController.popBackStack() }) {
 					Icon(
-						painter = painterResource(id = R.drawable.outline_arrow_back_24),
+						painter = painterResource(id = R.drawable.arrow_back_24px),
 						contentDescription = "Search",
-						tint = MaterialTheme.colorScheme.onSurfaceVariant,
+						tint = MaterialTheme.colorScheme.onBackground,
 					)
 				}
 			},
 			keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
 			keyboardActions = KeyboardActions(onSearch = {
 				keyboardController?.hide()
-				viewModel.onEvent(SearchEvent.Search(query.text))
 			}),
 			singleLine = true,
 			colors = TextFieldDefaults.colors(
@@ -152,7 +151,9 @@ fun SearchBar(
 
 @Composable
 fun SearchList(
-	data: List<Data>, viewModel: SearchViewModel
+	navController: NavController,
+	data: List<Data>,
+	viewModel: SearchViewModel
 ) {
 	val listState = rememberLazyListState()
 	listState.OnBottomReached(buffer = 10) {
@@ -164,37 +165,32 @@ fun SearchList(
 		viewModel.scrollToTop.value = false
 	}
 
-	Surface(
-		modifier = Modifier.fillMaxSize()
+
+	LazyColumn(
+		state = listState,
+		modifier = Modifier.padding(16.dp),
+		verticalArrangement = Arrangement.spacedBy(16.dp)
 	) {
-		Box(
-			modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-		) {
-			LazyColumn(
-				state = listState, modifier = Modifier
-					.fillMaxWidth()
-					.padding(8.dp)
-			) {
 
-				items(data) { anime ->
-					ListItemColumn(data = anime, onItemClick = {
-						// navController.navigate(Screen.AnimeDetailScreen.route+"/${anime.node.id}")
-					})
-				}
+		items(data) { anime ->
+			ListItemColumn(
+				data = anime,
+				onItemClick = { navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}") }
+			)
+		}
 
-				if (viewModel.state.value.isLoadingMore) {
-					item {
-						Column(
-							modifier = Modifier.fillMaxWidth(),
-							verticalArrangement = Arrangement.Center,
-							horizontalAlignment = Alignment.CenterHorizontally
-						) {
-							CircularProgressIndicator()
-						}
-					}
+		if (viewModel.state.value.isLoadingMore) {
+			item {
+				Column(
+					modifier = Modifier.padding(16.dp),
+					verticalArrangement = Arrangement.Center,
+					horizontalAlignment = Alignment.CenterHorizontally
+				) {
+					CircularProgressIndicator()
 				}
 			}
 		}
+
 	}
 }
 

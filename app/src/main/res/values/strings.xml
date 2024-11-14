@@ -5,4 +5,5 @@
     <string name="token_refresh_error">Token refresh error!</string>
     <string name="error_fetching">Error while fetching!</string>
     <string name="login_code_error">Error during user login: \'code\' parameter not found.</string>
+    <string name="media_image">Media image</string>
 </resources>

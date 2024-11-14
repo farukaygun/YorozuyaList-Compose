@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.data.remote.dto.user
 
-import com.farukaygun.yorozuyalist.domain.model.user.User
-import com.farukaygun.yorozuyalist.domain.model.user.UserAnimeStatistics
+import com.farukaygun.yorozuyalist.domain.models.user.User
+import com.farukaygun.yorozuyalist.domain.models.user.UserAnimeStatistics
 import com.google.gson.annotations.SerializedName
 
 data class UserDto(
@@ -21,7 +21,7 @@ data class UserDto(
 	val picture: String,
 )
 
-fun UserDto.toUser() : User {
+fun UserDto.toUser(): User {
 	return User(
 		userAnimeStatistics = userAnimeStatistics,
 		birthday = birthday,

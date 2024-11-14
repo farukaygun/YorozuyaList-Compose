@@ -19,7 +19,8 @@ class Calendar {
 			get() = Clock.System.now().toLocalDateTime(tokyoTimeZone).time
 
 		fun getYearAndSeason(): Pair<Int, Seasons> {
-			val currentLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+			val currentLocalDateTime =
+				Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 			val year = currentLocalDateTime.year
 			val month = currentLocalDateTime.month
 

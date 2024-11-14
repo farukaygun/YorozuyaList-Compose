@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.login
 
-import com.farukaygun.yorozuyalist.domain.model.AccessToken
+import com.farukaygun.yorozuyalist.domain.models.AccessToken
 
 data class LoginState(
 	val isLoading: Boolean = false,

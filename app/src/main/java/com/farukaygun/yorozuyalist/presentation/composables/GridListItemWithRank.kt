@@ -1,0 +1,192 @@
+package com.farukaygun.yorozuyalist.presentation.composables
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
+import com.farukaygun.yorozuyalist.R
+import com.farukaygun.yorozuyalist.domain.models.Data
+import com.farukaygun.yorozuyalist.domain.models.MainPicture
+import com.farukaygun.yorozuyalist.domain.models.MyListStatus
+import com.farukaygun.yorozuyalist.domain.models.Node
+import com.farukaygun.yorozuyalist.domain.models.Ranking
+import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
+import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
+import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
+import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
+import com.farukaygun.yorozuyalist.domain.models.enums.Season
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
+
+private const val IMAGE_WIDTH = 100
+private const val IMAGE_HEIGHT = 150
+
+@Composable
+fun GridListItemWithRank(
+	data: Data,
+	onItemClick: () -> Unit
+) {
+	val title = data.node.title
+	val mainPictureUrl = data.node.mainPicture.medium.takeUnless { it.isEmpty() }
+		?: R.drawable.broken_image_24px
+
+	Column(
+		modifier = Modifier
+			.wrapContentWidth()
+			.clickable { onItemClick() },
+		verticalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		Surface(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+		) {
+			SubcomposeAsyncImage(
+				model = ImageRequest.Builder(LocalContext.current)
+					.data(mainPictureUrl)
+					.crossfade(true)
+					.crossfade(300)
+					.build(),
+				loading = {
+					ShimmerEffect(
+						modifier = Modifier
+							.clip(RoundedCornerShape(10.dp))
+							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+					)
+				},
+				error = {
+					Icon(
+						painter = painterResource(id = R.drawable.broken_image_24px),
+						contentDescription = "Error icon",
+					)
+				},
+				contentDescription = title,
+				contentScale = ContentScale.Crop,
+				modifier = Modifier
+					.clip(RoundedCornerShape(10.dp))
+					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+			)
+
+			Box(contentAlignment = Alignment.BottomStart) {
+				Row(
+					modifier = Modifier
+						.background(MaterialTheme.colorScheme.primary)
+						.padding(4.dp),
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					Text(
+						text = "#${data.ranking?.rank}",
+						style = MaterialTheme.typography.bodyMedium,
+						textAlign = TextAlign.Center,
+						color = MaterialTheme.colorScheme.onPrimary,
+						fontWeight = FontWeight.Bold
+					)
+				}
+			}
+		}
+
+		Text(
+			text = title,
+			textAlign = TextAlign.Start,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			modifier = Modifier.width(IMAGE_WIDTH.dp),
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodyMedium
+		)
+	}
+}
+
+@Composable
+fun ShimmerEffectGridListItemWithRank() {
+	Column(
+		modifier = Modifier
+			.wrapContentWidth(),
+		verticalArrangement = Arrangement.spacedBy(8.dp)
+	) {
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+		)
+
+		ShimmerEffect(
+			modifier = Modifier
+				.clip(RoundedCornerShape(10.dp))
+				.size(IMAGE_WIDTH.dp, 40.dp)
+		)
+	}
+}
+
+@Composable
+@Preview
+fun GridListItemWithRankPreview(
+) {
+	val data = Data(
+		node = Node(
+			id = 52991,
+			title = "Sousou no Frieren",
+			mainPicture = MainPicture(
+				medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
+				large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
+			),
+			status = "finished_airing",
+			mean = "9.38",
+			mediaType = MediaType.TV,
+			startSeason = StartSeason(
+				year = 2023,
+				season = Season.FALL
+			),
+			numListUsers = 701406,
+			numEpisodes = 12,
+			broadcast = Broadcast(
+				dayOfTheWeek = "Saturday",
+				startTime = "00:00"
+			),
+		),
+		myListStatus = MyListStatus(
+			status = MyListMediaStatus.WATCHING,
+			score = 10,
+			numEpisodesWatched = 12,
+			isRewatching = false,
+			updatedAt = "",
+			startDate = "",
+			finishDate = "",
+			numTimesRewatched = 0,
+			rewatchValue = 0,
+			tags = emptyList(),
+			priority = 0,
+			comments = ""
+		),
+		ranking = Ranking(
+			rank = 1,
+		),
+		rankingType = "Score"
+	)
+	GridListItemWithRank(data = data, onItemClick = {})
+}

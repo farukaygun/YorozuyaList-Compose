@@ -8,8 +8,8 @@ class Util {
 				val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9') + '-' + '.' + '_' + '~'
 
 				codeVerifier = (1..64)
-					.map { allowedChars.random() } // return random element from collection
-					.joinToString("") // add element to new string
+					.map { allowedChars.random() }
+					.joinToString("")
 			}
 			return codeVerifier
 		}

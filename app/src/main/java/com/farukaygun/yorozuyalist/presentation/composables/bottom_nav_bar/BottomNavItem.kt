@@ -4,36 +4,31 @@ import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.presentation.Screen
 
 sealed class BottomNavItem(
-	val route: String,
+	val screen: Screen,
 	val unselectedIcon: Int,
 	val selectedIcon: Int,
-	val label: String,
 ) {
 	data object Home : BottomNavItem(
-		route = Screen.HomeScreen.route,
-		unselectedIcon = R.drawable.outline_home_24px,
-		selectedIcon = R.drawable.filled_outline_home_24px,
-		label = Screen.HomeScreen.title
+		screen = Screen.HomeScreen,
+		unselectedIcon = R.drawable.home_unfilled_24px,
+		selectedIcon = R.drawable.home_24px,
 	)
 
 	data object UserAnimeList : BottomNavItem(
-		route = Screen.AnimeListScreen.route,
-		unselectedIcon = R.drawable.outline_movie_24px,
-		selectedIcon = R.drawable.filled_outline_movie_24px,
-		label = Screen.AnimeListScreen.title
+		screen = Screen.UserAnimeListScreen,
+		unselectedIcon = R.drawable.movie_unfilled_24px,
+		selectedIcon = R.drawable.movie_24px,
 	)
 
 	data object UserMangaList : BottomNavItem(
-		route = Screen.MangaListScreen.route,
-		unselectedIcon = R.drawable.outline_book_24px,
-		selectedIcon = R.drawable.filled_outline_book_24px,
-		label = Screen.MangaListScreen.title
+		screen = Screen.UserMangaListScreen,
+		unselectedIcon = R.drawable.book_unfilled_24px,
+		selectedIcon = R.drawable.book_24px,
 	)
 
 	data object Profile : BottomNavItem(
-		route = Screen.ProfileScreen.route,
-		unselectedIcon = R.drawable.outline_person_24px,
-		selectedIcon = R.drawable.filled_outline_person_24px,
-		label = Screen.ProfileScreen.title
+		screen = Screen.ProfileScreen,
+		unselectedIcon = R.drawable.person_unfilled_24px,
+		selectedIcon = R.drawable.person_24px,
 	)
 }
