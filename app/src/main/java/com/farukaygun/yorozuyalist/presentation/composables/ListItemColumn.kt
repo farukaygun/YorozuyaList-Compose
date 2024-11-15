@@ -66,14 +66,13 @@ fun ListItemColumn(
 				.crossfade(true)
 				.crossfade(300)
 				.build(),
-//			loading = {
-//				Column(
-//					verticalArrangement = Arrangement.Center,
-//					horizontalAlignment = Alignment.CenterHorizontally
-//				) {
-//					CircularProgressIndicator()
-//				}
-//			},
+			loading = {
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+				)
+			},
 			error = {
 				Icon(
 					painter = painterResource(id = R.drawable.broken_image_24px),

@@ -6,6 +6,8 @@ import com.farukaygun.yorozuyalist.domain.models.Stat
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
 import com.farukaygun.yorozuyalist.domain.use_case.UserUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
+import com.farukaygun.yorozuyalist.util.Constants
+import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.openCustomTab
 import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
@@ -84,6 +86,10 @@ class ProfileViewModel(
 		when (event) {
 			is ProfileEvent.InitRequestChain -> {
 				getUserProfile()
+			}
+
+			is ProfileEvent.OpenProfileWithCustomTab -> {
+				event.context.openCustomTab("${Constants.HOME_URL}/profile/${event.username}")
 			}
 		}
 	}

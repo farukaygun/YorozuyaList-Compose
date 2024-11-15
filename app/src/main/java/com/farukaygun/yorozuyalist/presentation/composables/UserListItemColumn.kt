@@ -40,6 +40,7 @@ import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
 import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
 import com.farukaygun.yorozuyalist.domain.models.enums.Season
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 
 private const val IMAGE_WIDTH = 100
 private const val IMAGE_HEIGHT = 150
@@ -76,14 +77,13 @@ fun UserListItemColumn(
 					.crossfade(true)
 					.crossfade(300)
 					.build(),
-//				loading = {
-//					Column(
-//						verticalArrangement = Arrangement.Center,
-//						horizontalAlignment = Alignment.CenterHorizontally
-//					) {
-//						CircularProgressIndicator()
-//					}
-//				},
+				loading = {
+					ShimmerEffect(
+						modifier = Modifier
+							.clip(RoundedCornerShape(10.dp))
+							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+					)
+				},
 				error = {
 					Icon(
 						painter = painterResource(id = R.drawable.broken_image_24px),

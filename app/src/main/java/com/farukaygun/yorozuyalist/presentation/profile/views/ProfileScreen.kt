@@ -1,6 +1,7 @@
 package com.farukaygun.yorozuyalist.presentation.profile.views
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.models.user.User
+import com.farukaygun.yorozuyalist.presentation.profile.ProfileEvent
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileViewModel
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToAbbreviatedDate
@@ -58,7 +60,10 @@ fun ProfileScreen(
 		Column(
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-			UserInfoSection(data = state.profileData)
+			UserInfoSection(
+				viewModel = viewModel,
+				data = state.profileData
+			)
 
 			HorizontalDivider(
 				color = MaterialTheme.colorScheme.onBackground,
@@ -76,7 +81,12 @@ fun ProfileScreen(
 }
 
 @Composable
-fun UserInfoSection(data: User) {
+fun UserInfoSection(
+	viewModel: ProfileViewModel,
+	data: User
+) {
+	val context = LocalContext.current
+
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -115,13 +125,33 @@ fun UserInfoSection(data: User) {
 		Column(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			Text(
-				text = data.name,
-				color = MaterialTheme.colorScheme.onBackground,
-				style = MaterialTheme.typography.titleLarge,
-				fontWeight = FontWeight.Bold
+			Row(
+				horizontalArrangement = Arrangement.spacedBy(8.dp),
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier
+					.clickable {
+						viewModel.onEvent(
+							ProfileEvent.OpenProfileWithCustomTab(
+								context = context,
+								username = data.name
+							)
+						)
+					}
+			) {
+				Text(
+					text = data.name,
+					color = MaterialTheme.colorScheme.onBackground,
+					style = MaterialTheme.typography.titleLarge,
+					fontWeight = FontWeight.Bold
+				)
 
-			)
+				Icon(
+					painter = painterResource(id = R.drawable.link_24px),
+					contentDescription = "Verified icon",
+					tint = MaterialTheme.colorScheme.onBackground
+				)
+			}
+
 			Row(
 				horizontalArrangement = Arrangement.spacedBy(8.dp),
 				verticalAlignment = Alignment.CenterVertically
