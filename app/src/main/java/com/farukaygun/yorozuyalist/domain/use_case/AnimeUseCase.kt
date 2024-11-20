@@ -17,7 +17,7 @@ import com.farukaygun.yorozuyalist.domain.models.anime.AnimeSeasonal
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeSuggested
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.Sort
+import com.farukaygun.yorozuyalist.util.enums.UserListSorting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -138,7 +138,7 @@ class AnimeUseCase(
 
 	fun executeUserAnimeList(
 		status: String?,
-		sort: String = Sort.ANIME_TITLE.format(),
+		sort: String = UserListSorting.ANIME_TITLE.value,
 		limit: Int = 10,
 		offset: Int = 0
 	): Flow<Resource<AnimeUserList>> = flow {

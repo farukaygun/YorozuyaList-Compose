@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.presentation.grid_list
 
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
-import com.farukaygun.yorozuyalist.util.GridListType
+import com.farukaygun.yorozuyalist.util.enums.GridListType
 
 data class GridListState(
 	val gridList: MediaList? = null,

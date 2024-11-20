@@ -46,10 +46,10 @@ fun ListItemColumn(
 	onItemClick: () -> Unit
 ) {
 	val title = data.node.title
-	val mediaType = data.node.mediaType?.format()
+	val mediaType = data.node.mediaType?.displayName
 	val numEpisodes = if (data.node.numEpisodes > 0) "(${data.node.numEpisodes} episodes)" else ""
 	val mainPictureUrl = data.node.mainPicture.medium
-	val season = data.node.startSeason?.season?.format() ?: "Unknown"
+	val season = data.node.startSeason?.season?.displayName ?: "Unknown"
 	val year = data.node.startSeason?.year?.toString()
 	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
 

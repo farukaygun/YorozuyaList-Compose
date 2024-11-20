@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.domain.models.enums
+package com.farukaygun.yorozuyalist.util.enums
 
 import com.google.gson.annotations.SerializedName
 

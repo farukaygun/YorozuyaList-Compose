@@ -73,7 +73,7 @@ import com.farukaygun.yorozuyalist.util.Extensions.ModelExtensions.episodeDurati
 import com.farukaygun.yorozuyalist.util.Extensions.ModelExtensions.formatBroadcast
 import com.farukaygun.yorozuyalist.util.Extensions.ModelExtensions.formatMediaDuration
 import com.farukaygun.yorozuyalist.util.Extensions.ModelExtensions.formatStartSeason
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
@@ -227,7 +227,7 @@ private fun MediaInfo() {
 				)
 
 				Text(
-					text = mediaDetail.status?.format() ?: "N/A",
+					text = mediaDetail.status?.displayName ?: "N/A",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -424,7 +424,7 @@ fun MoreInfoSection() {
 			)
 			MediaInfoView(
 				title = "Source",
-				info = mediaDetail.source.format(),
+				info = mediaDetail.source.displayName,
 			)
 		}
 		HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -518,10 +518,10 @@ fun MyListFloatingActionButton(detail: MediaDetail, showBottomSheet: MutableStat
 	val editIcon = R.drawable.edit_24px
 
 	val statusMap: Map<String?, Pair<String, Int>> = MyListMediaStatus.entries.associate {
-		it.format() to (it.format() to editIcon)
+		it.displayName to (it.displayName to editIcon)
 	} + (null to ("Add to List" to R.drawable.add_24px))
 
-	val (text, icon) = statusMap[detail.myListStatus?.status?.format()]
+	val (text, icon) = statusMap[detail.myListStatus?.status?.displayName]
 		?: ("Add to List" to R.drawable.add_24px)
 
 	ExtendedFloatingActionButton(

@@ -41,8 +41,10 @@ import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectHorizontalList
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
-import com.farukaygun.yorozuyalist.util.GridListType
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.season
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.year
+import com.farukaygun.yorozuyalist.util.enums.GridListType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
@@ -85,8 +87,8 @@ fun HomeScreen(
 				navController = navController,
 				data = state.animeSeasonalList,
 				isLoading = state.isLoading,
-				title = "Seasonal Anime",
-				icon = R.drawable.calendar_month_24px,
+				title = "${season.displayName} $year Anime",
+				icon = season.icon,
 				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
 			)
 			HomeScreenSection(

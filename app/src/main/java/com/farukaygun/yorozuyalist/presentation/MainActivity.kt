@@ -22,10 +22,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.farukaygun.yorozuyalist.presentation.common.rememberSearchBarState
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomNavBarState
 import com.farukaygun.yorozuyalist.presentation.composables.search_bar.SearchBar
+import com.farukaygun.yorozuyalist.presentation.composables.search_bar.rememberSearchBarState
 import com.farukaygun.yorozuyalist.presentation.detail.views.DetailScreen
 import com.farukaygun.yorozuyalist.presentation.grid_list.views.GridListScreen
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen

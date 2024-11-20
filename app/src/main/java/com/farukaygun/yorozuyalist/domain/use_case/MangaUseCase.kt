@@ -10,7 +10,7 @@ import com.farukaygun.yorozuyalist.domain.models.MyListStatus
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaDetail
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaUserList
 import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.Sort
+import com.farukaygun.yorozuyalist.util.enums.UserListSorting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -19,7 +19,7 @@ class MangaUseCase(
 ) {
 	fun executeUserMangaList(
 		status: String?,
-		sort: String = Sort.MANGA_TITLE.format(),
+		sort: String = UserListSorting.MANGA_TITLE.value,
 		limit: Int = 10,
 		offset: Int = 0
 	): Flow<Resource<MangaUserList>> = flow {

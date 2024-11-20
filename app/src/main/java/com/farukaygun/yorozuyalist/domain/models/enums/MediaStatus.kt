@@ -1,9 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.models.enums
 
-import com.farukaygun.yorozuyalist.domain.interfaces.Formattable
 import com.google.gson.annotations.SerializedName
 
-enum class MediaStatus(private val displayName: String, private val apiName: String) : Formattable {
+enum class MediaStatus(val displayName: String, val apiName: String) {
 	@SerializedName("finished_airing")
 	FINISHED_AIRING("Finished Airing", "finished_airing"),
 
@@ -14,9 +13,5 @@ enum class MediaStatus(private val displayName: String, private val apiName: Str
 	NOT_YET_AIRED("Not Yet Aired", "not_yet_aired"),
 
 	@SerializedName("not_yet_published")
-	NOT_YET_PUBLISHED("Not Yet Published", "not_yet_published");
-
-	override fun format() = displayName
-
-	override fun formatForApi() = apiName
+	NOT_YET_PUBLISHED("Not Yet Published", "not_yet_published")
 }

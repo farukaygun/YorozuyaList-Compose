@@ -10,8 +10,8 @@ import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.ScreenType
 import com.farukaygun.yorozuyalist.util.StringValue
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -105,7 +105,7 @@ class UserListViewModel(
 
 	private fun filterList(filter: MyListMediaStatus?) {
 		_state.value = _state.value.copy(
-			filter = filter?.formatForApi()
+			filter = filter?.apiName
 		)
 
 		getUserList()

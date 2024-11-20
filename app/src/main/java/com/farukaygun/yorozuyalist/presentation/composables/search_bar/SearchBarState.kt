@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.presentation.common
+package com.farukaygun.yorozuyalist.presentation.composables.search_bar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

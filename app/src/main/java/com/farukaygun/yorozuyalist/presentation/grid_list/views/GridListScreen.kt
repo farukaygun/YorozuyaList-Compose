@@ -23,8 +23,8 @@ import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectGridList
 import com.farukaygun.yorozuyalist.presentation.grid_list.GridListEvent
 import com.farukaygun.yorozuyalist.presentation.grid_list.GridListViewModel
-import com.farukaygun.yorozuyalist.util.GridListType
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.GridListType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
