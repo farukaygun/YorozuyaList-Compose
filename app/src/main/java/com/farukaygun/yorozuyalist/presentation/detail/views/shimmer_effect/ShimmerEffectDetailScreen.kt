@@ -29,7 +29,7 @@ import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.presentation.detail.views.DetailScreen
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
 
@@ -102,14 +102,14 @@ fun ShimmerEffectGenresSection() {
 			.horizontalScroll(rememberScrollState()),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		for (i in 1..5) {
-			ShimmerEffect(
-				modifier = Modifier
-					.padding(vertical = 8.dp)
-					.clip(RoundedCornerShape(10.dp))
-					.size(72.dp, 32.dp)
-			)
-		}
+        (1..5).forEach { i ->
+            ShimmerEffect(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .size(72.dp, 32.dp)
+            )
+        }
 	}
 }
 
@@ -124,13 +124,13 @@ fun ShimmerEffectSynopsisSection() {
 		Column(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			for (i in 1..5) {
-				ShimmerEffect(
-					modifier = Modifier
-						.clip(RoundedCornerShape(10.dp))
-						.size(400.dp, 12.dp)
-				)
-			}
+            (1..5).forEach { i ->
+                ShimmerEffect(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .size(400.dp, 12.dp)
+                )
+            }
 		}
 
 		ShimmerEffect(
@@ -188,9 +188,9 @@ fun ShimmerEffectMoreInfoSection() {
 			color = MaterialTheme.colorScheme.onBackground
 		)
 
-		for (i in 1..6) {
-			ShimmerEffectMediaInfoView()
-		}
+        (1..6).forEach { i ->
+            ShimmerEffectMediaInfoView()
+        }
 
 		HorizontalDivider()
 
@@ -198,9 +198,9 @@ fun ShimmerEffectMoreInfoSection() {
 
 		HorizontalDivider()
 
-		for (i in 1..3) {
-			ShimmerEffectMediaInfoView()
-		}
+        (1..3).forEach { i ->
+            ShimmerEffectMediaInfoView()
+        }
 	}
 }
 

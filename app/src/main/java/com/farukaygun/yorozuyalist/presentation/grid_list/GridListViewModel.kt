@@ -4,14 +4,15 @@ import androidx.compose.runtime.mutableStateOf
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeUserList
-import com.farukaygun.yorozuyalist.domain.models.enums.RankingType
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
-import com.farukaygun.yorozuyalist.util.Calendar.Companion.getYearAndSeason
-import com.farukaygun.yorozuyalist.util.GridListType
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.season
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.year
 import com.farukaygun.yorozuyalist.util.Resource
 import com.farukaygun.yorozuyalist.util.StringValue
+import com.farukaygun.yorozuyalist.util.enums.GridListType
+import com.farukaygun.yorozuyalist.util.enums.RankingType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -24,12 +25,11 @@ class GridListViewModel(
 
 	@Suppress("UNCHECKED_CAST")
 	private fun getList() {
-		val (year, season) = getYearAndSeason()
 		val getList = when (_state.value.type) {
 			GridListType.SUGGESTED_ANIME_LIST -> animeUseCase.executeSuggestedAnime()
 			GridListType.SEASONAL_ANIME_LIST -> animeUseCase.executeSeasonalAnime(
 				year = year,
-				season = season.value
+				season = season.apiName
 			)
 			GridListType.RANKING_ANIME_LIST -> animeUseCase.executeGetAnimeRanking(rankingType = RankingType.ALL.value)
 			GridListType.RANKING_MANGA_LIST -> mangaUseCase.executeGetMangaRanking(rankingType = RankingType.ALL.value)

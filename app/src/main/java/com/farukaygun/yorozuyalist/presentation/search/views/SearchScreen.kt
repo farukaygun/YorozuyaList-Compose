@@ -53,7 +53,7 @@ import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectVerticalList
 import com.farukaygun.yorozuyalist.presentation.search.SearchEvent
 import com.farukaygun.yorozuyalist.presentation.search.SearchViewModel
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication

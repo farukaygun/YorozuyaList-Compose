@@ -13,8 +13,8 @@ import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToISODate
 import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.ScreenType
 import com.farukaygun.yorozuyalist.util.StringValue
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -57,7 +57,7 @@ class MyListModalBottomSheetViewModel(
 		val completedStatus = newStatus == MyListMediaStatus.COMPLETED
 
 		_state.value = _state.value.copy(
-			selectedStatus = if (_state.value.selectedStatus?.formatForApi() == newStatus.formatForApi()) null else newStatus,
+			selectedStatus = if (_state.value.selectedStatus?.apiName == newStatus.apiName) null else newStatus,
 			episodeCount = if (mediaDetail is AnimeDetail && completedStatus) mediaDetail.numEpisodes else _state.value.episodeCount,
 			chapterCount = if (mediaDetail is MangaDetail && completedStatus) mediaDetail.numChapters else _state.value.chapterCount,
 			volumeCount = if (mediaDetail is MangaDetail && completedStatus) mediaDetail.numVolumes else _state.value.volumeCount
@@ -158,7 +158,7 @@ class MyListModalBottomSheetViewModel(
 			val rewatchValue = rewatchValue.takeIf { it != myListStatus?.rewatchValue }
 			val comments = comments.takeIf { it != myListStatus?.comments }
 
-			val formattedStatus = selectedStatus?.formatForApi()
+			val formattedStatus = selectedStatus?.apiName
 			val formattedStartDate = startDate?.formatToISODate()
 			val formattedFinishDate = finishDate?.formatToISODate()
 			val formattedTags = tags?.joinToString()

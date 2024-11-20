@@ -2,7 +2,7 @@ package com.farukaygun.yorozuyalist.presentation.detail.bottom_sheet
 
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 
 sealed class MyListBottomSheetEvent {
 	data class Init(val detail: MediaDetail, val type: ScreenType) : MyListBottomSheetEvent()

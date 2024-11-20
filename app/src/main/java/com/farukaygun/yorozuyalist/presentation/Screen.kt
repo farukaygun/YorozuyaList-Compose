@@ -1,6 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation
 
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 
 sealed class Screen(
 	val route: String,

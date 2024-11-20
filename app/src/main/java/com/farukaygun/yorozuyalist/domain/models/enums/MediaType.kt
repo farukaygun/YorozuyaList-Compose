@@ -1,9 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.models.enums
 
-import com.farukaygun.yorozuyalist.domain.interfaces.Formattable
 import com.google.gson.annotations.SerializedName
 
-enum class MediaType(private val displayName: String) : Formattable {
+enum class MediaType(val displayName: String) {
 	@SerializedName("unknown")
 	UNKNOWN("Unknown"),
 
@@ -48,6 +47,4 @@ enum class MediaType(private val displayName: String) : Formattable {
 
 	@SerializedName("oel")
 	OEL("Oel");
-
-	override fun format() = displayName
 }
