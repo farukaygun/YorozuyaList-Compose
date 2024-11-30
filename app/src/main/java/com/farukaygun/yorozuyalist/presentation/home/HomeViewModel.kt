@@ -9,8 +9,9 @@ import com.farukaygun.yorozuyalist.domain.models.enums.MediaStatus
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
-import com.farukaygun.yorozuyalist.util.Calendar.Companion.getYearAndSeason
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.season
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.weekDayJapan
+import com.farukaygun.yorozuyalist.util.Calendar.Companion.year
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
@@ -121,10 +122,13 @@ class HomeViewModel(
 	private fun getTodayAnime(
 		limit: Int = 500
 	) {
-		val (year, season) = getYearAndSeason()
 		val animeList = mutableListOf<Data>()
 
-		jobs += animeUseCase.executeSeasonalAnime(year, season.value, limit)
+		jobs += animeUseCase.executeSeasonalAnime(
+			year = year,
+			season = season.apiName,
+			limit = limit
+		)
 			.flowOn(Dispatchers.IO)
 			.handleResource(
 				onSuccess = { animeData ->
@@ -132,7 +136,7 @@ class HomeViewModel(
 						if (anime.node.broadcast?.dayOfTheWeek.equals(
 								weekDayJapan.toString(),
 								true
-							) && anime.node.status == MediaStatus.CURRENTLY_AIRING.formatForApi()
+							) && anime.node.status == MediaStatus.CURRENTLY_AIRING.apiName
 						)
 							animeList.add(anime)
 					}.apply {
@@ -154,9 +158,10 @@ class HomeViewModel(
 
 
 	private fun getSeasonalAnime() {
-		val (year, season) = getYearAndSeason()
-
-		jobs += animeUseCase.executeSeasonalAnime(year, season.value)
+		jobs += animeUseCase.executeSeasonalAnime(
+			year = year,
+			season = season.apiName
+		)
 			.flowOn(Dispatchers.IO)
 			.handleResource(
 				onSuccess = { animeData ->

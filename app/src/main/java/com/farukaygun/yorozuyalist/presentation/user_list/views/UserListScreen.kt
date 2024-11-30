@@ -45,7 +45,7 @@ import com.farukaygun.yorozuyalist.presentation.composables.UserListItemColumn
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectVerticalList
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListEvent
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListViewModel
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
@@ -95,7 +95,7 @@ fun MyListStatusFilterChips(
 	}
 
 	fun toggleStatusFilter(status: MyListMediaStatus) {
-		statusFilter = if (statusFilter?.formatForApi() == status.formatForApi()) null else status
+		statusFilter = if (statusFilter?.apiName == status.apiName) null else status
 		viewModel.onEvent(UserListEvent.FilterList(statusFilter))
 	}
 
@@ -118,10 +118,10 @@ fun MyListStatusFilterChips(
 		modifier = Modifier.horizontalScroll(rememberScrollState())
 	) {
 		statuses.forEach { status ->
-			val selected = statusFilter?.formatForApi() == status.formatForApi()
+			val selected = statusFilter?.apiName == status.apiName
 			FilterChip(
 				onClick = { toggleStatusFilter(status) },
-				label = { Text(status.format()) },
+				label = { Text(status.displayName) },
 				selected = selected,
 				leadingIcon = {
 					AnimatedContent(
@@ -157,7 +157,6 @@ fun UserList(
 		modifier = Modifier.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(16.dp)
 	) {
-
 		items(data) { media ->
 			UserListItemColumn(data = media, onItemClick = {
 				if (viewModel.state.value.type == ScreenType.ANIME)

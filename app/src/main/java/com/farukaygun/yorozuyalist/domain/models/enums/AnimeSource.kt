@@ -1,9 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.models.enums
 
-import com.farukaygun.yorozuyalist.domain.interfaces.Formattable
 import com.google.gson.annotations.SerializedName
 
-enum class AnimeSource(private val displayName: String) : Formattable {
+enum class AnimeSource(val displayName: String) {
 	@SerializedName("original")
 	ORIGINAL("Original"),
 
@@ -36,6 +35,4 @@ enum class AnimeSource(private val displayName: String) : Formattable {
 
 	@SerializedName("4_koma_manga")
 	YON_KOMA_MANGA("4-Koma Manga");
-
-	override fun format() = displayName
 }

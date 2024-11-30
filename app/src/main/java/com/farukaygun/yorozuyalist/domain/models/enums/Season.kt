@@ -1,9 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.models.enums
 
-import com.farukaygun.yorozuyalist.domain.interfaces.Formattable
 import com.google.gson.annotations.SerializedName
 
-enum class Season(private val displayName: String) : Formattable {
+enum class Season(val displayName: String) {
 	@SerializedName("winter")
 	WINTER("Winter"),
 
@@ -15,6 +14,4 @@ enum class Season(private val displayName: String) : Formattable {
 
 	@SerializedName("fall")
 	FALL("Fall");
-
-	override fun format() = displayName
 }

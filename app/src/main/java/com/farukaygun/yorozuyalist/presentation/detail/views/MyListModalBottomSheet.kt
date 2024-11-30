@@ -53,7 +53,7 @@ import com.farukaygun.yorozuyalist.presentation.detail.bottom_sheet.MyListModalB
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatPriority
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatRewatchValue
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatScore
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToInt
 
@@ -171,12 +171,12 @@ fun StatusFilterOptions(
 		modifier = Modifier.horizontalScroll(rememberScrollState())
 	) {
 		statusList.forEach { status ->
-			val isSelected = state.selectedStatus?.formatForApi() == status.formatForApi()
+			val isSelected = state.selectedStatus?.apiName == status.apiName
 
 			FilterChip(onClick = {
 				viewModel.onEvent(MyListBottomSheetEvent.SetStatus(newStatus = status))
 			},
-				label = { Text(status.format()) },
+				label = { Text(status.displayName) },
 				selected = isSelected,
 				leadingIcon = {
 					AnimatedContent(

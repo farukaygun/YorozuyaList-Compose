@@ -1,10 +1,8 @@
 package com.farukaygun.yorozuyalist.domain.models.enums
 
-import com.farukaygun.yorozuyalist.domain.interfaces.Formattable
 import com.google.gson.annotations.SerializedName
 
-enum class MyListMediaStatus(private val displayName: String, private val apiName: String) :
-	Formattable {
+enum class MyListMediaStatus(val displayName: String, val apiName: String) {
 	@SerializedName("watching")
 	WATCHING("Watching", "watching"),
 
@@ -25,8 +23,4 @@ enum class MyListMediaStatus(private val displayName: String, private val apiNam
 
 	@SerializedName("plan_to_read")
 	PLAN_TO_READ("Plan to Read", "plan_to_read");
-
-	override fun format() = displayName
-
-	override fun formatForApi() = apiName
 }

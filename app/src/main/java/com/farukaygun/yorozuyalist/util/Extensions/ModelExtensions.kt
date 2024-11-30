@@ -28,7 +28,7 @@ object ModelExtensions {
 
 	@Composable
 	fun StartSeason.formatStartSeason() = if (season.isNotNull() && year != 0) {
-		"${season.format()} $year"
+		"${season.displayName} $year"
 	} else {
 		"N/A"
 	}

@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 import com.farukaygun.yorozuyalist.domain.models.Node
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
-import com.farukaygun.yorozuyalist.util.ScreenType
+import com.farukaygun.yorozuyalist.util.enums.ScreenType
 
 @Composable
 fun MediaListView(
