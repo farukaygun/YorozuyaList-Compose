@@ -20,8 +20,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.MainPicture
 import com.farukaygun.yorozuyalist.domain.models.Node
@@ -50,7 +51,7 @@ fun ListItemRow(
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(node.mainPicture.medium)
 				.crossfade(true)
-				.crossfade(300)
+				.crossfade(350)
 				.build(),
 			loading = {
 				ShimmerEffect(

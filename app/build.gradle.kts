@@ -59,16 +59,16 @@ android {
 
 dependencies {
 	implementation("androidx.test.services:storage:1.5.0")
-	val ktorVersion = "3.0.1"
+	val ktorVersion = "3.1.1"
 	val koinVersion="4.0.0"
-	val coilVersion = "2.7.0"
+	val coilVersion = "3.1.0"
 
 
-	implementation("com.google.android.engage:engage-core:1.5.5")
+	implementation("com.google.android.engage:engage-core:1.5.6")
 	implementation("androidx.core:core-ktx:1.15.0")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-	implementation("androidx.activity:activity-compose:1.9.3")
-	implementation(platform("androidx.compose:compose-bom:2024.11.00"))
+	implementation("androidx.activity:activity-compose:1.10.1")
+	implementation(platform("androidx.compose:compose-bom:2025.02.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
@@ -76,7 +76,7 @@ dependencies {
 
 	// navigation
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-	implementation("androidx.navigation:navigation-compose:2.8.4")
+	implementation("androidx.navigation:navigation-compose:2.8.8")
 
 	// Ktor
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -93,7 +93,9 @@ dependencies {
 	implementation ("io.insert-koin:koin-logger-slf4j:$koinVersion")
 
 	// Coil
-	implementation("io.coil-kt:coil-compose:$coilVersion")
+	implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
+	implementation("io.coil-kt.coil3:coil-network-ktor3:3.0.4")
+
 	// Custom Tabs
 	implementation("androidx.browser:browser:1.8.0")
 	implementation("androidx.preference:preference-ktx:1.2.1")
@@ -104,8 +106,8 @@ dependencies {
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.2.1")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2024.11.00"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2025.02.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.5")
+	debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.8")
 }

@@ -34,8 +34,9 @@ import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
@@ -98,7 +99,7 @@ fun UserInfoSection(
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(data.picture)
 				.crossfade(true)
-				.crossfade(300)
+				.crossfade(350)
 				.build(),
 			loading = {
 				Column(
