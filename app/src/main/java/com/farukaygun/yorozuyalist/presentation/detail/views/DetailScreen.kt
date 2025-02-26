@@ -53,8 +53,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
@@ -172,7 +173,7 @@ private fun MediaInfo() {
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(LocalMediaDetail.current.mainPicture?.medium)
 				.crossfade(true)
-				.crossfade(300)
+				.crossfade(350)
 				.build(),
 			loading = {
 				Column(

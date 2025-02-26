@@ -72,7 +72,7 @@ class APIServiceImpl(
 		season: String,
 		limit: Int
 	): AnimeSeasonalDto {
-		println(sharedPrefsHelper.getString("accessToken"))
+		println("accessToken: ${sharedPrefsHelper.getString("accessToken")}")
 		return client.get("${Constants.ANIME_URL}/season/$year/$season") {
 			header(
 				HttpHeaders.Authorization,
