@@ -82,17 +82,17 @@ object CustomExtensions {
 	}
 
 	fun Int.formatScore() = when (this) {
-		0 -> "─"
-		1 -> "1 Appalling"
-		2 -> "2 Horrible"
-		3 -> "3 Very Bad"
-		4 -> "4 Bad"
-		5 -> "5 Average"
-		6 -> "6 Fine"
-		7 -> "7 Good"
-		8 -> "8 Very Good"
-		9 -> "9 Great"
-		10 -> "10 Masterpiece"
+		0 -> "-"
+		1 -> "Appalling"
+		2 -> "Horrible"
+		3 -> "Very Bad"
+		4 -> "Bad"
+		5 -> "Average"
+		6 -> "Fine"
+		7 -> "Good"
+		8 -> "Very Good"
+		9 -> "Great"
+		10 -> "Masterpiece"
 		else -> "N/A"
 	}
 

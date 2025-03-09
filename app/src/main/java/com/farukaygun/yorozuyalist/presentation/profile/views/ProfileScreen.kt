@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -59,6 +60,7 @@ fun ProfileScreen(
 
 	if (state.profileData != null && !state.isLoading) {
 		Column(
+			modifier = Modifier.statusBarsPadding(),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			UserInfoSection(

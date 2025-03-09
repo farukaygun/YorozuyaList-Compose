@@ -66,7 +66,7 @@ fun HomeScreen(
 		isRefreshing = state.isLoading,
 		onRefresh = { viewModel.onEvent(event = HomeEvent.InitRequestChain) },
 		state = rememberPullToRefreshState(),
-		modifier = Modifier.padding(16.dp)
+		modifier = Modifier.padding(horizontal = 16.dp)
 	) {
 		Column(
 			modifier = Modifier

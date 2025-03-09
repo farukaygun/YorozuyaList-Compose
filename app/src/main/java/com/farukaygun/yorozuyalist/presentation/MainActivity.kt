@@ -33,6 +33,7 @@ import com.farukaygun.yorozuyalist.presentation.login.LoginEvent
 import com.farukaygun.yorozuyalist.presentation.login.LoginViewModel
 import com.farukaygun.yorozuyalist.presentation.login.views.LoginScreen
 import com.farukaygun.yorozuyalist.presentation.profile.views.ProfileScreen
+
 import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.presentation.user_list.views.UserListScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
 								bottomNavBarState = bottomNavBarState
 							)
 						},
-					) { padding ->
+					) { paddingValues ->
 						NavHost(
 							navController = navController,
 							startDestination = Screen.HomeScreen.route,
@@ -91,7 +92,7 @@ class MainActivity : ComponentActivity() {
 									animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
 								)
 							},
-							modifier = Modifier.padding(padding),
+							modifier = Modifier.padding(paddingValues)
 						) {
 							composable(
 								route = Screen.LoginScreen.route,

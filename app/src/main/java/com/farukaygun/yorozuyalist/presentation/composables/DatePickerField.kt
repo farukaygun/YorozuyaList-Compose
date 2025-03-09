@@ -26,7 +26,8 @@ fun DatePickerField(
 	selectedDate: String?,
 	label: String,
 	onDateSelected: (String) -> Unit,
-	onClear: () -> Unit
+	onClear: () -> Unit,
+	modifier: Modifier = Modifier
 ) {
 	var date by remember { mutableStateOf(selectedDate) }
 	var showDatePicker by remember { mutableStateOf(false) }
@@ -54,7 +55,7 @@ fun DatePickerField(
 			unfocusedBorderColor = MaterialTheme.colorScheme.outline,
 			disabledBorderColor = MaterialTheme.colorScheme.outline
 		),
-		modifier = Modifier.clickable { showDatePicker = true }
+		modifier = modifier.clickable { showDatePicker = true }
 	)
 
 	if (showDatePicker) {

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -43,6 +44,7 @@ fun GridListScreen(
 	Column(
 		modifier = Modifier
 			.padding(16.dp)
+			.statusBarsPadding()
 	) {
 		if (!state.isLoading && state.gridList?.data?.isNotEmpty() == true) {
 			GridList(

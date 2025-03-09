@@ -40,14 +40,14 @@ fun SearchBar(
 		targetState = isVisible,
 		transitionSpec = {
 			slideInVertically(initialOffsetY = { -it }) togetherWith
-					slideOutVertically(targetOffsetY = { -it })
+			slideOutVertically(targetOffsetY = { -it })
 		}, label = ""
 	) { visible ->
 		if (visible) {
 			Column(
 				modifier = Modifier
 					.statusBarsPadding()
-					.padding(top = 8.dp)
+					.padding(vertical = 16.dp)
 					.verticalScroll(rememberScrollState())
 			) {
 				Surface(

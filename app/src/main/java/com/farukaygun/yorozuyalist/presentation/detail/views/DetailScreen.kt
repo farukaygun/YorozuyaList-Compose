@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -108,6 +109,7 @@ fun DetailScreen(
 				Column(
 					modifier = Modifier
 						.padding(16.dp)
+						.statusBarsPadding()
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(16.dp)
 				) {

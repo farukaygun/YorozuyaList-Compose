@@ -58,7 +58,7 @@ fun UserListScreen(
 	val state = viewModel.state.value
 	Column(
 		modifier = Modifier
-			.padding(16.dp)
+			.padding(horizontal = 16.dp)
 	) {
 		MyListStatusFilterChips(viewModel)
 
