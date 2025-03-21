@@ -1,8 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,52 +13,47 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.presentation.Screen.UserAnimeListScreen.getScreen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavBar(
 	navController: NavController,
-	bottomNavBarState: BottomNavBarState
+	bottomNavBarState: BottomNavBarState,
 ) {
-	AnimatedVisibility(
-		visible = bottomNavBarState.isVisible,
-		enter = expandVertically(),
-		exit = shrinkVertically()
-	) {
-		NavigationBar {
-			bottomNavBarState.items.forEachIndexed { _, bottomNavItem ->
-				NavigationBarItem(
-					selected = bottomNavBarState.currentScreen?.route == bottomNavItem.screen.route,
-					onClick = {
-						val route = bottomNavItem.screen.route + bottomNavItem.screen.navArg
-						navController.navigate(route) {
-							navController.graph.startDestinationRoute?.let {
-								popUpTo(it) {
-									saveState = true
-								}
-								launchSingleTop = true
-								restoreState = true
+	NavigationBar {
+		bottomNavBarState.items.forEachIndexed { _, bottomNavItem ->
+			NavigationBarItem(
+				selected = bottomNavBarState.currentScreen?.route == bottomNavItem.screen.route,
+				onClick = {
+					val route = bottomNavItem.screen.route + bottomNavItem.screen.navArg
+					navController.navigate(route) {
+						navController.graph.startDestinationRoute?.let {
+							popUpTo(it) {
+								saveState = true
 							}
+							launchSingleTop = true
+							restoreState = true
 						}
-						bottomNavBarState.currentScreen = getScreen(bottomNavItem.screen.route)
-					},
-					icon = {
-						Icon(
-							painter = painterResource(
-								id = if (bottomNavItem.screen.route == bottomNavBarState.currentScreen?.route) {
-									bottomNavItem.selectedIcon
-								} else {
-									bottomNavItem.unselectedIcon
-								}
-							),
-							contentDescription = bottomNavItem.screen.title
-						)
-					},
-					label = {
-						Text(
-							text = bottomNavItem.screen.title,
-						)
 					}
-				)
-			}
+					bottomNavBarState.currentScreen = getScreen(bottomNavItem.screen.route)
+				},
+				icon = {
+					Icon(
+						painter = painterResource(
+							id = if (bottomNavItem.screen.route == bottomNavBarState.currentScreen?.route) {
+								bottomNavItem.selectedIcon
+							} else {
+								bottomNavItem.unselectedIcon
+							}
+						),
+						contentDescription = bottomNavItem.screen.title
+					)
+				},
+				label = {
+					Text(
+						text = bottomNavItem.screen.title,
+					)
+				}
+			)
 		}
 	}
 }

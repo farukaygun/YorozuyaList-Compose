@@ -85,8 +85,9 @@ fun SearchScreen(
 		}
 	}
 
-	if (state.error.isNotEmpty())
+	if (state.error.isNotEmpty()) {
 		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	}
 }
 
 @Composable
@@ -109,7 +110,7 @@ fun SearchBar(
 			onValueChange = {
 				query = it
 				// if at least 3 non whitespace characters are entered, search
-				if (Regex("\\S{3,}").matches(query.text))
+				if (query.text.replace("\\s".toRegex(), "").length >= 3)
 					viewModel.onEvent(SearchEvent.Search(query.text))
 			},
 			modifier = Modifier

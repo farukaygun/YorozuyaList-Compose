@@ -10,9 +10,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.BottomAppBarScrollBehavior
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -28,11 +31,13 @@ import com.farukaygun.yorozuyalist.util.enums.GridListType
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GridListScreen(
 	navController: NavController,
 	viewModel: GridListViewModel = koinViewModel(),
-	type: String
+	type: String,
+	bottomAppBarScrollBehavior: BottomAppBarScrollBehavior
 ) {
 	val state = viewModel.state.value
 
@@ -45,6 +50,7 @@ fun GridListScreen(
 		modifier = Modifier
 			.padding(16.dp)
 			.statusBarsPadding()
+			.nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
 	) {
 		if (!state.isLoading && state.gridList?.data?.isNotEmpty() == true) {
 			GridList(
@@ -57,8 +63,9 @@ fun GridListScreen(
 		}
 	}
 
-	if (state.error.isNotEmpty())
+	if (state.error.isNotEmpty()) {
 		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	}
 }
 
 @Composable

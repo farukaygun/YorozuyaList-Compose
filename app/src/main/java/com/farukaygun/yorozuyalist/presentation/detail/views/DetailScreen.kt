@@ -158,8 +158,9 @@ fun DetailScreen(
 		ShimmerEffectDetailScreen()
 	}
 
-	if (state.error.isNotEmpty())
+	if (state.error.isNotEmpty()) {
 		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	}
 }
 
 @Composable

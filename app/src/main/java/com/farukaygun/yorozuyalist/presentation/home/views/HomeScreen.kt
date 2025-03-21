@@ -19,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -56,11 +55,6 @@ fun HomeScreen(
 	viewModel: HomeViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
-
-	LaunchedEffect(Unit) {
-		if (!viewModel.isLoggedIn())
-			navController.navigate(route = Screen.LoginScreen.route)
-	}
 
 	PullToRefreshBox(
 		isRefreshing = state.isLoading,
@@ -100,10 +94,12 @@ fun HomeScreen(
 				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
 			)
 		}
-	}
 
-	if (state.error.isNotEmpty())
-		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+		if (state.error.isNotEmpty()) {
+			Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+		}
+
+	}
 }
 
 @Composable
@@ -238,7 +234,8 @@ fun HorizontalList(
 			horizontalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			items(animeList) { anime ->
-				ListItemRow(node = anime.node,
+				ListItemRow(
+					node = anime.node,
 					onItemClick = {
 						navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
 					}
@@ -248,6 +245,7 @@ fun HorizontalList(
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun HomeScreenPreview() {
