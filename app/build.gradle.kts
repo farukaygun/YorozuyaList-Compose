@@ -14,7 +14,7 @@ android {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
 		targetSdk = 35
-		versionCode = 15
+		versionCode = 17
 		versionName = "2.0"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

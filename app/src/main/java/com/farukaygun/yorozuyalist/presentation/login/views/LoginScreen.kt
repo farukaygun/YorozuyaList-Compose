@@ -3,11 +3,13 @@ package com.farukaygun.yorozuyalist.presentation.login.views
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -80,17 +83,29 @@ fun LoginScreen(
 		Spacer(modifier = Modifier.height(32.dp))
 
 		Button(
+			enabled = !state.isLoading,
 			colors = ButtonDefaults.buttonColors(
 				containerColor = MaterialTheme.colorScheme.primary,
 				contentColor = MaterialTheme.colorScheme.onPrimary
 			),
 			onClick = { viewModel.onEvent(LoginEvent.Login(context)) },
 		) {
+			Box(
+				contentAlignment = Alignment.Center
+			) {
+				Text(
+					text = stringResource(R.string.login),
+					style = MaterialTheme.typography.bodyMedium,
+					modifier = Modifier.alpha(if (state.isLoading) 0f else 1f)
+				)
 
-			Text(
-				text = stringResource(R.string.login),
-				style = MaterialTheme.typography.labelMedium,
-			)
+				if (state.isLoading) {
+					CircularProgressIndicator(
+						modifier = Modifier.size(20.dp),
+						color = MaterialTheme.colorScheme.onSurface,
+					)
+				}
+			}
 		}
 
 		if (state.error.isNotEmpty()) {
@@ -102,10 +117,6 @@ fun LoginScreen(
 			)
 
 			Spacer(modifier = Modifier.height(32.dp))
-		}
-
-		if (!state.isLoading) {
-			CircularProgressIndicator()
 		}
 
 		if (state.error.isNotEmpty()) {
