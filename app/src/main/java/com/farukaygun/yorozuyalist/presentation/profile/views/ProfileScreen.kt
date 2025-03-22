@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,6 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
@@ -59,6 +64,9 @@ fun ProfileScreen(
 
 	if (state.profileData != null && !state.isLoading) {
 		Column(
+			modifier = Modifier
+				.statusBarsPadding()
+				.verticalScroll(rememberScrollState()),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			UserInfoSection(
@@ -77,8 +85,9 @@ fun ProfileScreen(
 		ShimmerEffectProfileScreen()
 	}
 
-	if (state.error.isNotEmpty())
+	if (state.error.isNotEmpty()) {
 		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	}
 }
 
 @Composable

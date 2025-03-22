@@ -5,11 +5,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,15 +31,15 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -85,7 +88,7 @@ fun MyListModalBottomSheet(
 		ModalBottomSheet(sheetState = sheetState, onDismissRequest = onDismiss) {
 			Column(
 				modifier = Modifier
-					.padding(16.dp)
+					.padding(24.dp)
 					.verticalScroll(rememberScrollState()),
 				verticalArrangement = Arrangement.spacedBy(32.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
@@ -100,11 +103,10 @@ fun MyListModalBottomSheet(
 				ProgressInputField(mediaDetail = mediaDetail)
 				MediaScoreSlider()
 				DateRangePicker()
-				TagsField()
 				PrioritySlider()
-				RewatchCheckbox()
-				RewatchCountInputField()
+				RewatchCount()
 				RewatchValueSlider()
+				TagsField()
 				NoteInputField()
 				DeleteButton(type = type)
 			}
@@ -118,7 +120,8 @@ fun BottomSheetActionButtons(
 	onApply: () -> Unit,
 ) {
 	Row(
-		modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+		modifier = Modifier.fillMaxWidth(),
+		horizontalArrangement = Arrangement.SpaceBetween
 	) {
 		Button(onClick = onDismiss) {
 			Text(text = "Cancel")
@@ -137,19 +140,21 @@ fun StatusFilterOptions(
 	val viewModel = LocalViewModel.current
 	val state = viewModel.state.value
 
-	val statusList = buildList {
-		if (type == ScreenType.ANIME) {
-			addAll(listOf(MyListMediaStatus.WATCHING, MyListMediaStatus.PLAN_TO_WATCH))
-		} else {
-			addAll(listOf(MyListMediaStatus.READING, MyListMediaStatus.PLAN_TO_READ))
-		}
-		addAll(
-			listOf(
-				MyListMediaStatus.COMPLETED,
-				MyListMediaStatus.ON_HOLD,
-				MyListMediaStatus.DROPPED
+	val statusList = remember(type) {
+		buildList {
+			if (type == ScreenType.ANIME) {
+				addAll(listOf(MyListMediaStatus.WATCHING, MyListMediaStatus.PLAN_TO_WATCH))
+			} else {
+				addAll(listOf(MyListMediaStatus.READING, MyListMediaStatus.PLAN_TO_READ))
+			}
+			addAll(
+				listOf(
+					MyListMediaStatus.COMPLETED,
+					MyListMediaStatus.ON_HOLD,
+					MyListMediaStatus.DROPPED
+				)
 			)
-		)
+		}
 	}
 
 	fun getStatusIcon(status: MyListMediaStatus, isSelected: Boolean): Int {
@@ -166,31 +171,40 @@ fun StatusFilterOptions(
 		}
 	}
 
-	Row(
-		horizontalArrangement = Arrangement.spacedBy(8.dp),
-		modifier = Modifier.horizontalScroll(rememberScrollState())
-	) {
-		statusList.forEach { status ->
-			val isSelected = state.selectedStatus?.apiName == status.apiName
+	Column {
+		Text(
+			text = "Status",
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodySmall
+		)
 
-			FilterChip(onClick = {
-				viewModel.onEvent(MyListBottomSheetEvent.SetStatus(newStatus = status))
-			},
-				label = { Text(status.displayName) },
-				selected = isSelected,
-				leadingIcon = {
-					AnimatedContent(
-						targetState = isSelected,
-						transitionSpec = { fadeIn() togetherWith fadeOut() },
-						label = ""
-					) { state ->
-						Icon(
-							painterResource(id = getStatusIcon(status, state)),
-							contentDescription = "Status icon",
-						)
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier.horizontalScroll(rememberScrollState())
+		) {
+			statusList.forEach { status ->
+				val isSelected = state.selectedStatus?.apiName == status.apiName
+
+				FilterChip(onClick = {
+					viewModel.onEvent(MyListBottomSheetEvent.SetStatus(newStatus = status))
+				},
+					label = { Text(status.displayName) },
+					selected = isSelected,
+					leadingIcon = {
+						AnimatedContent(
+							targetState = isSelected,
+							transitionSpec = { fadeIn() togetherWith fadeOut() },
+							label = "",
+							contentKey = { isSelected }
+						) { state ->
+							Icon(
+								painterResource(id = getStatusIcon(status, state)),
+								contentDescription = "Status icon",
+							)
+						}
 					}
-				}
-			)
+				)
+			}
 		}
 	}
 }
@@ -348,27 +362,46 @@ fun ProgressInputField(mediaDetail: MediaDetail) {
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MediaScoreSlider() {
 	val viewModel = LocalViewModel.current
 	val state by viewModel.state
+	val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 
 	Column {
+		Text(
+			text = "Score",
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodySmall
+		)
+
 		Slider(
 			value = state.score.toFloat(),
 			onValueChange = { viewModel.onEvent(MyListBottomSheetEvent.UpdateScore(it.roundToInt())) },
-			colors = SliderDefaults.colors(
-				thumbColor = MaterialTheme.colorScheme.secondary,
-				activeTrackColor = MaterialTheme.colorScheme.secondary,
-				inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-			),
-			steps = 9,
-			valueRange = 0f..10f
+			valueRange = 0f..10f,
+			thumb = {
+				SliderDefaults.Thumb(
+					modifier = Modifier.size(30.dp),
+					interactionSource = interactionSource
+				)
+				Box(
+					modifier = Modifier
+						.size(30.dp),
+					contentAlignment = Alignment.Center
+				) {
+					Text(
+						text = state.score.toString(),
+						style = MaterialTheme.typography.bodySmall,
+						color = MaterialTheme.colorScheme.onPrimary
+					)
+				}
+			}
 		)
 		Text(
-			text = "Score: ${state.score.formatScore()}",
+			text = state.score.formatScore(),
 			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.bodyMedium,
+			style = MaterialTheme.typography.bodySmall,
 			modifier = Modifier.fillMaxWidth()
 		)
 	}
@@ -379,18 +412,188 @@ fun DateRangePicker() {
 	val viewModel = LocalViewModel.current
 	val state by viewModel.state
 
-	DatePickerField(
-		selectedDate = state.startDate,
-		onDateSelected = { viewModel.onEvent(MyListBottomSheetEvent.UpdateStartDate(it)) },
-		onClear = { viewModel.onEvent(MyListBottomSheetEvent.UpdateStartDate("")) },
-		label = "Start Date"
-	)
-	DatePickerField(
-		selectedDate = state.finishDate,
-		onDateSelected = { viewModel.onEvent(MyListBottomSheetEvent.UpdateFinishDate(it)) },
-		onClear = { viewModel.onEvent(MyListBottomSheetEvent.UpdateFinishDate("")) },
-		label = "End Date"
-	)
+	Column {
+		Row(
+			modifier = Modifier
+				.fillMaxWidth(),
+			horizontalArrangement = Arrangement.spacedBy(8.dp),
+		) {
+			DatePickerField(
+				selectedDate = state.startDate,
+				onDateSelected = { viewModel.onEvent(MyListBottomSheetEvent.UpdateStartDate(it)) },
+				onClear = { viewModel.onEvent(MyListBottomSheetEvent.UpdateStartDate("")) },
+				label = "Start Date",
+				modifier = Modifier.weight(1f)
+			)
+			DatePickerField(
+				selectedDate = state.finishDate,
+				onDateSelected = { viewModel.onEvent(MyListBottomSheetEvent.UpdateFinishDate(it)) },
+				onClear = { viewModel.onEvent(MyListBottomSheetEvent.UpdateFinishDate("")) },
+				label = "End Date",
+				modifier = Modifier.weight(1f)
+			)
+		}
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PrioritySlider() {
+	val viewModel = LocalViewModel.current
+	val state by viewModel.state
+	val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+
+	Column {
+		Text(
+			text = "Priority",
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodySmall
+		)
+
+		Slider(
+			value = state.priority.toFloat(),
+			onValueChange = { viewModel.onEvent(MyListBottomSheetEvent.UpdatePriority(it.roundToInt())) },
+			valueRange = 0f..2f,
+			thumb = {
+				SliderDefaults.Thumb(
+					modifier = Modifier.size(30.dp),
+					interactionSource = interactionSource
+				)
+				Box(
+					modifier = Modifier
+						.size(30.dp),
+					contentAlignment = Alignment.Center
+				) {
+					Text(
+						text = state.priority.toString(),
+						style = MaterialTheme.typography.bodySmall,
+						color = MaterialTheme.colorScheme.onPrimary
+					)
+				}
+			}
+		)
+		Text(
+			text = state.priority.formatPriority(),
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.bodySmall,
+			modifier = Modifier.fillMaxWidth()
+		)
+	}
+}
+
+@Composable
+fun RewatchCount() {
+	val viewModel = LocalViewModel.current
+	val state by viewModel.state
+
+	Column(horizontalAlignment = Alignment.CenterHorizontally) {
+		Row(
+			modifier = Modifier.fillMaxWidth(),
+			horizontalArrangement = Arrangement.Center,
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			IconButton(
+				onClick = {
+					viewModel.onEvent(
+						MyListBottomSheetEvent.UpdateRewatchCount(
+							(state.rewatchCount ?: 0) - 1
+						)
+					)
+				}
+			) {
+				Icon(
+					painter = painterResource(id = R.drawable.remove_24px),
+					contentDescription = "Minus icon"
+				)
+			}
+
+			OutlinedTextField(
+				value = state.rewatchCount?.toString() ?: "",
+				onValueChange = { input ->
+					val newValue = input.toIntOrNull()
+					viewModel.onEvent(MyListBottomSheetEvent.UpdateRewatchCount(newValue))
+				},
+				label = { Text(text = "Rewatch Count") },
+				keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+				singleLine = true,
+				modifier = Modifier.width(150.dp)
+			)
+
+			IconButton(
+				onClick = {
+					viewModel.onEvent(
+						MyListBottomSheetEvent.UpdateRewatchCount(
+							(state.rewatchCount ?: 0) + 1
+						)
+					)
+				}
+			) {
+				Icon(
+					painter = painterResource(id = R.drawable.add_24px),
+					contentDescription = "Plus icon"
+				)
+			}
+		}
+
+		Row(
+			verticalAlignment = Alignment.CenterVertically
+		) {
+			Checkbox(
+				modifier = Modifier.scale(1f),
+				checked = state.checkedRewatchState,
+				onCheckedChange = { viewModel.onEvent(MyListBottomSheetEvent.ToggleRewatchState) }
+			)
+			Text(
+				text = "Rewatching",
+				style = MaterialTheme.typography.bodySmall,
+			)
+		}
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RewatchValueSlider() {
+	val viewModel = LocalViewModel.current
+	val state by viewModel.state
+	val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+
+	Column {
+		Text(
+			text = "Rewatch Value",
+			color = MaterialTheme.colorScheme.onBackground,
+			style = MaterialTheme.typography.bodySmall
+		)
+
+		Slider(
+			value = state.rewatchValue.toFloat(),
+			onValueChange = { viewModel.onEvent(MyListBottomSheetEvent.UpdateRewatchValue(it.roundToInt())) },
+			valueRange = 0f..5f,
+			thumb = {
+				SliderDefaults.Thumb(
+					modifier = Modifier.size(30.dp),
+					interactionSource = interactionSource
+				)
+				Box(
+					modifier = Modifier
+						.size(30.dp),
+					contentAlignment = Alignment.Center
+				) {
+					Text(
+						text = state.rewatchValue.toString(),
+						style = MaterialTheme.typography.bodySmall,
+						color = MaterialTheme.colorScheme.onPrimary
+					)
+				}
+			}
+		)
+		Text(
+			text = state.rewatchValue.formatRewatchValue(),
+			textAlign = TextAlign.Center,
+			style = MaterialTheme.typography.bodySmall,
+			modifier = Modifier.fillMaxWidth()
+		)
+	}
 }
 
 @Composable
@@ -398,125 +601,15 @@ fun TagsField() {
 	val viewModel = LocalViewModel.current
 	val state by viewModel.state
 
-	OutlinedTextField(value = state.tags.toString(), onValueChange = {
-		if (it.length <= 500) viewModel.onEvent(MyListBottomSheetEvent.UpdateTags(it))
-	}, label = { Text(text = "Tags") }, singleLine = true)
-}
-
-@Composable
-fun PrioritySlider() {
-	val viewModel = LocalViewModel.current
-	val state by viewModel.state
-
-	Column {
-		Slider(
-			value = state.priority.toFloat(),
-			onValueChange = { viewModel.onEvent(MyListBottomSheetEvent.UpdatePriority(it.roundToInt())) },
-			colors = SliderDefaults.colors(
-				thumbColor = MaterialTheme.colorScheme.secondary,
-				activeTrackColor = MaterialTheme.colorScheme.secondary,
-				inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-			),
-			steps = 1,
-			valueRange = 0f..2f
-		)
-		Text(
-			text = "Priority: ${state.priority.formatPriority()}",
-			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.bodyMedium,
-			modifier = Modifier.fillMaxWidth()
-		)
-	}
-}
-
-@Composable
-fun RewatchCheckbox() {
-	val viewModel = LocalViewModel.current
-	val state by viewModel.state
-
-	Row(
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		Checkbox(checked = state.checkedRewatchState,
-			onCheckedChange = { viewModel.onEvent(MyListBottomSheetEvent.ToggleRewatchState) })
-		Text(text = "Rewatching")
-	}
-}
-
-@Composable
-fun RewatchCountInputField() {
-	val viewModel = LocalViewModel.current
-	val state by viewModel.state
-
-	Row(
+	OutlinedTextField(
+		value = state.tags.toString(),
+		onValueChange = {
+			if (it.length <= 500) viewModel.onEvent(MyListBottomSheetEvent.UpdateTags(it))
+		},
+		label = { Text(text = "Tags") },
 		modifier = Modifier.fillMaxWidth(),
-		horizontalArrangement = Arrangement.Center,
-		verticalAlignment = Alignment.CenterVertically
-	) {
-		IconButton(onClick = {
-			viewModel.onEvent(
-				MyListBottomSheetEvent.UpdateRewatchCount(
-					(state.rewatchCount ?: 0) - 1
-				)
-			)
-		}) {
-			Icon(
-				painter = painterResource(id = R.drawable.remove_24px),
-				contentDescription = "Minus icon"
-			)
-		}
-
-		OutlinedTextField(
-			value = state.rewatchCount?.toString() ?: "",
-			onValueChange = { input ->
-				val newValue = input.toIntOrNull()
-				viewModel.onEvent(MyListBottomSheetEvent.UpdateRewatchCount(newValue))
-			},
-			label = { Text(text = "Rewatch Count") },
-			keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-			singleLine = true,
-			modifier = Modifier.width(150.dp)
-		)
-
-		IconButton(onClick = {
-			viewModel.onEvent(
-				MyListBottomSheetEvent.UpdateRewatchCount(
-					(state.rewatchCount ?: 0) + 1
-				)
-			)
-		}) {
-			Icon(
-				painter = painterResource(id = R.drawable.add_24px),
-				contentDescription = "Plus icon"
-			)
-		}
-	}
-}
-
-@Composable
-fun RewatchValueSlider() {
-	val viewModel = LocalViewModel.current
-	val state by viewModel.state
-
-	Column {
-		Slider(
-			value = state.rewatchValue.toFloat(),
-			onValueChange = { viewModel.onEvent(MyListBottomSheetEvent.UpdateRewatchValue(it.roundToInt())) },
-			colors = SliderDefaults.colors(
-				thumbColor = MaterialTheme.colorScheme.secondary,
-				activeTrackColor = MaterialTheme.colorScheme.secondary,
-				inactiveTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-			),
-			steps = 4,
-			valueRange = 0f..5f
-		)
-		Text(
-			text = "Rewatch Value: ${state.rewatchValue.formatRewatchValue()}",
-			textAlign = TextAlign.Center,
-			style = MaterialTheme.typography.bodyMedium,
-			modifier = Modifier.fillMaxWidth()
-		)
-	}
+		singleLine = true
+	)
 }
 
 @Composable
@@ -524,16 +617,12 @@ fun NoteInputField() {
 	val viewModel = LocalViewModel.current
 	val state by viewModel.state
 
-	TextField(
+	OutlinedTextField(
 		value = state.comments,
 		onValueChange = { viewModel.onEvent(MyListBottomSheetEvent.UpdateComments(it)) },
 		label = { Text(text = "Notes") },
 		modifier = Modifier.fillMaxWidth(),
-		singleLine = false,
-		colors = TextFieldDefaults.colors(
-			focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-			cursorColor = MaterialTheme.colorScheme.primary
-		)
+		singleLine = false
 	)
 }
 

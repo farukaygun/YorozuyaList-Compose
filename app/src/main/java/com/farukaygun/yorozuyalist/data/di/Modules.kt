@@ -35,7 +35,7 @@ val apiServiceModule = module {
 
 val viewModelModule = module {
 	viewModel { LoginViewModel(get(), get()) }
-	viewModel { HomeViewModel(get(), get(), get()) }
+	viewModel { HomeViewModel(get()) }
 	viewModel { UserListViewModel(get(), get(), get()) }
 	viewModel { ProfileViewModel(get()) }
 	viewModel { SearchViewModel(get()) }

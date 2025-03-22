@@ -9,15 +9,22 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.BottomAppBarScrollBehavior
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,34 +58,45 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserListScreen(
 	navController: NavController,
-	viewModel: UserListViewModel = koinViewModel()
+	viewModel: UserListViewModel = koinViewModel(),
+	topAppBarScrollBehavior: TopAppBarScrollBehavior,
+	bottomAppBarScrollBehavior: BottomAppBarScrollBehavior
 ) {
 	val state = viewModel.state.value
-	Column(
-		modifier = Modifier
-			.padding(16.dp)
-	) {
-		MyListStatusFilterChips(viewModel)
+	val listState = rememberLazyListState()
 
-		if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
-			UserList(
-				navController = navController,
-				data = state.userList.data,
-				viewModel = viewModel,
-			)
-		} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
-			NoDataView()
-		} else {
-			ShimmerEffectVerticalList()
+		Column(
+			modifier = Modifier
+				.padding(horizontal = 16.dp)
+				.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
+				.nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
+			verticalArrangement = Arrangement.SpaceBetween
+		) {
+			MyListStatusFilterChips(viewModel)
+
+			if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
+				UserList(
+					navController = navController,
+					data = state.userList.data,
+					viewModel = viewModel,
+					listState = listState
+				)
+			} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
+				NoDataView()
+			} else {
+				ShimmerEffectVerticalList()
+			}
 		}
-	}
 
-	if (state.error.isNotEmpty())
+	if (state.error.isNotEmpty()) {
 		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	}
 }
+
 
 @Composable
 fun MyListStatusFilterChips(
@@ -91,7 +110,13 @@ fun MyListStatusFilterChips(
 		} else {
 			addAll(listOf(MyListMediaStatus.READING, MyListMediaStatus.PLAN_TO_READ))
 		}
-		addAll(listOf(MyListMediaStatus.COMPLETED, MyListMediaStatus.ON_HOLD, MyListMediaStatus.DROPPED))
+		addAll(
+			listOf(
+				MyListMediaStatus.COMPLETED,
+				MyListMediaStatus.ON_HOLD,
+				MyListMediaStatus.DROPPED
+			)
+		)
 	}
 
 	fun toggleStatusFilter(status: MyListMediaStatus) {
@@ -141,20 +166,23 @@ fun MyListStatusFilterChips(
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserList(
 	navController: NavController,
 	data: List<Data>,
-	viewModel: UserListViewModel
+	viewModel: UserListViewModel,
+	listState: LazyListState
 ) {
-	val listState = rememberLazyListState()
 	listState.OnBottomReached(buffer = 10) {
 		viewModel.onEvent(UserListEvent.LoadMore)
 	}
 
 	LazyColumn(
 		state = listState,
-		modifier = Modifier.padding(16.dp),
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(16.dp)
 	) {
 		items(data) { media ->
@@ -179,6 +207,7 @@ fun UserList(
 	}
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun AnimeListScreenPreview() {
@@ -190,6 +219,10 @@ fun AnimeListScreenPreview() {
 			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
 		)
 	}) {
-		UserListScreen(navController = rememberNavController())
+		UserListScreen(
+			navController = rememberNavController(),
+			topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
+			bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+		)
 	}
 }
