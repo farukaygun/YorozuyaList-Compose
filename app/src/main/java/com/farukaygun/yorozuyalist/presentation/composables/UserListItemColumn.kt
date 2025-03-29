@@ -63,6 +63,7 @@ fun UserListItemColumn(
 	Row(
 		modifier = Modifier
 			.fillMaxWidth()
+			.padding(vertical = 8.dp)
 			.clickable { onItemClick() },
 		horizontalArrangement = Arrangement.spacedBy(16.dp)
 	) {

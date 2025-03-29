@@ -17,12 +17,12 @@ import com.farukaygun.yorozuyalist.presentation.Screen.UserAnimeListScreen.getSc
 @Composable
 fun BottomNavBar(
 	navController: NavController,
-	bottomNavBarState: BottomNavBarState,
+	bottomAppBarState: BottomAppBarState,
 ) {
 	NavigationBar {
-		bottomNavBarState.items.forEachIndexed { _, bottomNavItem ->
+		bottomAppBarState.items.forEachIndexed { _, bottomNavItem ->
 			NavigationBarItem(
-				selected = bottomNavBarState.currentScreen?.route == bottomNavItem.screen.route,
+				selected = bottomAppBarState.currentScreen?.route == bottomNavItem.screen.route,
 				onClick = {
 					val route = bottomNavItem.screen.route + bottomNavItem.screen.navArg
 					navController.navigate(route) {
@@ -34,12 +34,12 @@ fun BottomNavBar(
 							restoreState = true
 						}
 					}
-					bottomNavBarState.currentScreen = getScreen(bottomNavItem.screen.route)
+					bottomAppBarState.currentScreen = getScreen(bottomNavItem.screen.route)
 				},
 				icon = {
 					Icon(
 						painter = painterResource(
-							id = if (bottomNavItem.screen.route == bottomNavBarState.currentScreen?.route) {
+							id = if (bottomNavItem.screen.route == bottomAppBarState.currentScreen?.route) {
 								bottomNavItem.selectedIcon
 							} else {
 								bottomNavItem.unselectedIcon
@@ -66,6 +66,6 @@ fun BottomNavBarPreview() {
 
 	BottomNavBar(
 		navController = navController,
-		bottomNavBarState = BottomNavBarState(navController, scope)
+		bottomAppBarState = BottomAppBarState(navController, scope)
 	)
 }

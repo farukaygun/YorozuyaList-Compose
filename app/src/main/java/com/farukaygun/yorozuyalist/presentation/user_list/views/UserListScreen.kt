@@ -16,15 +16,11 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.BottomAppBarDefaults
-import androidx.compose.material3.BottomAppBarScrollBehavior
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,8 +28,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,34 +61,32 @@ import org.koin.compose.KoinApplication
 fun UserListScreen(
 	navController: NavController,
 	viewModel: UserListViewModel = koinViewModel(),
-	topAppBarScrollBehavior: TopAppBarScrollBehavior,
-	bottomAppBarScrollBehavior: BottomAppBarScrollBehavior
+	nestedScrollConnection: NestedScrollConnection
 ) {
 	val state = viewModel.state.value
 	val listState = rememberLazyListState()
 
-		Column(
-			modifier = Modifier
-				.padding(horizontal = 16.dp)
-				.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
-				.nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
-			verticalArrangement = Arrangement.SpaceBetween
-		) {
-			MyListStatusFilterChips(viewModel)
+	Column(
+		modifier = Modifier
+			.padding(horizontal = 16.dp),
+		verticalArrangement = Arrangement.SpaceBetween
+	) {
+		MyListStatusFilterChips(viewModel)
 
-			if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
-				UserList(
-					navController = navController,
-					data = state.userList.data,
-					viewModel = viewModel,
-					listState = listState
-				)
-			} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
-				NoDataView()
-			} else {
-				ShimmerEffectVerticalList()
-			}
+		if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
+			UserList(
+				navController = navController,
+				data = state.userList.data,
+				viewModel = viewModel,
+				listState = listState,
+				nestedScrollConnection = nestedScrollConnection
+			)
+		} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
+			NoDataView()
+		} else {
+			ShimmerEffectVerticalList()
 		}
+	}
 
 	if (state.error.isNotEmpty()) {
 		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
@@ -172,7 +168,8 @@ fun UserList(
 	navController: NavController,
 	data: List<Data>,
 	viewModel: UserListViewModel,
-	listState: LazyListState
+	listState: LazyListState,
+	nestedScrollConnection: NestedScrollConnection
 ) {
 	listState.OnBottomReached(buffer = 10) {
 		viewModel.onEvent(UserListEvent.LoadMore)
@@ -182,8 +179,7 @@ fun UserList(
 		state = listState,
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(16.dp),
-		verticalArrangement = Arrangement.spacedBy(16.dp)
+			.nestedScroll(nestedScrollConnection)
 	) {
 		items(data) { media ->
 			UserListItemColumn(data = media, onItemClick = {
@@ -221,8 +217,7 @@ fun AnimeListScreenPreview() {
 	}) {
 		UserListScreen(
 			navController = rememberNavController(),
-			topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-			bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+			nestedScrollConnection = rememberNestedScrollInteropConnection()
 		)
 	}
 }

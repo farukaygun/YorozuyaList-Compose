@@ -1,9 +1,11 @@
 package com.farukaygun.yorozuyalist.presentation
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -29,15 +31,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
-import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomNavBarState
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomAppBarState
 import com.farukaygun.yorozuyalist.presentation.composables.search_bar.SearchBar
 import com.farukaygun.yorozuyalist.presentation.composables.search_bar.rememberSearchBarState
 import com.farukaygun.yorozuyalist.presentation.detail.views.DetailScreen
@@ -58,37 +67,62 @@ class MainActivity : ComponentActivity() {
 	@OptIn(ExperimentalMaterial3Api::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		enableEdgeToEdge(
+			statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+			navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+		)
 
 		setContent {
 			AppTheme {
 				val navController = rememberNavController()
 				val searchBarState = rememberSearchBarState(navController = navController)
-				val bottomNavBarState = rememberBottomNavBarState(navController = navController)
-				val topAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+				val bottomAppBarState = rememberBottomAppBarState(navController = navController)
+				val topAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 				val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+				var isScaffoldBarVisible by remember { mutableStateOf(true) }
+				var accumulatedScroll = 0f
+				var hideThreshold = -1000f
+				var showThreshold = 300f
+
+				val nestedScrollConnection = remember {
+					object : NestedScrollConnection {
+						override fun onPreScroll(
+							available: Offset,
+							source: NestedScrollSource
+						): Offset {
+							accumulatedScroll += available.y
+
+							if (isScaffoldBarVisible && accumulatedScroll < hideThreshold) {
+								isScaffoldBarVisible = false
+								accumulatedScroll = 0f
+							} else if (!isScaffoldBarVisible && accumulatedScroll > showThreshold) {
+								isScaffoldBarVisible = true
+								accumulatedScroll = 0f
+							}
+
+							return Offset.Zero
+						}
+					}
+				}
 
 				navController.addOnDestinationChangedListener { _, _, _ ->
-					topAppBarScrollBehavior.state.contentOffset = 0f
-					topAppBarScrollBehavior.state.heightOffset = 0f
-
-					bottomAppBarScrollBehavior.state.contentOffset = 0f
-					bottomAppBarScrollBehavior.state.heightOffset = 0f
+					isScaffoldBarVisible = true
+					accumulatedScroll = 0f
 				}
 
 				Scaffold(
-					modifier = Modifier.fillMaxSize()
-						.navigationBarsPadding()
-						.statusBarsPadding(),
+					modifier = Modifier.fillMaxSize(),
 					topBar = {
 						AnimatedVisibility(
-							visible = searchBarState.isVisible,
+							modifier = Modifier.statusBarsPadding(),
+							visible = searchBarState.isVisible && isScaffoldBarVisible,
 							enter = expandVertically(
 								expandFrom = Alignment.Top,
-								animationSpec = tween(durationMillis = 350)
+								animationSpec = tween(durationMillis = 250)
 							),
 							exit = shrinkVertically(
 								shrinkTowards = Alignment.Top,
-								animationSpec = tween(durationMillis = 350)
+								animationSpec = tween(durationMillis = 250)
 							)
 						) {
 							TopAppBar(
@@ -110,14 +144,15 @@ class MainActivity : ComponentActivity() {
 					},
 					bottomBar = {
 						AnimatedVisibility(
-							visible = bottomNavBarState.isVisible,
+							modifier = Modifier.navigationBarsPadding(),
+							visible = bottomAppBarState.isEnabled && isScaffoldBarVisible,
 							enter = expandVertically(
 								expandFrom = Alignment.Top,
-								animationSpec = tween(durationMillis = 350)
+								animationSpec = tween(durationMillis = 250)
 							),
 							exit = shrinkVertically(
 								shrinkTowards = Alignment.Top,
-								animationSpec = tween(durationMillis = 350)
+								animationSpec = tween(durationMillis = 250)
 							)
 						) {
 							BottomAppBar(
@@ -126,7 +161,7 @@ class MainActivity : ComponentActivity() {
 									Box(modifier = Modifier.fillMaxWidth()) {
 										BottomNavBar(
 											navController = navController,
-											bottomNavBarState = bottomNavBarState
+											bottomAppBarState = bottomAppBarState
 										)
 									}
 								}
@@ -134,8 +169,8 @@ class MainActivity : ComponentActivity() {
 						}
 					}
 				) { paddingValues ->
-
 					NavHost(
+						modifier = Modifier.padding(paddingValues),
 						navController = navController,
 						startDestination = if (loginViewModel.isLoggedIn()) Screen.HomeScreen.route else Screen.LoginScreen.route,
 						enterTransition = {
@@ -158,8 +193,7 @@ class MainActivity : ComponentActivity() {
 								towards = AnimatedContentTransitionScope.SlideDirection.End,
 								animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
 							)
-						},
-						modifier = Modifier.padding(paddingValues)
+						}
 					) {
 						composable(
 							route = Screen.LoginScreen.route,
@@ -200,8 +234,7 @@ class MainActivity : ComponentActivity() {
 						) {
 							UserListScreen(
 								navController = navController,
-								topAppBarScrollBehavior = topAppBarScrollBehavior,
-								bottomAppBarScrollBehavior = bottomAppBarScrollBehavior
+								nestedScrollConnection = nestedScrollConnection
 							)
 						}
 
@@ -219,8 +252,7 @@ class MainActivity : ComponentActivity() {
 						) {
 							UserListScreen(
 								navController = navController,
-								topAppBarScrollBehavior = topAppBarScrollBehavior,
-								bottomAppBarScrollBehavior = bottomAppBarScrollBehavior
+								nestedScrollConnection = nestedScrollConnection
 							)
 						}
 

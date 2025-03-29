@@ -14,21 +14,21 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class BottomNavBarState(
+class BottomAppBarState(
 	navController: NavController,
 	scope: CoroutineScope
 ) {
 	var currentScreen by mutableStateOf<Screen?>(null)
 
 	val items = listOf(
-		BottomNavItem.Home,
-		BottomNavItem.UserAnimeList,
-		BottomNavItem.UserMangaList,
-		BottomNavItem.Profile
+		BottomAppBarItem.Home,
+		BottomAppBarItem.UserAnimeList,
+		BottomAppBarItem.UserMangaList,
+		BottomAppBarItem.Profile
 	)
 
-	val isVisible: Boolean
-		get() = currentScreen?.isBottomNavBarVisible == true
+	val isEnabled: Boolean
+		get() = currentScreen?.isBottomAppBarVisible == true
 
 	init {
 		navController.currentBackStackEntryFlow
@@ -42,11 +42,11 @@ class BottomNavBarState(
 }
 
 @Composable
-fun rememberBottomNavBarState(
+fun rememberBottomAppBarState(
 	navController: NavController,
 	scope: CoroutineScope = rememberCoroutineScope()
 ) = remember {
-	BottomNavBarState(
+	BottomAppBarState(
 		navController,
 		scope
 	)

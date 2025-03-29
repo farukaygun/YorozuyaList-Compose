@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -89,7 +90,8 @@ fun MyListModalBottomSheet(
 			Column(
 				modifier = Modifier
 					.padding(24.dp)
-					.verticalScroll(rememberScrollState()),
+					.verticalScroll(rememberScrollState())
+					.imePadding(),
 				verticalArrangement = Arrangement.spacedBy(32.dp),
 				horizontalAlignment = Alignment.CenterHorizontally
 			) {

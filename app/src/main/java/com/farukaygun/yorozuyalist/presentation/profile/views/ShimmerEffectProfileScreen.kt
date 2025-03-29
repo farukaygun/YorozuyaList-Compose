@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
@@ -144,7 +143,7 @@ fun ShimmerEffectAnimeStatisticsSection() {
 			Column(
 				verticalArrangement = Arrangement.spacedBy(16.dp)
 			) {
-				for (i in 1..5) {
+				repeat(5) {
 					ShimmerEffect(
 						modifier = Modifier
 							.clip(RoundedCornerShape(10.dp))

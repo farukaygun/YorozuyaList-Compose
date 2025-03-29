@@ -17,6 +17,7 @@
         tools:targetApi="34">
         <activity
             android:name=".presentation.MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.YorozuyaList">
