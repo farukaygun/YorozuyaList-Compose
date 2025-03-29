@@ -7,27 +7,27 @@ sealed class Screen(
 	val navArg: String = "",
 	val title: String = "",
 	val isSearchBarVisible: Boolean = false,
-	val isBottomNavBarVisible: Boolean = false,
+	val isBottomAppBarVisible: Boolean = false,
 ) {
 	data object LoginScreen : Screen(
 		route = "login_screen",
 		title = "Login",
 		isSearchBarVisible = false,
-		isBottomNavBarVisible = false
+		isBottomAppBarVisible = false
 	)
 
 	data object HomeScreen : Screen(
 		route = "home_screen",
 		title = "Home",
 		isSearchBarVisible = true,
-		isBottomNavBarVisible = true
+		isBottomAppBarVisible = true
 	)
 
 	data object SearchScreen : Screen(
 		route = "search_screen",
 		title = "Search",
 		isSearchBarVisible = false,
-		isBottomNavBarVisible = false
+		isBottomAppBarVisible = false
 	)
 
 	data object UserAnimeListScreen : Screen(
@@ -35,7 +35,7 @@ sealed class Screen(
 		navArg = "/${ScreenType.ANIME}",
 		title = "Anime List",
 		isSearchBarVisible = true,
-		isBottomNavBarVisible = true
+		isBottomAppBarVisible = true
 	)
 
 	data object UserMangaListScreen : Screen(
@@ -43,28 +43,28 @@ sealed class Screen(
 		navArg = "/${ScreenType.MANGA}",
 		title = "Manga List",
 		isSearchBarVisible = true,
-		isBottomNavBarVisible = true
+		isBottomAppBarVisible = true
 	)
 
 	data object ProfileScreen : Screen(
 		route = "profile_screen",
 		title = "Profile",
 		isSearchBarVisible = false,
-		isBottomNavBarVisible = true
+		isBottomAppBarVisible = true
 	)
 
 	data object GridListScreen : Screen(
 		route = "grid_list_screen",
 		title = "Grid List",
 		isSearchBarVisible = true,
-		isBottomNavBarVisible = false
+		isBottomAppBarVisible = false
 	)
 
 	data object DetailScreen : Screen(
 		route = "detail_screen",
 		title = "Detail",
 		isSearchBarVisible = false,
-		isBottomNavBarVisible = false
+		isBottomAppBarVisible = false
 	)
 
 	fun getScreen(route: String?): Screen? {
