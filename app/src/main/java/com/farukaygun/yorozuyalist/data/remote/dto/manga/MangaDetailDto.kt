@@ -72,7 +72,7 @@ data class MangaDetailDto(
 	@SerializedName("recommendations")
 	val recommendations: List<RecommendationDto>,
 	@SerializedName("serialization")
-	val serialization: List<SerializationDto>,
+	val serialization: List<SerializationDto>
 )
 
 // to model
@@ -105,6 +105,6 @@ fun MangaDetailDto.toMangaDetail(): MangaDetail {
 		relatedAnime = relatedAnime.map { it.toRelated() },
 		relatedManga = relatedManga.map { it.toRelated() },
 		recommendations = recommendations.map { it.toRecommendation() },
-		serialization = serialization.map { it.toSerialization() },
+		serialization = serialization.map { it.toSerialization() }
 	)
 }

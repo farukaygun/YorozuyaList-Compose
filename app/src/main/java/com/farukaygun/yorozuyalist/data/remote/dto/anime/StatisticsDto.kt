@@ -8,7 +8,7 @@ data class StatisticsDto(
 	@SerializedName("status")
 	val status: MediaStatus,
 	@SerializedName("num_list_users")
-	val numListUsers: Int,
+	val numListUsers: Int
 )
 
 fun StatisticsDto.toStatistics(): Statistics {

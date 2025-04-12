@@ -28,7 +28,7 @@ data class NodeDto(
 	@SerializedName("num_list_users")
 	val numListUsers: Int,
 	@SerializedName("status")
-	val status: String?,
+	val status: String?
 )
 
 fun NodeDto.toNode(): Node {

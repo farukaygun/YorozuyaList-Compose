@@ -60,6 +60,7 @@ import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.presentation.user_list.views.UserListScreen
 import com.farukaygun.yorozuyalist.ui.theme.AppTheme
 import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.KoinAndroidContext
 
 class MainActivity : ComponentActivity() {
 	private val loginViewModel: LoginViewModel by inject()
@@ -73,7 +74,8 @@ class MainActivity : ComponentActivity() {
 		)
 
 		setContent {
-			AppTheme {
+			KoinAndroidContext {
+				AppTheme {
 				val navController = rememberNavController()
 				val searchBarState = rememberSearchBarState(navController = navController)
 				val bottomAppBarState = rememberBottomAppBarState(navController = navController)
@@ -307,6 +309,7 @@ class MainActivity : ComponentActivity() {
 						}
 					}
 				}
+			}
 			}
 		}
 	}

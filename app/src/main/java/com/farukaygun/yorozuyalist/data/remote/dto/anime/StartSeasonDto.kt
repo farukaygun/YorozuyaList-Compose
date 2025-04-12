@@ -8,7 +8,7 @@ data class StartSeasonDto(
 	@SerializedName("year")
 	val year: Int,
 	@SerializedName("season")
-	val season: Season,
+	val season: Season
 )
 
 fun StartSeasonDto.toStartSeason(): StartSeason {

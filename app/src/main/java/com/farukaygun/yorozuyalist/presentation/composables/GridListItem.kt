@@ -151,7 +151,9 @@ fun GridListItemPreview(
 			rewatchValue = 0,
 			tags = emptyList(),
 			priority = 0,
-			comments = ""
+			comments = "",
+			numChaptersRead = 0,
+			numVolumesRead = 0
 		),
 		ranking = Ranking(
 			rank = 1,

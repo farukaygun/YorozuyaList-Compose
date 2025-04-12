@@ -81,7 +81,7 @@ data class AnimeDetailDto(
 	@SerializedName("studios")
 	val studios: List<StudioDto>,
 	@SerializedName("statistics")
-	val statistics: StatisticsDto?,
+	val statistics: StatisticsDto?
 )
 
 fun AnimeDetailDto.toAnimeDetail(): AnimeDetail {

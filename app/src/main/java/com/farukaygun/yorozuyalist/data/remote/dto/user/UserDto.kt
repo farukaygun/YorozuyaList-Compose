@@ -18,7 +18,7 @@ data class UserDto(
 	@SerializedName("name")
 	val name: String,
 	@SerializedName("picture")
-	val picture: String,
+	val picture: String
 )
 
 fun UserDto.toUser(): User {

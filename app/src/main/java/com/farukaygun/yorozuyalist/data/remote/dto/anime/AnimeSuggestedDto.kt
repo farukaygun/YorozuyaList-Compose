@@ -10,9 +10,8 @@ import com.google.gson.annotations.SerializedName
 data class AnimeSuggestedDto(
 	@SerializedName("data")
 	val data: List<DataDto>,
-
 	@SerializedName("paging")
-	val paging: PagingDto,
+	val paging: PagingDto
 )
 
 fun AnimeSuggestedDto.toAnimeSuggested(): AnimeSuggested {

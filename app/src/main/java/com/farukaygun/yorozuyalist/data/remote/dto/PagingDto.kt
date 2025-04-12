@@ -5,9 +5,9 @@ import com.google.gson.annotations.SerializedName
 
 data class PagingDto(
 	@SerializedName("next")
-	val next: String? = null,
+	val next: String?,
 	@SerializedName("previous")
-	val previous: String? = null,
+	val previous: String?
 )
 
 fun PagingDto.toPaging(): Paging {

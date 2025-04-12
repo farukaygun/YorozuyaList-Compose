@@ -6,9 +6,8 @@ import com.google.gson.annotations.SerializedName
 data class RecommendationDto(
 	@SerializedName("node")
 	val node: NodeDto,
-
 	@SerializedName("num_recommendations")
-	val numRecommendations: Int,
+	val numRecommendations: Int
 )
 
 fun RecommendationDto.toRecommendation(): Recommendation {

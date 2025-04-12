@@ -7,7 +7,7 @@ data class SerializationNodeDto(
 	@SerializedName("id")
 	val id: Int,
 	@SerializedName("name")
-	val name: String,
+	val name: String
 )
 
 fun SerializationNodeDto.toSerializationNode(): SerializationNode {

@@ -6,9 +6,8 @@ import com.google.gson.annotations.SerializedName
 data class AuthorDto(
 	@SerializedName("node")
 	val node: AuthorNodeDto,
-
 	@SerializedName("role")
-	val role: String,
+	val role: String
 )
 
 fun AuthorDto.toAuthor(): Author {

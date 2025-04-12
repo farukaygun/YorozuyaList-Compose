@@ -7,7 +7,7 @@ data class MainPictureDto(
 	@SerializedName("medium")
 	val medium: String,
 	@SerializedName("large")
-	val large: String,
+	val large: String
 )
 
 fun MainPictureDto.toMainPicture(): MainPicture {
@@ -16,5 +16,3 @@ fun MainPictureDto.toMainPicture(): MainPicture {
 		large = large
 	)
 }
-
-
