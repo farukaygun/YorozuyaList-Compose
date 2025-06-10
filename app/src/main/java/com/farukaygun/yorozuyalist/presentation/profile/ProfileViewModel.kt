@@ -1,6 +1,5 @@
 package com.farukaygun.yorozuyalist.presentation.profile
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Stat
