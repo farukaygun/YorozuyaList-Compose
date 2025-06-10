@@ -2,7 +2,6 @@ package com.farukaygun.yorozuyalist.data.remote.dto.manga
 
 import com.farukaygun.yorozuyalist.data.remote.dto.DataDto
 import com.farukaygun.yorozuyalist.data.remote.dto.toData
-import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.domain.models.Paging
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaUserList
 import com.google.gson.annotations.SerializedName

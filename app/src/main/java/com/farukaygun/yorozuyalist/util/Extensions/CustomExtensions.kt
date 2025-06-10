@@ -39,10 +39,12 @@ object CustomExtensions {
 		}
 
 		return if (this.length == 10)
- 			LocalDate.parse(this).format(ymdFormat)
+			LocalDate.parse(this).format(ymdFormat)
 		else {
 			val date = ymFormat.parse(this)
-			return "${date.month?.name?.lowercase()?.replaceFirstChar { it.uppercase() }} ${date.year}"
+			return "${
+				date.month?.name?.lowercase()?.replaceFirstChar { it.uppercase() }
+			} ${date.year}"
 		}
 	}
 

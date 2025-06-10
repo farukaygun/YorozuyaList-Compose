@@ -161,9 +161,17 @@ class LoginViewModel(
 
 	fun onEvent(event: LoginEvent) {
 		when (event) {
-			is LoginEvent.Login -> { event.context.openCustomTab(loginUrl) }
-			is LoginEvent.ParseIntentData -> { parseIntentData(event.context, event.intent) }
-			is LoginEvent.SaveToken -> { saveToken(event.accesToken) }
+			is LoginEvent.Login -> {
+				event.context.openCustomTab(loginUrl)
+			}
+
+			is LoginEvent.ParseIntentData -> {
+				parseIntentData(event.context, event.intent)
+			}
+
+			is LoginEvent.SaveToken -> {
+				saveToken(event.accesToken)
+			}
 		}
 	}
 }

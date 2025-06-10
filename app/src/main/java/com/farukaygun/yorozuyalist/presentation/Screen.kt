@@ -67,6 +67,13 @@ sealed class Screen(
 		isBottomAppBarVisible = false
 	)
 
+	data object CalendarScreen : Screen(
+		route = "calendar_screen",
+		title = "Calendar",
+		isSearchBarVisible = false,
+		isBottomAppBarVisible = true
+	)
+
 	fun getScreen(route: String?): Screen? {
 		return when {
 			LoginScreen.route == route -> LoginScreen
@@ -75,6 +82,7 @@ sealed class Screen(
 			route?.startsWith(UserMangaListScreen.route) == true -> UserMangaListScreen
 			ProfileScreen.route == route -> ProfileScreen
 			SearchScreen.route == route -> SearchScreen
+			CalendarScreen.route == route -> CalendarScreen
 			else -> null
 		}
 	}

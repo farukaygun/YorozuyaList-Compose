@@ -138,6 +138,7 @@ fun GridListItemPreview(
 				dayOfTheWeek = "Saturday",
 				startTime = "00:00"
 			),
+			rank = 1
 		),
 		myListStatus = MyListStatus(
 			status = MyListMediaStatus.WATCHING,

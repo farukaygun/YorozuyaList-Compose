@@ -129,6 +129,7 @@ fun ListItemRowPreview(
 			dayOfTheWeek = "Saturday",
 			startTime = "00:00"
 		),
+		rank = 1
 	)
 	ListItemRow(node = data, onItemClick = {})
 }

@@ -3,7 +3,6 @@ package com.farukaygun.yorozuyalist.presentation.home
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.domain.models.enums.MediaStatus
 import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
@@ -16,7 +15,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-	private val animeUseCase: AnimeUseCase,
+	private val animeUseCase: AnimeUseCase
 ) : BaseViewModel<HomeState>() {
 	override val _state = mutableStateOf(HomeState())
 
@@ -38,8 +37,6 @@ class HomeViewModel(
 	private fun getTodayAnime(
 		limit: Int = 500
 	) {
-		val animeList = mutableListOf<Data>()
-
 		jobs += animeUseCase.executeSeasonalAnime(
 			year = year,
 			season = season.apiName,
@@ -48,19 +45,15 @@ class HomeViewModel(
 			.flowOn(Dispatchers.IO)
 			.handleResource(
 				onSuccess = { animeData ->
-					animeData?.data?.forEach { anime ->
-						if (anime.node.broadcast?.dayOfTheWeek.equals(
-								weekDayJapan.toString(),
-								true
-							) && anime.node.status == MediaStatus.CURRENTLY_AIRING.apiName
-						)
-							animeList.add(anime)
-					}.apply {
-						_state.value = _state.value.copy(
-							animeTodayList = animeList,
-							error = ""
-						)
-					}
+					val filteredList = animeData?.data?.filter { anime ->
+						anime.node.broadcast?.dayOfTheWeek.equals(weekDayJapan.toString(), true) &&
+								anime.node.status == MediaStatus.CURRENTLY_AIRING.apiName
+					} ?: emptyList()
+
+					_state.value = _state.value.copy(
+						animeTodayList = filteredList,
+						error = ""
+					)
 				},
 				onError = { error ->
 					_state.value = HomeState(

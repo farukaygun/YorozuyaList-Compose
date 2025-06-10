@@ -3,26 +3,24 @@ package com.farukaygun.yorozuyalist.presentation.composables
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,29 +40,30 @@ import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
 import com.farukaygun.yorozuyalist.domain.models.enums.Season
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
+import com.farukaygun.yorozuyalist.util.Calendar
 
 private const val IMAGE_WIDTH = 100
 private const val IMAGE_HEIGHT = 150
 
 @Composable
-fun GridListItemWithRank(
+fun ListItemCalenderColumn(
 	data: Data,
 	onItemClick: () -> Unit
 ) {
 	val title = data.node.title
-	val mainPictureUrl = data.node.mainPicture.medium.takeUnless { it.isEmpty() }
-		?: R.drawable.broken_image_24px
+	val mainPictureUrl = data.node.mainPicture.medium
+	val ranking = data.node.rank ?: "N/A"
+	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
+	val hour = if (data.node.broadcast?.startTime?.isNotEmpty() == true) Calendar.convertTimeToLocalTimezone(timeString = data.node.broadcast.startTime) else "N/A"
 
-	Column(
+	Card(
 		modifier = Modifier
-			.wrapContentWidth()
-			.clickable { onItemClick() },
-		verticalArrangement = Arrangement.spacedBy(8.dp)
+			.fillMaxWidth()
+			.padding(vertical = 8.dp)
+			.clickable { onItemClick() }
 	) {
-		Surface(
-			modifier = Modifier
-				.clip(RoundedCornerShape(10.dp))
-				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+		Row(
+			horizontalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			SubcomposeAsyncImage(
 				model = ImageRequest.Builder(LocalContext.current)
@@ -92,61 +91,142 @@ fun GridListItemWithRank(
 					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 			)
 
-			Box(contentAlignment = Alignment.BottomStart) {
+			Column(
+				verticalArrangement = Arrangement.spacedBy(8.dp),
+				modifier = Modifier
+					.fillMaxWidth()
+					.padding(top = 8.dp, end = 8.dp)
+			) {
+				Text(
+					text = title,
+					textAlign = TextAlign.Start,
+					maxLines = 2,
+					overflow = TextOverflow.Ellipsis,
+					color = MaterialTheme.colorScheme.onSurface,
+					style = MaterialTheme.typography.titleMedium
+				)
+
 				Row(
-					modifier = Modifier
-						.background(MaterialTheme.colorScheme.primary)
-						.padding(4.dp),
 					verticalAlignment = Alignment.CenterVertically,
 					horizontalArrangement = Arrangement.spacedBy(4.dp)
 				) {
+					Icon(
+						painter = painterResource(id = R.drawable.schedule_24px),
+						contentDescription = "Season icon",
+					)
+
 					Text(
-						text = "#${data.ranking?.rank}",
-						style = MaterialTheme.typography.bodyMedium,
+						text = hour,
 						textAlign = TextAlign.Center,
-						color = MaterialTheme.colorScheme.onPrimary,
-						fontWeight = FontWeight.Bold
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						color = MaterialTheme.colorScheme.onSurface,
+						style = MaterialTheme.typography.bodyMedium
+					)
+				}
+
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					Icon(
+						painter = painterResource(id = R.drawable.trending_up_24px),
+						contentDescription = "Ranking icon",
+					)
+
+					Text(
+						text = ranking.toString(),
+						textAlign = TextAlign.Center,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						color = MaterialTheme.colorScheme.onSurface,
+						style = MaterialTheme.typography.bodyMedium
+					)
+				}
+
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					horizontalArrangement = Arrangement.spacedBy(4.dp)
+				) {
+					Icon(
+						painter = painterResource(id = R.drawable.grade_24px),
+						contentDescription = "Mean score icon",
+					)
+
+					Text(
+						text = meanScore,
+						textAlign = TextAlign.Center,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						color = MaterialTheme.colorScheme.onSurface,
+						style = MaterialTheme.typography.bodyMedium
 					)
 				}
 			}
 		}
-
-		Text(
-			text = title,
-			textAlign = TextAlign.Start,
-			maxLines = 2,
-			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier.width(IMAGE_WIDTH.dp),
-			color = MaterialTheme.colorScheme.onBackground,
-			style = MaterialTheme.typography.bodyMedium
-		)
 	}
 }
 
 @Composable
-fun ShimmerEffectGridListItemWithRank() {
-	Column(
+fun ShimmerEffectItemCalenderColumn() {
+	Row(
 		modifier = Modifier
-			.wrapContentWidth(),
-		verticalArrangement = Arrangement.spacedBy(8.dp)
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+		horizontalArrangement = Arrangement.spacedBy(16.dp),
+		verticalAlignment = Alignment.Top
 	) {
 		ShimmerEffect(
 			modifier = Modifier
-				.clip(RoundedCornerShape(10.dp))
-				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
-		ShimmerEffect(
-			modifier = Modifier
-				.clip(RoundedCornerShape(10.dp))
-				.size(IMAGE_WIDTH.dp, 40.dp)
-		)
+		Column(
+			verticalArrangement = Arrangement.spacedBy(8.dp)
+		) {
+			ShimmerEffect(
+				modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .size(300.dp, 40.dp)
+			)
+
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				ShimmerEffect(
+					modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .size(IMAGE_WIDTH.dp, 24.dp)
+				)
+			}
+
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				ShimmerEffect(
+					modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .size(IMAGE_WIDTH.dp, 24.dp)
+				)
+			}
+
+			Row(
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				ShimmerEffect(
+					modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .size(IMAGE_WIDTH.dp, 24.dp)
+				)
+			}
+		}
 	}
 }
 
 @Composable
 @Preview
-fun GridListItemWithRankPreview(
+fun ListItemCalenderColumnPreview(
 ) {
 	val data = Data(
 		node = Node(
@@ -192,5 +272,5 @@ fun GridListItemWithRankPreview(
 		),
 		rankingType = "Score"
 	)
-	GridListItemWithRank(data = data, onItemClick = {})
+	ListItemCalenderColumn(data = data, onItemClick = {})
 }

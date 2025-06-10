@@ -1,7 +1,6 @@
 package com.farukaygun.yorozuyalist.util.Extensions
 
 import androidx.compose.runtime.Composable
-import co.yml.charts.common.extensions.isNotNull
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeDetail
 import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
@@ -18,16 +17,18 @@ object ModelExtensions {
 				"$numEpisodes Episodes"
 			} else "Unknown"
 		}
+
 		is MangaDetail -> {
 			if (numVolumes > 0) {
 				"$numVolumes Volumes"
 			} else "Unknown"
 		}
+
 		else -> "N/A"
 	}
 
 	@Composable
-	fun StartSeason.formatStartSeason() = if (season.isNotNull() && year != 0) {
+	fun StartSeason.formatStartSeason() = if (year != 0) {
 		"${season.displayName} $year"
 	} else {
 		"N/A"
@@ -42,15 +43,17 @@ object ModelExtensions {
 				"$hours hour $minutes minutes"
 			}
 		}
+
 		averageEpisodeDuration == 3600 -> "1 hour"
 		averageEpisodeDuration >= 60 -> "${averageEpisodeDuration / 60} minutes"
 		averageEpisodeDuration < 60 -> "<1 minute"
 		else -> "N/A"
 	}
 
-	fun Broadcast.formatBroadcast() = if (dayOfTheWeek.isNotEmpty() && startTime?.isNotEmpty() == true) {
-		"${dayOfTheWeek.replaceFirstChar { it.uppercase() }} $startTime"
-	} else {
-		"N/A"
-	}
+	fun Broadcast.formatBroadcast() =
+		if (dayOfTheWeek.isNotEmpty() && startTime?.isNotEmpty() == true) {
+			"${dayOfTheWeek.replaceFirstChar { it.uppercase() }} $startTime"
+		} else {
+			"N/A"
+		}
 }

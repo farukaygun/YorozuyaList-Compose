@@ -58,7 +58,7 @@ interface AnimeRepository {
 		id: Int,
 		status: String?,
 		episodeCount: Int?,
-		@IntRange(0,10) score: Int?,
+		@IntRange(0, 10) score: Int?,
 		startDate: String?,
 		finishDate: String?,
 		tags: String?,

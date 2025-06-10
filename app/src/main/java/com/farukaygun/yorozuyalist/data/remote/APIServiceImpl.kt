@@ -241,18 +241,21 @@ class APIServiceImpl(
 
 	override suspend fun getAnimeDetail(
 		id: String
-	) : AnimeDetailDto
-	{
-		val myListStatusFields = "start_date,finish_date,num_times_rewatched,is_rewatching,rewatch_value,priority,tags,comments"
+	): AnimeDetailDto {
+		val myListStatusFields =
+			"start_date,finish_date,num_times_rewatched,is_rewatching,rewatch_value,priority,tags,comments"
 		return client.get("${Constants.ANIME_URL}/${id}") {
 			header(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
-			parameter("fields", "id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity," +
-					"num_list_users,num_scoring_users,media_type,status,genres,my_list_status{$myListStatusFields},num_episodes,start_season,broadcast," +
-					"source,average_episode_duration,studios,opening_themes,ending_themes,related_anime{media_type},related_manga{media_type}," +
-					"recommendations")
+			parameter(
+				"fields",
+				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity," +
+						"num_list_users,num_scoring_users,media_type,status,genres,my_list_status{$myListStatusFields},num_episodes,start_season,broadcast," +
+						"source,average_episode_duration,studios,opening_themes,ending_themes,related_anime{media_type},related_manga{media_type}," +
+						"recommendations"
+			)
 		}.body()
 	}
 
@@ -264,10 +267,13 @@ class APIServiceImpl(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
-			parameter("fields", "id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity," +
-					"num_list_users,num_scoring_users,media_type,status,genres,my_list_status,num_chapters,num_volumes," +
-					"source,authors{first_name,last_name},serialization,related_anime{media_type},related_manga{media_type}," +
-					"recommendations")
+			parameter(
+				"fields",
+				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity," +
+						"num_list_users,num_scoring_users,media_type,status,genres,my_list_status,num_chapters,num_volumes," +
+						"source,authors{first_name,last_name},serialization,related_anime{media_type},related_manga{media_type}," +
+						"recommendations"
+			)
 		}.body()
 	}
 
@@ -275,7 +281,7 @@ class APIServiceImpl(
 		id: Int,
 		status: String?,
 		episodeCount: Int?,
-		@IntRange(0,10) score: Int?,
+		@IntRange(0, 10) score: Int?,
 		startDate: String?,
 		finishDate: String?,
 		tags: String?,
@@ -378,7 +384,10 @@ class APIServiceImpl(
 			parameter("ranking_type", rankingType)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users")
+			parameter(
+				"fields",
+				"alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users"
+			)
 		}.body()
 	}
 
@@ -388,7 +397,10 @@ class APIServiceImpl(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
-			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users")
+			parameter(
+				"fields",
+				"alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users"
+			)
 		}.body()
 	}
 
@@ -405,7 +417,10 @@ class APIServiceImpl(
 			parameter("ranking_type", rankingType)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users")
+			parameter(
+				"fields",
+				"alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users"
+			)
 		}.body()
 	}
 
@@ -415,7 +430,10 @@ class APIServiceImpl(
 				HttpHeaders.Authorization,
 				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
 			)
-			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users")
+			parameter(
+				"fields",
+				"alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users"
+			)
 		}.body()
 	}
 }

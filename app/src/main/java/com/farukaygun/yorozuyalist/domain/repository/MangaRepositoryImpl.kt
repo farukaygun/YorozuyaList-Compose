@@ -54,7 +54,7 @@ class MangaRepositoryImpl(
 		rereadCount: Int?,
 		rereadValue: Int?,
 		comments: String?
-	) : MyListStatusDto {
+	): MyListStatusDto {
 		return api.updateMyMangaListItem(
 			id = id,
 			status = status,

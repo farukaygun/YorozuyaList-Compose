@@ -59,7 +59,7 @@ class MangaUseCase(
 
 	fun executeGetMangaDetail(
 		id: String
-	) : Flow<Resource<MangaDetail>> = flow {
+	): Flow<Resource<MangaDetail>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -88,7 +88,7 @@ class MangaUseCase(
 		rereadCount: Int?,
 		rereadValue: Int?,
 		comments: String?
-	) : Flow<Resource<MyListStatus>> = flow {
+	): Flow<Resource<MyListStatus>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -117,7 +117,7 @@ class MangaUseCase(
 
 	fun executeDeleteMyMangaListItem(
 		id: Int
-	) : Flow<Resource<Boolean>> = flow {
+	): Flow<Resource<Boolean>> = flow {
 		try {
 			emit(Resource.Loading())
 

@@ -19,7 +19,7 @@ interface MangaRepository {
 
 	suspend fun getMangaDetail(
 		id: String
-	) : MangaDetailDto
+	): MangaDetailDto
 
 	suspend fun updateMyMangaListItem(
 		id: Int,
@@ -35,7 +35,7 @@ interface MangaRepository {
 		rereadCount: Int?,
 		rereadValue: Int?,
 		comments: String?
-	) : MyListStatusDto
+	): MyListStatusDto
 
 	suspend fun deleteMyMangaListItem(
 		id: Int

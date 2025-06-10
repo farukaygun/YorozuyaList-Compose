@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +45,7 @@ import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.models.user.User
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileEvent
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileViewModel
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
@@ -53,6 +53,9 @@ import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToAbbr
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+
+private const val IMAGE_WIDTH = 100
+private const val IMAGE_HEIGHT = 150
 
 @Composable
 fun ProfileScreen(
@@ -113,7 +116,11 @@ fun UserInfoSection(
 					verticalArrangement = Arrangement.Center,
 					horizontalAlignment = Alignment.CenterHorizontally
 				) {
-					CircularProgressIndicator()
+					ShimmerEffect(
+						modifier = Modifier
+							.clip(RoundedCornerShape(10.dp))
+							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+					)
 				}
 			},
 			error = {
@@ -255,7 +262,7 @@ fun AnimeStatisticsSection(data: User) {
 		),
 		plotType = PlotType.Donut
 	)
-
+	
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
@@ -271,7 +278,7 @@ fun AnimeStatisticsSection(data: User) {
 			color = MaterialTheme.colorScheme.onBackground,
 			textAlign = TextAlign.Center
 		)
-
+		
 		Row(
 			modifier = Modifier
 				.fillMaxWidth(),
@@ -279,7 +286,7 @@ fun AnimeStatisticsSection(data: User) {
 			verticalAlignment = Alignment.CenterVertically
 		) {
 			DonutChart(chartData)
-
+			
 			Column {
 				chartData.slices.forEach { slice ->
 					AssistChip(
@@ -301,7 +308,6 @@ fun AnimeStatisticsSection(data: User) {
 		}
 	}
 }
-
 @Composable
 private fun DonutChart(data: PieChartData) {
 	val donutChartConfig = PieChartConfig(
@@ -316,7 +322,7 @@ private fun DonutChart(data: PieChartData) {
 		chartPadding = 16,
 		backgroundColor = MaterialTheme.colorScheme.background,
 	)
-
+	
 	DonutPieChart(
 		modifier = Modifier
 			.height(175.dp),

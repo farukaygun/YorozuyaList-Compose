@@ -14,6 +14,12 @@ sealed class BottomAppBarItem(
 		selectedIcon = R.drawable.home_24px,
 	)
 
+	data object Calendar : BottomAppBarItem(
+		screen = Screen.CalendarScreen,
+		unselectedIcon = R.drawable.calendar_month_unfilled_24px,
+		selectedIcon = R.drawable.calendar_month_24px,
+	)
+
 	data object UserAnimeList : BottomAppBarItem(
 		screen = Screen.UserAnimeListScreen,
 		unselectedIcon = R.drawable.movie_unfilled_24px,

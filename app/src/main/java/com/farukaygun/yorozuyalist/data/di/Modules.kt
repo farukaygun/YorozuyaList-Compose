@@ -15,6 +15,7 @@ import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
 import com.farukaygun.yorozuyalist.domain.use_case.UserUseCase
+import com.farukaygun.yorozuyalist.presentation.calendar.CalendarViewModel
 import com.farukaygun.yorozuyalist.presentation.detail.DetailViewModel
 import com.farukaygun.yorozuyalist.presentation.detail.bottom_sheet.MyListModalBottomSheetViewModel
 import com.farukaygun.yorozuyalist.presentation.grid_list.GridListViewModel
@@ -36,6 +37,7 @@ val apiServiceModule = module {
 val viewModelModule = module {
 	viewModel { LoginViewModel(get(), get()) }
 	viewModel { HomeViewModel(get()) }
+	viewModel { CalendarViewModel(get()) }
 	viewModel { UserListViewModel(get(), get(), get()) }
 	viewModel { ProfileViewModel(get()) }
 	viewModel { SearchViewModel(get()) }
