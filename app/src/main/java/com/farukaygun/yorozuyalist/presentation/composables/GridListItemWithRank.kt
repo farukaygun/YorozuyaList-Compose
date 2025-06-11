@@ -169,6 +169,7 @@ fun GridListItemWithRankPreview(
 				dayOfTheWeek = "Saturday",
 				startTime = "00:00"
 			),
+			rank = 1
 		),
 		myListStatus = MyListStatus(
 			status = MyListMediaStatus.WATCHING,
@@ -182,7 +183,9 @@ fun GridListItemWithRankPreview(
 			rewatchValue = 0,
 			tags = emptyList(),
 			priority = 0,
-			comments = ""
+			comments = "",
+			numChaptersRead = 0,
+			numVolumesRead = 0
 		),
 		ranking = Ranking(
 			rank = 1,

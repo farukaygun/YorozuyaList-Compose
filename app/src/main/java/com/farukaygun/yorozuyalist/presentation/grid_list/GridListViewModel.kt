@@ -31,6 +31,7 @@ class GridListViewModel(
 				year = year,
 				season = season.apiName
 			)
+
 			GridListType.RANKING_ANIME_LIST -> animeUseCase.executeGetAnimeRanking(rankingType = RankingType.ALL.value)
 			GridListType.RANKING_MANGA_LIST -> mangaUseCase.executeGetMangaRanking(rankingType = RankingType.ALL.value)
 		} as Flow<Resource<MediaList>>
@@ -72,9 +73,11 @@ class GridListViewModel(
 				.flowOn(Dispatchers.IO)
 				.handleResource(
 					onSuccess = { animeList ->
-						val currentData = _state.value.gridList?.data?.toMutableList() ?: mutableListOf()
+						val currentData =
+							_state.value.gridList?.data?.toMutableList() ?: mutableListOf()
 						val newData = animeList?.data ?: emptyList()
-						val mergedData = (currentData + newData).distinctBy { media -> media.node.id }
+						val mergedData =
+							(currentData + newData).distinctBy { media -> media.node.id }
 
 						_state.value = _state.value.copy(
 							gridList = animeList?.paging?.let { paging ->

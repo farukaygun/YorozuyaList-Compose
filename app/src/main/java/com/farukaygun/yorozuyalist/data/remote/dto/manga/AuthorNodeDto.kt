@@ -9,7 +9,7 @@ data class AuthorNodeDto(
 	@SerializedName("first_name")
 	val firstName: String,
 	@SerializedName("last_name")
-	val lastName: String,
+	val lastName: String
 )
 
 fun AuthorNodeDto.toAuthorNode(): AuthorNode {

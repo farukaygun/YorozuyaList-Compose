@@ -102,14 +102,14 @@ fun ShimmerEffectGenresSection() {
 			.horizontalScroll(rememberScrollState()),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-        (1..5).forEach { i ->
-            ShimmerEffect(
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .size(72.dp, 32.dp)
-            )
-        }
+		(1..5).forEach { i ->
+			ShimmerEffect(
+				modifier = Modifier
+					.padding(vertical = 8.dp)
+					.clip(RoundedCornerShape(10.dp))
+					.size(72.dp, 32.dp)
+			)
+		}
 	}
 }
 
@@ -124,13 +124,13 @@ fun ShimmerEffectSynopsisSection() {
 		Column(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-            (1..5).forEach { i ->
-                ShimmerEffect(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .size(400.dp, 12.dp)
-                )
-            }
+			(1..5).forEach { i ->
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(400.dp, 12.dp)
+				)
+			}
 		}
 
 		ShimmerEffect(
@@ -188,9 +188,9 @@ fun ShimmerEffectMoreInfoSection() {
 			color = MaterialTheme.colorScheme.onBackground
 		)
 
-        (1..6).forEach { i ->
-            ShimmerEffectMediaInfoView()
-        }
+		(1..6).forEach { i ->
+			ShimmerEffectMediaInfoView()
+		}
 
 		HorizontalDivider()
 
@@ -198,9 +198,9 @@ fun ShimmerEffectMoreInfoSection() {
 
 		HorizontalDivider()
 
-        (1..3).forEach { i ->
-            ShimmerEffectMediaInfoView()
-        }
+		(1..3).forEach { i ->
+			ShimmerEffectMediaInfoView()
+		}
 	}
 }
 

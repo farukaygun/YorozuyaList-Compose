@@ -34,5 +34,5 @@ enum class AnimeSource(val displayName: String) {
 	MIXED_MEDIA("Mixed Media"),
 
 	@SerializedName("4_koma_manga")
-	YON_KOMA_MANGA("4-Koma Manga");
+	YON_KOMA_MANGA("4-Koma Manga")
 }

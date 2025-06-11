@@ -9,7 +9,7 @@ data class RelatedDto(
 	@SerializedName("relation_type")
 	val relationType: String,
 	@SerializedName("relation_type_formatted")
-	val relationTypeFormatted: String,
+	val relationTypeFormatted: String
 )
 
 fun RelatedDto.toRelated(): Related {

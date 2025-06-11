@@ -6,15 +6,12 @@ import com.google.gson.annotations.SerializedName
 data class DataDto(
 	@SerializedName("node")
 	val node: NodeDto,
-
 	@SerializedName("ranking")
 	val ranking: RankingDto?,
-
 	@SerializedName("ranking_type")
-	var rankingType: String? = null,
-
+	var rankingType: String?,
 	@SerializedName("list_status")
-	val myListStatus: MyListStatusDto?,
+	val myListStatus: MyListStatusDto?
 )
 
 fun DataDto.toData(): Data {

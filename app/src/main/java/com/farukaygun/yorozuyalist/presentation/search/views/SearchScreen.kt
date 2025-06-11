@@ -172,7 +172,6 @@ fun SearchList(
 		modifier = Modifier.padding(16.dp),
 		verticalArrangement = Arrangement.spacedBy(16.dp)
 	) {
-
 		items(data) { anime ->
 			ListItemColumn(
 				data = anime,

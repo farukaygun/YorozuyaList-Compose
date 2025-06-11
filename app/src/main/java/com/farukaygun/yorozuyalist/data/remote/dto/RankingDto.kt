@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class RankingDto(
 	@SerializedName("rank")
-	val rank: Int,
+	val rank: Int
 )
 
 fun RankingDto.toRanking(): Ranking {

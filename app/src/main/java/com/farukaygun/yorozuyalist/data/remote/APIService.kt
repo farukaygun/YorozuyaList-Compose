@@ -84,7 +84,7 @@ interface APIService {
 
 	suspend fun getMangaDetail(
 		id: String
-	) : MangaDetailDto
+	): MangaDetailDto
 
 	suspend fun updateMyAnimeListItem(
 		id: Int,
@@ -99,7 +99,7 @@ interface APIService {
 		rewatchCount: Int?,
 		rewatchValue: Int?,
 		comments: String?
-	) : MyListStatusDto
+	): MyListStatusDto
 
 	suspend fun updateMyMangaListItem(
 		id: Int,
@@ -115,7 +115,7 @@ interface APIService {
 		rereadCount: Int?,
 		rereadValue: Int?,
 		comments: String?
-	) : MyListStatusDto
+	): MyListStatusDto
 
 	suspend fun deleteMyAnimeListItem(
 		id: Int
@@ -129,19 +129,19 @@ interface APIService {
 		rankingType: String,
 		limit: Int,
 		offset: Int,
-	) : MediaRankingDto
+	): MediaRankingDto
 
 	suspend fun getAnimeRanking(
 		url: String
-	) : MediaRankingDto
+	): MediaRankingDto
 
 	suspend fun getMangaRanking(
 		rankingType: String,
 		limit: Int,
 		offset: Int,
-	) : MediaRankingDto
+	): MediaRankingDto
 
 	suspend fun getMangaRanking(
 		url: String
-	) : MediaRankingDto
+	): MediaRankingDto
 }

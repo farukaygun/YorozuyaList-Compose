@@ -7,5 +7,5 @@ data class HomeState(
 	val animeSeasonalList: List<Data> = emptyList(),
 	val animeSuggestionList: List<Data> = emptyList(),
 	val error: String = "",
-	val isLoading: Boolean = false,
+	val isLoading: Boolean = false
 )

@@ -13,7 +13,7 @@ data class AnimeSeasonalDto(
 	@SerializedName("paging")
 	val paging: PagingDto,
 	@SerializedName("season")
-	val season: SeasonDto,
+	val season: SeasonDto
 )
 
 fun AnimeSeasonalDto.toAnimeSeasonal(): AnimeSeasonal {

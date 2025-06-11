@@ -187,9 +187,10 @@ fun StatusFilterOptions(
 			statusList.forEach { status ->
 				val isSelected = state.selectedStatus?.apiName == status.apiName
 
-				FilterChip(onClick = {
-					viewModel.onEvent(MyListBottomSheetEvent.SetStatus(newStatus = status))
-				},
+				FilterChip(
+					onClick = {
+						viewModel.onEvent(MyListBottomSheetEvent.SetStatus(newStatus = status))
+					},
 					label = { Text(status.displayName) },
 					selected = isSelected,
 					leadingIcon = {
@@ -197,7 +198,6 @@ fun StatusFilterOptions(
 							targetState = isSelected,
 							transitionSpec = { fadeIn() togetherWith fadeOut() },
 							label = "",
-							contentKey = { isSelected }
 						) { state ->
 							Icon(
 								painterResource(id = getStatusIcon(status, state)),

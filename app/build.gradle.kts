@@ -14,8 +14,8 @@ android {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
 		targetSdk = 35
-		versionCode = 18
-		versionName = "2.0.1"
+		versionCode = 19
+		versionName = "2.1.0"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -56,23 +56,23 @@ android {
 }
 
 dependencies {
-	val ktorVersion = "3.1.1"
-	val koinVersion="4.1.0-Beta5"
-	val coilVersion = "3.1.0"
+	val ktorVersion = "3.1.3"
+	val koinVersion="4.1.0"
+	val coilVersion = "3.2.0"
 
-	implementation("com.google.android.engage:engage-core:1.5.7")
-	implementation("androidx.core:core-ktx:1.15.0")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+	implementation("com.google.android.engage:engage-core:1.5.8")
+	implementation("androidx.core:core-ktx:1.16.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
 	implementation("androidx.activity:activity-compose:1.10.1")
-	implementation(platform("androidx.compose:compose-bom:2025.03.01"))
+	implementation(platform("androidx.compose:compose-bom:2025.06.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3:1.3.1")
+	implementation("androidx.compose.material3:material3:1.3.2")
 
 	// navigation
-	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-	implementation("androidx.navigation:navigation-compose:2.8.9")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+	implementation("androidx.navigation:navigation-compose:2.9.0")
 
 	// Ktor
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -102,8 +102,8 @@ dependencies {
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.2.1")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2025.03.01"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2025.06.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.8")
+	debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.2")
 }

@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.yml.charts.common.extensions.isNotNull
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -89,7 +88,10 @@ fun ListItemColumn(
 		)
 
 		Column(
-			verticalArrangement = Arrangement.spacedBy(8.dp)
+			verticalArrangement = Arrangement.spacedBy(8.dp),
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(end = 8.dp)
 		) {
 			Text(
 				text = title,
@@ -110,7 +112,7 @@ fun ListItemColumn(
 				)
 
 				Text(
-					text = if (mediaType.isNotNull()) "$mediaType $numEpisodes" else "Unknown",
+					text = if (!mediaType.isNullOrEmpty()) "$mediaType $numEpisodes" else "Unknown",
 					textAlign = TextAlign.Center,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
@@ -242,6 +244,7 @@ fun ListItemColumnPreview(
 				dayOfTheWeek = "Saturday",
 				startTime = "00:00"
 			),
+			rank = 1
 		),
 		myListStatus = MyListStatus(
 			status = MyListMediaStatus.WATCHING,
@@ -255,7 +258,9 @@ fun ListItemColumnPreview(
 			rewatchValue = 0,
 			tags = emptyList(),
 			priority = 0,
-			comments = ""
+			comments = "",
+			numChaptersRead = 0,
+			numVolumesRead = 0
 		),
 		ranking = Ranking(
 			rank = 1,

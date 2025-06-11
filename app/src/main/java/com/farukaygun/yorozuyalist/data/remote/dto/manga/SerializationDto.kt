@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 
 data class SerializationDto(
 	@SerializedName("node")
-	val node: SerializationNodeDto,
+	val node: SerializationNodeDto
 )
 
 fun SerializationDto.toSerialization(): Serialization {

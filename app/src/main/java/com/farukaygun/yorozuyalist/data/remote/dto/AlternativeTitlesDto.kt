@@ -9,7 +9,7 @@ data class AlternativeTitlesDto(
 	@SerializedName("en")
 	val en: String,
 	@SerializedName("ja")
-	val ja: String,
+	val ja: String
 )
 
 fun AlternativeTitlesDto.toAlternativeTitles(): AlternativeTitles {

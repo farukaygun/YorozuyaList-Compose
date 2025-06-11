@@ -22,6 +22,7 @@ class BottomAppBarState(
 
 	val items = listOf(
 		BottomAppBarItem.Home,
+		BottomAppBarItem.Calendar,
 		BottomAppBarItem.UserAnimeList,
 		BottomAppBarItem.UserMangaList,
 		BottomAppBarItem.Profile

@@ -40,7 +40,7 @@ class SharedPrefsHelper {
 		}
 	}
 
-	fun getBool(key: String) = sharedPreferences?.getBoolean(key, false) ?: false
+	fun getBool(key: String) = sharedPreferences?.getBoolean(key, false) == true
 
 	fun saveInt(key: String, int: Int) {
 		sharedPreferences?.edit(commit = true) {

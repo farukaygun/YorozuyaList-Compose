@@ -46,5 +46,5 @@ enum class MediaType(val displayName: String) {
 	MANHUA("Manhua"),
 
 	@SerializedName("oel")
-	OEL("Oel");
+	OEL("Oel")
 }

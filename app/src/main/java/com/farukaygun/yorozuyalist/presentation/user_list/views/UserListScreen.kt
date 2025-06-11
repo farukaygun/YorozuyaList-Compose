@@ -17,11 +17,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -56,15 +56,19 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserListScreen(
 	navController: NavController,
 	viewModel: UserListViewModel = koinViewModel(),
-	nestedScrollConnection: NestedScrollConnection
+	nestedScrollConnection: NestedScrollConnection,
+	onListStateChanged: (LazyListState) -> Unit
 ) {
 	val state = viewModel.state.value
 	val listState = rememberLazyListState()
+
+	LaunchedEffect(listState) {
+		onListStateChanged(listState)
+	}
 
 	Column(
 		modifier = Modifier
@@ -162,7 +166,6 @@ fun MyListStatusFilterChips(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserList(
 	navController: NavController,
@@ -203,7 +206,6 @@ fun UserList(
 	}
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun AnimeListScreenPreview() {
@@ -217,7 +219,8 @@ fun AnimeListScreenPreview() {
 	}) {
 		UserListScreen(
 			navController = rememberNavController(),
-			nestedScrollConnection = rememberNestedScrollInteropConnection()
+			nestedScrollConnection = rememberNestedScrollInteropConnection(),
+			onListStateChanged = {}
 		)
 	}
 }

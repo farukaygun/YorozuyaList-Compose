@@ -32,7 +32,7 @@ data class MyListStatusDto(
 	@SerializedName("priority")
 	val priority: Int?,
 	@SerializedName("comments")
-	val comments: String?,
+	val comments: String?
 )
 
 fun MyListStatusDto.toMyListStatus(): MyListStatus {

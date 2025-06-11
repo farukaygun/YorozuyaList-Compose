@@ -178,7 +178,7 @@ class AnimeUseCase(
 
 	fun executeGetAnimeDetail(
 		id: String
-	) : Flow<Resource<AnimeDetail>> = flow {
+	): Flow<Resource<AnimeDetail>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -197,7 +197,7 @@ class AnimeUseCase(
 		id: Int,
 		status: String?,
 		episodeCount: Int?,
-		@IntRange(0,10) score: Int?,
+		@IntRange(0, 10) score: Int?,
 		startDate: String?,
 		finishDate: String?,
 		tags: String?,
@@ -206,7 +206,7 @@ class AnimeUseCase(
 		@IntRange(0, 5) rewatchCount: Int?,
 		@IntRange(0, 2) rewatchValue: Int?,
 		comments: String?
-	) : Flow<Resource<MyListStatus>> = flow {
+	): Flow<Resource<MyListStatus>> = flow {
 		try {
 			emit(Resource.Loading())
 
@@ -234,7 +234,7 @@ class AnimeUseCase(
 
 	fun executeDeleteMyAnimeListItem(
 		id: Int
-	) : Flow<Resource<Boolean>> = flow {
+	): Flow<Resource<Boolean>> = flow {
 		try {
 			emit(Resource.Loading())
 

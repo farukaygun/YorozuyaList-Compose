@@ -20,7 +20,7 @@ abstract class BaseViewModel<T> : ViewModel() {
 		crossinline onSuccess: (T?) -> Unit,
 		crossinline onError: (String?) -> Unit = { _ -> },
 		crossinline onLoading: () -> Unit = { }
-	) : Job {
+	): Job {
 		return onEach {
 			when (it) {
 				is Resource.Success -> onSuccess(it.data)

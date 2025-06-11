@@ -9,71 +9,38 @@ import com.farukaygun.yorozuyalist.domain.models.Recommendation
 import com.farukaygun.yorozuyalist.domain.models.Related
 import com.farukaygun.yorozuyalist.domain.models.enums.AnimeSource
 import com.farukaygun.yorozuyalist.domain.models.enums.MediaStatus
-import com.google.gson.annotations.SerializedName
 
 data class AnimeDetail(
-	@SerializedName("id")
 	override val id: Int,
-	@SerializedName("title")
 	override val title: String,
-	@SerializedName("main_picture")
 	override val mainPicture: MainPicture?,
-	@SerializedName("alternative_titles")
 	override val alternativeTitles: AlternativeTitles,
-	@SerializedName("start_date")
 	override val startDate: String?,
-	@SerializedName("end_date")
 	override val endDate: String?,
-	@SerializedName("synopsis")
 	override val synopsis: String,
-	@SerializedName("mean")
 	override val mean: Double,
-	@SerializedName("rank")
 	override val rank: Int,
-	@SerializedName("popularity")
 	override val popularity: Int,
-	@SerializedName("num_list_users")
 	override val numListUsers: Int,
-	@SerializedName("num_scoring_users")
 	override val numScoringUsers: Int,
-	@SerializedName("nsfw")
 	override val nsfw: String?,
-	@SerializedName("created_at")
 	override val createdAt: String?,
-	@SerializedName("updated_at")
 	override val updatedAt: String?,
-	@SerializedName("media_type")
 	override val mediaType: String,
-	@SerializedName("status")
 	override val status: MediaStatus?,
-	@SerializedName("genres")
 	override val genres: List<Genre>,
-	@SerializedName("num_episodes")
 	val numEpisodes: Int,
-	@SerializedName("my_list_status")
 	override val myListStatus: MyListStatus?,
-	@SerializedName("start_season")
 	val startSeason: StartSeason?,
-	@SerializedName("broadcast")
 	val broadcast: Broadcast?,
-	@SerializedName("source")
 	val source: AnimeSource,
-	@SerializedName("average_episode_duration")
 	val averageEpisodeDuration: Int,
-	@SerializedName("rating")
 	val rating: String?,
-	@SerializedName("pictures")
 	override val pictures: List<MainPicture?>?,
-	@SerializedName("background")
 	override val background: String?,
-	@SerializedName("related_anime")
 	override val relatedAnime: List<Related?>?,
-	@SerializedName("related_manga")
 	override val relatedManga: List<Related?>?,
-	@SerializedName("recommendations")
 	override val recommendations: List<Recommendation>?,
-	@SerializedName("studios")
 	val studios: List<Studio>,
-	@SerializedName("statistics")
-	val statistics: Statistics?,
+	val statistics: Statistics?
 ) : MediaDetail()

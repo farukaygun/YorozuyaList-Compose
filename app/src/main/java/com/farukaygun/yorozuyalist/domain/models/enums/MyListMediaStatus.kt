@@ -22,5 +22,5 @@ enum class MyListMediaStatus(val displayName: String, val apiName: String) {
 	PLAN_TO_WATCH("Plan to Watch", "plan_to_watch"),
 
 	@SerializedName("plan_to_read")
-	PLAN_TO_READ("Plan to Read", "plan_to_read");
+	PLAN_TO_READ("Plan to Read", "plan_to_read")
 }

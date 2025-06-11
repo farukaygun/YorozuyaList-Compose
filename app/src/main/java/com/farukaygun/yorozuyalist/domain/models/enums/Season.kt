@@ -13,5 +13,5 @@ enum class Season(val displayName: String) {
 	SUMMER("Summer"),
 
 	@SerializedName("fall")
-	FALL("Fall");
+	FALL("Fall")
 }
