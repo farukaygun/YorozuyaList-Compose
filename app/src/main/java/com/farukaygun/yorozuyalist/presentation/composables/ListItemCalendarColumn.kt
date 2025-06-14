@@ -1,7 +1,9 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
-import androidx.compose.foundation.clickable
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,19 +31,11 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Data
-import com.farukaygun.yorozuyalist.domain.models.MainPicture
-import com.farukaygun.yorozuyalist.domain.models.MyListStatus
-import com.farukaygun.yorozuyalist.domain.models.Node
-import com.farukaygun.yorozuyalist.domain.models.Ranking
-import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
-import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
-import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
-import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
-import com.farukaygun.yorozuyalist.domain.models.enums.Season
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.util.Calendar
+import com.farukaygun.yorozuyalist.util.Constants
 
-private const val IMAGE_WIDTH = 100
+private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
 
 @Composable
@@ -55,113 +50,150 @@ fun ListItemCalenderColumn(
 	val hour = if (data.node.broadcast?.startTime?.isNotEmpty() == true) Calendar.convertTimeToLocalTimezone(timeString = data.node.broadcast.startTime) else "N/A"
 
 	Card(
+		colors = CardDefaults.cardColors(
+			containerColor = MaterialTheme.colorScheme.surface,
+		),
+		elevation = CardDefaults.cardElevation(
+			defaultElevation = 2.dp
+		),
+		onClick = onItemClick,
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(vertical = 8.dp)
-			.clickable { onItemClick() }
+			.padding(vertical = 8.dp),
 	) {
 		Row(
+			verticalAlignment = Alignment.Top,
 			horizontalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			SubcomposeAsyncImage(
-				model = ImageRequest.Builder(LocalContext.current)
-					.data(mainPictureUrl)
-					.crossfade(true)
-					.crossfade(350)
-					.build(),
-				loading = {
-					ShimmerEffect(
-						modifier = Modifier
-							.clip(RoundedCornerShape(10.dp))
-							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-					)
-				},
-				error = {
-					Icon(
-						painter = painterResource(id = R.drawable.broken_image_24px),
-						contentDescription = "Error icon",
-					)
-				},
-				contentDescription = title,
-				contentScale = ContentScale.Crop,
+			MediaImage(
+				imageUrl = mainPictureUrl,
+				contentDescription = title
+			)
+			
+			MediaInfo(
+				title = title,
+				hour = hour,
+				ranking = ranking.toString(),
+				meanScore = meanScore,
+				modifier = Modifier.fillMaxWidth()
+			)
+		}
+	}
+}
+
+@Composable
+private fun MediaImage(
+	imageUrl: String?,
+	contentDescription: String,
+	modifier: Modifier = Modifier
+) {
+	SubcomposeAsyncImage(
+		model = ImageRequest.Builder(LocalContext.current)
+			.data(imageUrl)
+			.crossfade(350)
+			.build(),
+		loading = {
+			ShimmerEffect(
 				modifier = Modifier
 					.clip(RoundedCornerShape(10.dp))
 					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 			)
-
-			Column(
-				verticalArrangement = Arrangement.spacedBy(8.dp),
+		},
+		error = {
+			Box(
 				modifier = Modifier
-					.fillMaxWidth()
-					.padding(top = 8.dp, end = 8.dp)
+					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+					.background(
+						MaterialTheme.colorScheme.surface,
+						RoundedCornerShape(10.dp)
+					),
+				contentAlignment = Alignment.Center
 			) {
-				Text(
-					text = title,
-					textAlign = TextAlign.Start,
-					maxLines = 2,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.titleMedium
+				Icon(
+					painter = painterResource(R.drawable.broken_image_24px),
+					contentDescription = "Error loading image",
+					tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
 				)
-
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					Icon(
-						painter = painterResource(id = R.drawable.schedule_24px),
-						contentDescription = "Season icon",
-					)
-
-					Text(
-						text = hour,
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						color = MaterialTheme.colorScheme.onSurface,
-						style = MaterialTheme.typography.bodyMedium
-					)
-				}
-
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					Icon(
-						painter = painterResource(id = R.drawable.trending_up_24px),
-						contentDescription = "Ranking icon",
-					)
-
-					Text(
-						text = ranking.toString(),
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						color = MaterialTheme.colorScheme.onSurface,
-						style = MaterialTheme.typography.bodyMedium
-					)
-				}
-
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					Icon(
-						painter = painterResource(id = R.drawable.grade_24px),
-						contentDescription = "Mean score icon",
-					)
-
-					Text(
-						text = meanScore,
-						textAlign = TextAlign.Center,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						color = MaterialTheme.colorScheme.onSurface,
-						style = MaterialTheme.typography.bodyMedium
-					)
-				}
 			}
-		}
+		},
+		contentDescription = contentDescription,
+		contentScale = ContentScale.Crop,
+		modifier = modifier
+			.clip(RoundedCornerShape(10.dp))
+			.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+	)
+}
+
+@Composable
+private fun MediaInfo(
+	title: String,
+	hour: String,
+	ranking: String,
+	meanScore: String,
+	modifier: Modifier = Modifier
+) {
+	Column(
+		verticalArrangement = Arrangement.spacedBy(8.dp),
+		modifier = modifier
+			.fillMaxWidth()
+			.padding(8.dp)
+	) {
+		Text(
+			text = title,
+			textAlign = TextAlign.Start,
+			minLines = 2,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			style = MaterialTheme.typography.titleMedium
+		)
+		
+		InfoRow(
+			iconRes = R.drawable.schedule_24px,
+			text = hour,
+			contentDescription = "Broadcast time"
+		)
+		
+		InfoRow(
+			iconRes = R.drawable.trending_up_24px,
+			text = ranking,
+			contentDescription = "Ranking"
+		)
+		
+		InfoRow(
+			iconRes = R.drawable.grade_24px,
+			text = meanScore,
+			contentDescription = "Mean score"
+		)
+	}
+}
+
+@Composable
+private fun InfoRow(
+	@DrawableRes iconRes: Int,
+	text: String,
+	contentDescription: String,
+	modifier: Modifier = Modifier
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		modifier = modifier
+	) {
+		Icon(
+			painter = painterResource(iconRes),
+			contentDescription = contentDescription,
+			modifier = Modifier.size(18.dp),
+			tint = MaterialTheme.colorScheme.onSurfaceVariant
+		)
+		
+		Text(
+			text = text,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			style = MaterialTheme.typography.bodySmall
+		)
 	}
 }
 
@@ -226,49 +258,5 @@ fun ShimmerEffectItemCalenderColumn() {
 @Preview
 fun ListItemCalenderColumnPreview(
 ) {
-	val data = Data(
-		node = Node(
-			id = 52991,
-			title = "Sousou no Frieren",
-			mainPicture = MainPicture(
-				medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
-				large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
-			),
-			status = "finished_airing",
-			mean = "9.38",
-			mediaType = MediaType.TV,
-			startSeason = StartSeason(
-				year = 2023,
-				season = Season.FALL
-			),
-			numListUsers = 701406,
-			numEpisodes = 12,
-			broadcast = Broadcast(
-				dayOfTheWeek = "Saturday",
-				startTime = "00:00"
-			),
-			rank = 1
-		),
-		myListStatus = MyListStatus(
-			status = MyListMediaStatus.WATCHING,
-			score = 10,
-			numEpisodesWatched = 12,
-			isRewatching = false,
-			updatedAt = "",
-			startDate = "",
-			finishDate = "",
-			numTimesRewatched = 0,
-			rewatchValue = 0,
-			tags = emptyList(),
-			priority = 0,
-			comments = "",
-			numChaptersRead = 0,
-			numVolumesRead = 0
-		),
-		ranking = Ranking(
-			rank = 1,
-		),
-		rankingType = "Score"
-	)
-	ListItemCalenderColumn(data = data, onItemClick = {})
+	ListItemCalenderColumn(data = Constants.PREVIEW_SAMPLE_DATA, onItemClick = {})
 }

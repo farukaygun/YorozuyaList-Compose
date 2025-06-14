@@ -14,8 +14,8 @@ android {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
 		targetSdk = 35
-		versionCode = 19
-		versionName = "2.1.0"
+		versionCode = 20
+		versionName = "2.2.0"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -68,7 +68,7 @@ dependencies {
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3:1.3.2")
+	implementation("androidx.compose.material3:material3-android:1.4.0-alpha15")
 
 	// navigation
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
@@ -90,7 +90,7 @@ dependencies {
 
 	// Coil
 	implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
-	implementation("io.coil-kt.coil3:coil-network-ktor3:3.1.0")
+	implementation("io.coil-kt.coil3:coil-network-ktor3:$coilVersion")
 
 	// Custom Tabs
 	implementation("androidx.browser:browser:1.8.0")

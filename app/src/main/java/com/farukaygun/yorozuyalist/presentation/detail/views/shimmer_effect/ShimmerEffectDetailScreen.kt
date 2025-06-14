@@ -61,7 +61,7 @@ private fun ShimmerEffectMediaInfo() {
 		ShimmerEffect(
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(120.dp, 150.dp)
 		)
 
 		Column(

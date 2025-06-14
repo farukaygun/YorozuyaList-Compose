@@ -74,22 +74,28 @@ fun GridList(
 	Box {
 		LazyVerticalGrid(
 			state = listState,
-			columns = GridCells.Adaptive(minSize = 100.dp),
-			horizontalArrangement = Arrangement.SpaceAround,
+			columns = GridCells.Adaptive(minSize = 120.dp),
+			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			val type = viewModel.state.value.type
-			items(data) { anime ->
+			items(data) { media ->
 				when (type) {
 					GridListType.SUGGESTED_ANIME_LIST, GridListType.SEASONAL_ANIME_LIST -> {
-						GridListItem(data = anime, onItemClick = {
-							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+						GridListItem(data = media, onItemClick = {
+							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${media.node.id}")
 						})
 					}
 
-					GridListType.RANKING_ANIME_LIST, GridListType.RANKING_MANGA_LIST -> {
-						GridListItemWithRank(data = anime, onItemClick = {
-							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${anime.node.id}")
+					GridListType.RANKING_ANIME_LIST -> {
+						GridListItemWithRank(data = media, onItemClick = {
+							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${media.node.id}")
+						})
+					}
+					
+					GridListType.RANKING_MANGA_LIST -> {
+						GridListItemWithRank(data = media, onItemClick = {
+							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.MANGA.name}/${media.node.id}")
 						})
 					}
 				}

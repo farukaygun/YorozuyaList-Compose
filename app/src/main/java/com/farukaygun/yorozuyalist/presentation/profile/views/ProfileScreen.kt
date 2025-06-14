@@ -54,7 +54,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
-private const val IMAGE_WIDTH = 100
+private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
 
 @Composable
@@ -134,7 +134,7 @@ fun UserInfoSection(
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(IMAGE_WIDTH.dp, 150.dp)
 		)
 
 		Column(

@@ -230,7 +230,7 @@ fun HorizontalList(
 			modifier = Modifier
 				.fillMaxWidth()
 				.padding(vertical = 8.dp),
-			horizontalArrangement = Arrangement.spacedBy(16.dp)
+			horizontalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			items(animeList) { anime ->
 				ListItemRow(

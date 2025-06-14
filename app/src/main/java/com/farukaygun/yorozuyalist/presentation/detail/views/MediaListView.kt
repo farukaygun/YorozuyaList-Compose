@@ -35,7 +35,7 @@ fun MediaListView(
 			LazyRow(
 				modifier = Modifier
 					.fillMaxWidth(),
-				horizontalArrangement = Arrangement.spacedBy(16.dp)
+				horizontalArrangement = Arrangement.spacedBy(8.dp)
 			) {
 				items(mediaList) { item ->
 					ListItemRow(

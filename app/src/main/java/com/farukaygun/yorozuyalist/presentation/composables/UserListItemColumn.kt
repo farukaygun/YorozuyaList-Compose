@@ -1,7 +1,7 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,18 +31,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Data
-import com.farukaygun.yorozuyalist.domain.models.MainPicture
-import com.farukaygun.yorozuyalist.domain.models.MyListStatus
-import com.farukaygun.yorozuyalist.domain.models.Node
-import com.farukaygun.yorozuyalist.domain.models.Ranking
-import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
-import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
-import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
-import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
-import com.farukaygun.yorozuyalist.domain.models.enums.Season
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
+import com.farukaygun.yorozuyalist.util.Constants
 
-private const val IMAGE_WIDTH = 100
+private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
 
 @Composable
@@ -50,147 +42,84 @@ fun UserListItemColumn(
 	data: Data,
 	onItemClick: () -> Unit
 ) {
-	val title = data.node.title
-	val mediaType = data.node.mediaType?.displayName
-	val numEpisodes = if (data.node.numEpisodes > 0) "(${data.node.numEpisodes} episodes)" else ""
-	val mainPictureUrl = data.node.mainPicture.medium
-	val season = data.node.startSeason?.season?.displayName ?: "Unknown"
-	val year = data.node.startSeason?.year?.toString()
-	val meanScore = data.node.mean ?: "Unknown"
+	val node = data.node
+	val title = node.title
+	val mediaType = node.mediaType?.displayName
+	val numEpisodes = if (node.numEpisodes > 0) "(${node.numEpisodes} episodes)" else ""
+	val mainPictureUrl = node.mainPicture.medium
+	val season = node.startSeason?.season?.displayName ?: "N/A"
+	val year = node.startSeason?.year?.toString()
+	val meanScore = node.mean ?: "N/A"
 	val userScore = data.myListStatus?.score
-
-	Row(
-		modifier = Modifier
-			.fillMaxWidth()
+	
+	Card(
+		onClick = onItemClick,
+		colors = CardDefaults.cardColors(
+			containerColor = MaterialTheme.colorScheme.surface,
+		),
+		elevation = CardDefaults.cardElevation(
+			defaultElevation = 2.dp
+		),
+		modifier = Modifier.fillMaxWidth()
 			.padding(vertical = 8.dp)
-			.clickable { onItemClick() },
-		horizontalArrangement = Arrangement.spacedBy(16.dp)
 	) {
-		Surface(
+		Row(
+			verticalAlignment = Alignment.Top,
+			horizontalArrangement = Arrangement.spacedBy(16.dp)
+		) {
+			MediaImageWithScore(
+				imageUrl = mainPictureUrl,
+				contentDescription = title,
+				userScore = userScore
+			)
+			
+			MediaInfo(
+				title = title,
+				mediaType = mediaType,
+				numEpisodes = numEpisodes,
+				season = season,
+				year = year,
+				meanScore = meanScore
+			)
+		}
+	}
+}
+
+@Composable
+private fun MediaImageWithScore(
+	imageUrl: String?,
+	contentDescription: String,
+	userScore: Int?,
+	modifier: Modifier = Modifier
+) {
+	Box(modifier = modifier) {
+		SubcomposeAsyncImage(
+			model = ImageRequest.Builder(LocalContext.current)
+				.data(imageUrl)
+				.crossfade(350)
+				.build(),
+			loading = {
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+				)
+			},
+			error = {
+				ErrorImagePlaceHolder()
+			},
+			contentDescription = contentDescription,
+			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
 				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-				.background(MaterialTheme.colorScheme.surface)
-		) {
-			SubcomposeAsyncImage(
-				model = ImageRequest.Builder(LocalContext.current)
-					.data(mainPictureUrl)
-					.crossfade(true)
-					.crossfade(350)
-					.build(),
-				loading = {
-					ShimmerEffect(
-						modifier = Modifier
-							.clip(RoundedCornerShape(10.dp))
-							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-					)
-				},
-				error = {
-					Icon(
-						painter = painterResource(id = R.drawable.broken_image_24px),
-						contentDescription = "Error icon",
-					)
-				},
-				contentDescription = title,
-				contentScale = ContentScale.Crop,
-				modifier = Modifier
-					.clip(RoundedCornerShape(10.dp))
-					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-			)
-
-			Box(contentAlignment = Alignment.BottomStart) {
-				Row(
-					modifier = Modifier
-						.background(MaterialTheme.colorScheme.primary)
-						.padding(4.dp),
-					verticalAlignment = Alignment.CenterVertically,
-					horizontalArrangement = Arrangement.spacedBy(4.dp)
-				) {
-					Text(
-						text = userScore.toString(),
-						style = MaterialTheme.typography.bodyMedium,
-						textAlign = TextAlign.Center,
-						color = MaterialTheme.colorScheme.onPrimary,
-						fontWeight = FontWeight.Bold
-					)
-					Icon(
-						painter = painterResource(id = R.drawable.grade_16px),
-						contentDescription = "Grade",
-						tint = MaterialTheme.colorScheme.onPrimary
-					)
-				}
-			}
-		}
-
-		Column(
-			verticalArrangement = Arrangement.spacedBy(8.dp),
-			modifier = Modifier
-				.fillMaxWidth()
-				.padding(end = 8.dp)
-		) {
-			Text(
-				text = title,
-				textAlign = TextAlign.Start,
-				maxLines = 2,
-				overflow = TextOverflow.Ellipsis,
-				color = MaterialTheme.colorScheme.onSurface,
-				style = MaterialTheme.typography.titleMedium
-			)
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.tv_24px),
-					contentDescription = "Media type icon",
-				)
-
-				Text(
-					text = if (!mediaType.isNullOrEmpty()) "$mediaType $numEpisodes" else "Unknown",
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.bodyMedium
-				)
-			}
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.calendar_month_24px),
-					contentDescription = "Season icon",
-				)
-
-				Text(
-					text = if (year != null) "$season $year" else "N/A",
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.bodyMedium
-				)
-			}
-
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				horizontalArrangement = Arrangement.spacedBy(4.dp)
-			) {
-				Icon(
-					painter = painterResource(id = R.drawable.grade_24px),
-					contentDescription = "Mean score icon",
-				)
-
-				Text(
-					text = meanScore,
-					textAlign = TextAlign.Center,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
-					style = MaterialTheme.typography.bodyMedium
+		)
+		
+		if (userScore != null) {
+			if (userScore > 0) {
+				UserScoreBadge(
+					score = userScore,
+					modifier = Modifier.align(Alignment.BottomStart)
 				)
 			}
 		}
@@ -198,52 +127,146 @@ fun UserListItemColumn(
 }
 
 @Composable
+private fun ErrorImagePlaceHolder(
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier
+			.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+			.background(
+				MaterialTheme.colorScheme.surface,
+				RoundedCornerShape(10.dp)
+			),
+		contentAlignment = Alignment.Center
+	) {
+		Icon(
+			painter = painterResource(R.drawable.broken_image_24px),
+			contentDescription = "Error loading image",
+			tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+		)
+	}
+}
+
+@Composable
+private fun UserScoreBadge(
+	score: Int,
+	modifier: Modifier = Modifier
+) {
+	Row(
+		modifier = modifier
+			.background(
+				MaterialTheme.colorScheme.primary,
+				RoundedCornerShape(bottomStart = 8.dp, topEnd = 8.dp)
+			)
+			.padding(horizontal = 6.dp, vertical = 4.dp),
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(2.dp)
+	) {
+		Text(
+			text = score.toString(),
+			style = MaterialTheme.typography.labelMedium,
+			color = MaterialTheme.colorScheme.onPrimary,
+			fontWeight = FontWeight.Bold
+		)
+		Icon(
+			painter = painterResource(R.drawable.grade_16px),
+			contentDescription = null,
+			tint = MaterialTheme.colorScheme.onPrimary,
+			modifier = Modifier.size(12.dp)
+		)
+	}
+}
+
+@Composable
+private fun MediaInfo(
+	title: String,
+	mediaType: String?,
+	numEpisodes: String?,
+	season: String?,
+	year: String?,
+	meanScore: String,
+) {
+	Column(
+		verticalArrangement = Arrangement.spacedBy(8.dp),
+		modifier = Modifier
+			.fillMaxWidth()
+			.padding(8.dp)
+	) {
+		Text(
+			text = title,
+			minLines = 2,
+			maxLines = 2,
+			overflow = TextOverflow.Ellipsis,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			style = MaterialTheme.typography.titleMedium
+		)
+		
+		InfoRow(
+			iconRes = R.drawable.tv_24px,
+			text = buildMediaTypeText(mediaType, numEpisodes),
+			contentDescription = "Media type"
+		)
+		
+		InfoRow(
+			iconRes = R.drawable.calendar_month_24px,
+			text = buildSeasonText(season, year),
+			contentDescription = "Season and year"
+		)
+		
+		InfoRow(
+			iconRes = R.drawable.grade_24px,
+			text = meanScore,
+			contentDescription = "Rating"
+		)
+	}
+}
+
+@Composable
+private fun InfoRow(
+	@DrawableRes iconRes: Int,
+	text: String,
+	contentDescription: String,
+	modifier: Modifier = Modifier
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		horizontalArrangement = Arrangement.spacedBy(4.dp),
+		modifier = modifier
+	) {
+		Icon(
+			painter = painterResource(iconRes),
+			contentDescription = contentDescription,
+			modifier = Modifier.size(18.dp),
+			tint = MaterialTheme.colorScheme.onSurfaceVariant
+		)
+		
+		Text(
+			text = text,
+			maxLines = 1,
+			overflow = TextOverflow.Ellipsis,
+			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			style = MaterialTheme.typography.bodySmall
+		)
+	}
+}
+
+private fun buildMediaTypeText(mediaType: String?, numEpisodes: String?): String {
+	return when {
+		!mediaType.isNullOrEmpty() -> "$mediaType $numEpisodes"
+		else -> "Unknown"
+	}
+}
+
+private fun buildSeasonText(season: String?, year: String?): String {
+	return when (year) {
+		null -> "N/A"
+		else -> "$season $year"
+	}
+}
+
+@Composable
 @Preview
 fun UserListItemColumnPreview(
 ) {
-	val data = Data(
-		node = Node(
-			id = 52991,
-			title = "Sousou no Frieren",
-			mainPicture = MainPicture(
-				medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
-				large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
-			),
-			status = "finished_airing",
-			mean = "9.38",
-			mediaType = MediaType.TV,
-			startSeason = StartSeason(
-				year = 2023,
-				season = Season.FALL
-			),
-			numListUsers = 701406,
-			numEpisodes = 12,
-			broadcast = Broadcast(
-				dayOfTheWeek = "Saturday",
-				startTime = "00:00"
-			),
-			rank = 1
-		),
-		myListStatus = MyListStatus(
-			status = MyListMediaStatus.WATCHING,
-			score = 10,
-			numEpisodesWatched = 12,
-			isRewatching = false,
-			updatedAt = "",
-			startDate = "",
-			finishDate = "",
-			numTimesRewatched = 0,
-			rewatchValue = 0,
-			tags = emptyList(),
-			priority = 0,
-			comments = "",
-			numChaptersRead = 0,
-			numVolumesRead = 0
-		),
-		ranking = Ranking(
-			rank = 1,
-		),
-		rankingType = "Score"
-	)
-	UserListItemColumn(data = data, onItemClick = {})
+	UserListItemColumn(data = Constants.PREVIEW_SAMPLE_DATA, onItemClick = {})
 }
