@@ -33,26 +33,30 @@ class Calendar {
 				Month.JULY, Month.AUGUST, Month.SEPTEMBER -> Seasons.SUMMER
 				Month.OCTOBER, Month.NOVEMBER, Month.DECEMBER -> Seasons.FALL
 			}
-
+		
 		fun convertTimeToLocalTimezone(
 			timeString: String,
-		    sourceTimezoneId: String = "JST"
+			sourceTimezoneId: String = "JST"
 		): String {
-			val (hour, minute) = timeString.split(":").map { it.toInt() }
-			val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
-			val sourceDateTime = LocalDateTime(
-				year = today.year,
-				month = today.month,
-				dayOfMonth = today.dayOfMonth,
-				hour = hour,
-				minute = minute,
-				second = 0,
-				nanosecond = 0
-			)
-			val sourceInstant = sourceDateTime.toInstant(TimeZone.of(sourceTimezoneId))
-			val localDateTime = sourceInstant.toLocalDateTime(TimeZone.currentSystemDefault())
-
-			return "${localDateTime.hour.toString().padStart(2, '0')}:${localDateTime.minute.toString().padStart(2, '0')}"
+			return try {
+				val (hour, minute) = timeString.split(":").map { it.toInt() }
+				val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
+				val sourceDateTime = LocalDateTime(
+					year = today.year,
+					month = today.month,
+					dayOfMonth = today.dayOfMonth,
+					hour = hour,
+					minute = minute,
+					second = 0,
+					nanosecond = 0
+				)
+				val sourceInstant = sourceDateTime.toInstant(TimeZone.of(sourceTimezoneId))
+				val localDateTime = sourceInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+				
+				"${localDateTime.hour.toString().padStart(2, '0')}:${localDateTime.minute.toString().padStart(2, '0')}"
+			} catch (e: Exception) {
+				timeString
+			}
 		}
 
 		fun getFormattedTimeDifference(timeString: String): String {

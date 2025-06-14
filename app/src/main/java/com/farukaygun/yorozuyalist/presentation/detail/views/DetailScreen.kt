@@ -6,6 +6,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,13 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -66,6 +65,7 @@ import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeDetail
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaDetail
+import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.presentation.detail.DetailEvent
 import com.farukaygun.yorozuyalist.presentation.detail.DetailViewModel
 import com.farukaygun.yorozuyalist.presentation.detail.views.shimmer_effect.ShimmerEffectDetailScreen
@@ -81,6 +81,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 
+private const val IMAGE_WIDTH = 120
+private const val IMAGE_HEIGHT = 150
 val LocalMediaDetail = compositionLocalOf<MediaDetail> { error("MediaDetail not provided") }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,7 +111,6 @@ fun DetailScreen(
 				Column(
 					modifier = Modifier
 						.padding(16.dp)
-						.statusBarsPadding()
 						.verticalScroll(rememberScrollState()),
 					verticalArrangement = Arrangement.spacedBy(16.dp)
 				) {
@@ -175,28 +176,23 @@ private fun MediaInfo() {
 		SubcomposeAsyncImage(
 			model = ImageRequest.Builder(LocalContext.current)
 				.data(LocalMediaDetail.current.mainPicture?.medium)
-				.crossfade(true)
 				.crossfade(350)
 				.build(),
 			loading = {
-				Column(
-					verticalArrangement = Arrangement.Center,
-					horizontalAlignment = Alignment.CenterHorizontally
-				) {
-					CircularProgressIndicator()
-				}
+				ShimmerEffect(
+					modifier = Modifier
+						.clip(RoundedCornerShape(10.dp))
+						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+				)
 			},
 			error = {
-				Icon(
-					painter = painterResource(id = R.drawable.broken_image_24px),
-					contentDescription = "Error icon",
-				)
+				ErrorImagePlaceholder()
 			},
 			contentDescription = stringResource(R.string.media_image),
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
 				.clip(RoundedCornerShape(10.dp))
-				.size(100.dp, 150.dp)
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
 		Column(
@@ -541,6 +537,28 @@ fun MyListFloatingActionButton(detail: MediaDetail, showBottomSheet: MutableStat
 		text = { Text(text = text) },
 		modifier = Modifier.padding(16.dp)
 	)
+}
+
+@Composable
+private fun ErrorImagePlaceholder(
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier
+			.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+			.background(
+				MaterialTheme.colorScheme.surfaceVariant,
+				RoundedCornerShape(10.dp)
+			),
+		contentAlignment = Alignment.Center
+	) {
+		Icon(
+			painter = painterResource(R.drawable.broken_image_24px),
+			contentDescription = "Error loading image",
+			tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+			modifier = modifier.size(32.dp)
+		)
+	}
 }
 
 @Preview

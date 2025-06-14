@@ -9,7 +9,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -83,8 +83,8 @@ fun WeeklyTabView(
 	nestedScrollConnection: NestedScrollConnection
 ) {
 	var selectedDay by remember { mutableStateOf(Calendar.WeekDays.entries[0]) }
-
-	ScrollableTabRow(
+	
+	PrimaryScrollableTabRow(
 		selectedTabIndex = Calendar.WeekDays.entries.indexOf(selectedDay),
 		modifier = Modifier.fillMaxWidth(),
 		edgePadding = 0.dp

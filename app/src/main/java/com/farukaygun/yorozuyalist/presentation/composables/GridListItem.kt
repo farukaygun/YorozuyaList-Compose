@@ -1,16 +1,23 @@
 package com.farukaygun.yorozuyalist.presentation.composables
 
-import androidx.compose.foundation.clickable
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -25,18 +32,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Data
-import com.farukaygun.yorozuyalist.domain.models.MainPicture
-import com.farukaygun.yorozuyalist.domain.models.MyListStatus
-import com.farukaygun.yorozuyalist.domain.models.Node
-import com.farukaygun.yorozuyalist.domain.models.Ranking
-import com.farukaygun.yorozuyalist.domain.models.anime.Broadcast
-import com.farukaygun.yorozuyalist.domain.models.anime.StartSeason
-import com.farukaygun.yorozuyalist.domain.models.enums.MediaType
-import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
-import com.farukaygun.yorozuyalist.domain.models.enums.Season
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
+import com.farukaygun.yorozuyalist.util.Constants
 
-private const val IMAGE_WIDTH = 100
+private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
 
 @Composable
@@ -44,52 +43,102 @@ fun GridListItem(
 	data: Data,
 	onItemClick: () -> Unit
 ) {
-	val title = data.node.title
-	val mainPictureUrl = data.node.mainPicture.medium.takeUnless { it.isEmpty() }
-		?: R.drawable.broken_image_24px
-
-	Column(
+	val node = data.node
+	val title = node.title
+	
+	Card(
+		onClick = onItemClick,
+		colors = CardDefaults.cardColors(
+			containerColor = MaterialTheme.colorScheme.surface
+		),
+		elevation = CardDefaults.cardElevation(
+			defaultElevation = 2.dp
+		),
 		modifier = Modifier
-			.wrapContentWidth()
-			.clickable { onItemClick() },
-		verticalArrangement = Arrangement.spacedBy(8.dp)
+			.width(IMAGE_WIDTH.dp)
+			.padding(horizontal = 4.dp)
 	) {
-		SubcomposeAsyncImage(
-			model = ImageRequest.Builder(LocalContext.current)
-				.data(mainPictureUrl)
-				.crossfade(true)
-				.crossfade(350)
-				.build(),
-			loading = {
-				ShimmerEffect(
-					modifier = Modifier
-						.clip(RoundedCornerShape(10.dp))
-						.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
-				)
-			},
-			error = {
-				Icon(
-					painter = painterResource(id = R.drawable.broken_image_24px),
-					contentDescription = "Error icon",
-				)
-			},
-			contentDescription = title,
-			contentScale = ContentScale.Crop,
-			modifier = Modifier
-				.clip(RoundedCornerShape(10.dp))
-				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+		MediaImage(
+			imageUrl = node.mainPicture.medium,
+			contentDescription = title
 		)
 
-		Text(
-			text = title,
-			textAlign = TextAlign.Start,
-			maxLines = 2,
-			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier.width(IMAGE_WIDTH.dp),
-			color = MaterialTheme.colorScheme.onBackground,
-			style = MaterialTheme.typography.bodyMedium
+		MediaTitle(
+			title = title,
+			modifier = Modifier
+				.fillMaxWidth()
+				.padding(4.dp)
 		)
 	}
+}
+
+@Composable
+private fun MediaImage(
+	imageUrl: String?,
+	contentDescription: String,
+	modifier: Modifier = Modifier
+) {
+	SubcomposeAsyncImage(
+		model = ImageRequest.Builder(LocalContext.current)
+			.data(imageUrl)
+			.crossfade(350)
+			.build(),
+		loading = {
+			ShimmerEffect(
+				modifier = Modifier
+					.clip(RoundedCornerShape(10.dp))
+					.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+			)
+		},
+		error = {
+			ErrorImagePlaceholder()
+		},
+		contentDescription = contentDescription,
+		contentScale = ContentScale.Crop,
+		modifier = modifier
+			.clip(RoundedCornerShape(10.dp))
+			.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+	)
+}
+
+@Composable
+private fun ErrorImagePlaceholder(
+	modifier: Modifier = Modifier
+) {
+	Box(
+		modifier = modifier
+			.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
+			.background(
+				MaterialTheme.colorScheme.surfaceVariant,
+				RoundedCornerShape(10.dp)
+			),
+		contentAlignment = Alignment.Center
+	) {
+		Icon(
+			painter = painterResource(R.drawable.broken_image_24px),
+			contentDescription = "Error loading image",
+			tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+			modifier = modifier.size(32.dp)
+		)
+	}
+}
+
+@Composable
+private fun MediaTitle(
+	title: String,
+	modifier: Modifier = Modifier
+) {
+	Text(
+		text = title,
+		textAlign = TextAlign.Center,
+		minLines = 2,
+		maxLines = 2,
+		overflow = TextOverflow.Ellipsis,
+		color = MaterialTheme.colorScheme.onSurface,
+		style = MaterialTheme.typography.bodyMedium,
+		lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
+		modifier = modifier
+	)
 }
 
 @Composable
@@ -114,52 +163,10 @@ fun ShimmerEffectGridListItem() {
 }
 
 @Composable
-@Preview
+@Preview(showSystemUi = false, showBackground = false,
+	uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_UNDEFINED
+)
 fun GridListItemPreview(
 ) {
-	val data = Data(
-		node = Node(
-			id = 52991,
-			title = "Sousou no Frieren",
-			mainPicture = MainPicture(
-				medium = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006.jpg",
-				large = "https:\\/\\/cdn.myanimelist.net\\/images\\/anime\\/1015\\/138006l.jpg"
-			),
-			status = "finished_airing",
-			mean = "9.38",
-			mediaType = MediaType.TV,
-			startSeason = StartSeason(
-				year = 2023,
-				season = Season.FALL
-			),
-			numListUsers = 701406,
-			numEpisodes = 12,
-			broadcast = Broadcast(
-				dayOfTheWeek = "Saturday",
-				startTime = "00:00"
-			),
-			rank = 1
-		),
-		myListStatus = MyListStatus(
-			status = MyListMediaStatus.WATCHING,
-			score = 10,
-			numEpisodesWatched = 12,
-			isRewatching = false,
-			updatedAt = "",
-			startDate = "",
-			finishDate = "",
-			numTimesRewatched = 0,
-			rewatchValue = 0,
-			tags = emptyList(),
-			priority = 0,
-			comments = "",
-			numChaptersRead = 0,
-			numVolumesRead = 0
-		),
-		ranking = Ranking(
-			rank = 1,
-		),
-		rankingType = "Score"
-	)
-	GridListItem(data = data, onItemClick = {})
+	GridListItem(data = Constants.PREVIEW_SAMPLE_DATA, onItemClick = {})
 }

@@ -25,13 +25,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -67,8 +64,8 @@ import kotlin.math.abs
 
 class MainActivity : ComponentActivity() {
 	private val loginViewModel: LoginViewModel by inject()
-
-	@OptIn(ExperimentalMaterial3Api::class)
+	
+	@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		enableEdgeToEdge(
@@ -81,9 +78,6 @@ class MainActivity : ComponentActivity() {
 				val navController = rememberNavController()
 				val searchBarState = rememberSearchBarState(navController = navController)
 				val bottomAppBarState = rememberBottomAppBarState(navController = navController)
-				val topAppBarScrollBehavior =
-					TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-				val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 				var currentListState by remember { mutableStateOf<LazyListState?>(null) }
 				var isScaffoldBarVisible by remember { mutableStateOf(true) }
 				var scrollState by remember { mutableStateOf(ScrollState.IDLE) }
@@ -166,21 +160,13 @@ class MainActivity : ComponentActivity() {
 							animationSpec = tween(durationMillis = 200)
 						)
 					) {
-						TopAppBar(
-							title = { },
-							scrollBehavior = topAppBarScrollBehavior,
-							actions = {
-								Box(modifier = Modifier.fillMaxWidth()) {
-									SearchBar(
-										navController = navController
-									)
-								}
-							},
-							colors = TopAppBarDefaults.topAppBarColors(
-								containerColor = MaterialTheme.colorScheme.background,
-								scrolledContainerColor = MaterialTheme.colorScheme.background
+						Box(modifier = Modifier
+							.fillMaxWidth()
+							.padding(vertical = 8.dp)) {
+							SearchBar(
+								navController = navController
 							)
-						)
+						}
 					}
 				}, bottomBar = {
 					AnimatedVisibility(
@@ -195,15 +181,10 @@ class MainActivity : ComponentActivity() {
 							animationSpec = tween(durationMillis = 200)
 						)
 					) {
-						BottomAppBar(
-							scrollBehavior = bottomAppBarScrollBehavior, actions = {
-								Box(modifier = Modifier.fillMaxWidth()) {
-									BottomNavBar(
-										navController = navController,
-										bottomAppBarState = bottomAppBarState
-									)
-								}
-							})
+						BottomNavBar(
+							navController = navController,
+							bottomAppBarState = bottomAppBarState
+						)
 					}
 				}) { paddingValues ->
 					NavHost(

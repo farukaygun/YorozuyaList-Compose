@@ -22,7 +22,7 @@ fun ShimmerEffectHorizontalList() {
 		LazyRow(
 			modifier = Modifier
 				.fillMaxWidth(),
-			horizontalArrangement = Arrangement.spacedBy(16.dp)
+			horizontalArrangement = Arrangement.spacedBy(8.dp)
 		) {
 			items(10) {
 				ShimmerEffectItemRow()
