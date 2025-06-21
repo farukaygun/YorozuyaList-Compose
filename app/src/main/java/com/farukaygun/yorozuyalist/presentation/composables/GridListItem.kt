@@ -59,7 +59,7 @@ fun GridListItem(
 			.padding(horizontal = 4.dp)
 	) {
 		MediaImage(
-			imageUrl = node.mainPicture.medium,
+			imageUrl = node.mainPicture?.medium,
 			contentDescription = title
 		)
 

@@ -57,7 +57,7 @@ fun GridListItemWithRank(
 			.padding(horizontal = 4.dp)
 	) {
 		MediaImageWithScore(
-			imageUrl = data.node.mainPicture.medium,
+			imageUrl = data.node.mainPicture?.medium,
 			contentDescription = data.node.title,
 			rank = data.ranking?.rank
 		)

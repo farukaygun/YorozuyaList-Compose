@@ -45,7 +45,7 @@ fun ListItemColumn(
 	val title = node.title
 	val mediaType = node.mediaType?.displayName
 	val numEpisodes = if (node.numEpisodes > 0) "(${node.numEpisodes} episodes)" else ""
-	val mainPictureUrl = node.mainPicture.medium
+	val mainPictureUrl = node.mainPicture?.medium
 	val season = node.startSeason?.season?.displayName ?: "N/A"
 	val year = node.startSeason?.year?.toString()
 	val meanScore = node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
