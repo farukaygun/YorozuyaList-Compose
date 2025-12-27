@@ -17,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToAbbreviatedDate
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -62,7 +61,7 @@ fun DatePickerField(
 		DatePickerModal(
 			onDateSelected = {
 				onDateSelected(
-					it?.formatToAbbreviatedDate() ?: Clock.System.now().toLocalDateTime(
+					it?.formatToAbbreviatedDate() ?: kotlin.time.Clock.System.now().toLocalDateTime(
 						TimeZone.currentSystemDefault()
 					).date.toString().formatDate()
 				)

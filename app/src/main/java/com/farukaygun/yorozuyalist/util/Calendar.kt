@@ -1,7 +1,6 @@
 package com.farukaygun.yorozuyalist.util
 
 import com.farukaygun.yorozuyalist.R
-import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
@@ -15,8 +14,9 @@ class Calendar {
 	companion object {
 		private val tokyoTimeZone = TimeZone.of("Asia/Tokyo")
 		private val currentDateTime =
-			Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-		private val currentDateTimeJapan = Clock.System.now().toLocalDateTime(tokyoTimeZone)
+			kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+		private val currentDateTimeJapan =
+            kotlin.time.Clock.System.now().toLocalDateTime(tokyoTimeZone)
 
 		val weekDay: DayOfWeek
 			get() = currentDateTime.dayOfWeek
@@ -40,7 +40,7 @@ class Calendar {
 		): String {
 			return try {
 				val (hour, minute) = timeString.split(":").map { it.toInt() }
-				val today = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
+				val today = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.UTC).date
 				val sourceDateTime = LocalDateTime(
 					year = today.year,
 					month = today.month,
@@ -63,7 +63,8 @@ class Calendar {
 			val localTime = convertTimeToLocalTimezone(timeString)
 			val (hour, minute) = localTime.split(":").map { it.toInt() }
 
-			val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+			val currentDateTime =
+                kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 			val givenDateTime = LocalDateTime(
 				year = currentDateTime.year,
 				month = currentDateTime.month,
@@ -75,7 +76,7 @@ class Calendar {
 			)
 
 			val differenceInMinutes = givenDateTime.toInstant(TimeZone.currentSystemDefault())
-				.minus(Clock.System.now())
+				.minus(kotlin.time.Clock.System.now())
 				.inWholeMinutes
 
 			return when {
