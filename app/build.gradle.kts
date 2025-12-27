@@ -8,14 +8,14 @@ plugins {
 
 android {
 	namespace = "com.farukaygun.yorozuyalist"
-	compileSdk = 35
+    compileSdk = 36
 
-	defaultConfig {
+    defaultConfig {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
-		targetSdk = 35
-		versionCode = 20
-		versionName = "2.2.0"
+		targetSdk = 36
+		versionCode = 21
+		versionName = "2.2.1"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -37,11 +37,8 @@ android {
 		}
 	}
 	compileOptions {
-		sourceCompatibility = JavaVersion.VERSION_19
-		targetCompatibility = JavaVersion.VERSION_19
-	}
-	kotlinOptions {
-		jvmTarget = "19"
+		sourceCompatibility = JavaVersion.VERSION_21
+		targetCompatibility = JavaVersion.VERSION_21
 	}
 	buildFeatures {
 		compose = true
@@ -56,23 +53,23 @@ android {
 }
 
 dependencies {
-	val ktorVersion = "3.1.3"
-	val koinVersion="4.1.0"
-	val coilVersion = "3.2.0"
+	val ktorVersion = "3.3.3"
+	val koinVersion="4.1.1"
+	val coilVersion = "3.3.0"
 
-	implementation("com.google.android.engage:engage-core:1.5.8")
-	implementation("androidx.core:core-ktx:1.16.0")
-	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
-	implementation("androidx.activity:activity-compose:1.10.1")
-	implementation(platform("androidx.compose:compose-bom:2025.06.00"))
+	implementation("com.google.android.engage:engage-core:1.5.11")
+	implementation("androidx.core:core-ktx:1.17.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+	implementation("androidx.activity:activity-compose:1.12.2")
+	implementation(platform("androidx.compose:compose-bom:2025.12.01"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3-android:1.4.0-alpha15")
+	implementation("androidx.compose.material3:material3-android:1.4.0")
 
 	// navigation
-	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
-	implementation("androidx.navigation:navigation-compose:2.9.0")
+	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+	implementation("androidx.navigation:navigation-compose:2.9.6")
 
 	// Ktor
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -93,17 +90,17 @@ dependencies {
 	implementation("io.coil-kt.coil3:coil-network-ktor3:$coilVersion")
 
 	// Custom Tabs
-	implementation("androidx.browser:browser:1.8.0")
+	implementation("androidx.browser:browser:1.9.0")
 	implementation("androidx.preference:preference-ktx:1.2.1")
 
-	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 	implementation("co.yml:ycharts:2.1.0")
 
 	testImplementation("junit:junit:4.13.2")
-	androidTestImplementation("androidx.test.ext:junit:1.2.1")
-	androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2025.06.00"))
+	androidTestImplementation("androidx.test.ext:junit:1.3.0")
+	androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+	androidTestImplementation(platform("androidx.compose:compose-bom:2025.12.01"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest:1.8.2")
+	debugImplementation("androidx.compose.ui:ui-test-manifest:1.10.0")
 }

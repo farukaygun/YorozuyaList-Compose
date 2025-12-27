@@ -1,65 +1,51 @@
 name: Android build & release
-
 on:
   push:
     branches: [ dev ]
   release:
     types: [ published ]
-
 jobs:
   build-and-release:
     runs-on: windows-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'adopt'
-
+          java-version: '21'
+          distribution: 'temurin'
       - name: Grant execution permissions
         run: 
           chmod +x ./gradlew
-
       - name: Expose app versionName
         run: |
           "VERSION_NAME=$(./gradlew -q printVersionName)" | Out-File -FilePath $env:GITHUB_ENV -Append
           
       - name: Build APKs
         run: ./gradlew assembleDebug assembleRelease
-
       - name: Generate App Name
         run: |
           "APP_NAME=yorozuya-list-v${{env.VERSION_NAME}}.${{github.run_number}}d.apk" | Out-File -FilePath $env:GITHUB_ENV -Append
-
       - name: Rename APKs
         run: Rename-Item -Path "./app/build/outputs/apk/debug/app-debug.apk" -NewName ${{env.APP_NAME}}
-
       - name: Upload debug APK to Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{env.APP_NAME}}
           path: "app/build/outputs/apk/debug/"
-
       - name: Create Tag Name
         run: |
           "TAG=v${{env.VERSION_NAME}}.${{github.run_number}}d" | Out-File -FilePath $env:GITHUB_ENV -Append
-
       - name: Push Tag
         id: push_tag
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git tag ${{env.TAG}}
-          git push origin 
+          git push origin ${{env.TAG}}
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          JAVA_HOME: C:\hostedtoolcache\windows\Java_Adopt_jdk\17.0.11-9\x64
-          JAVA_HOME_17_X64: C:\hostedtoolcache\windows\Java_Adopt_jdk\17.0.11-9\x64
-
               
       - name: Create Release        
         uses: ncipollo/release-action@v1.14.0

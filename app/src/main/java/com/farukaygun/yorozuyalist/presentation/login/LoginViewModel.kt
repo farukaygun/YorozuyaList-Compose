@@ -19,7 +19,6 @@ import com.farukaygun.yorozuyalist.util.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 class LoginViewModel(
 	private val loginUseCase: LoginUseCase,
@@ -43,7 +42,7 @@ class LoginViewModel(
 		val expiresInAsMillis = sharedPrefsHelper.getLong("expiresIn")
 		if (expiresInAsMillis == 0L) return false
 
-		val currentTimeMillis = Clock.System.now().toEpochMilliseconds()
+		val currentTimeMillis = kotlin.time.Clock.System.now().toEpochMilliseconds()
 
 		if (currentTimeMillis > expiresInAsMillis) {
 			clearToken()

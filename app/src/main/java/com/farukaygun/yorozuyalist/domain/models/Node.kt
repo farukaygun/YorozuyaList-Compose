@@ -8,7 +8,7 @@ data class Node(
 	val id: Int,
 	val title: String,
 	val broadcast: Broadcast?,
-	val mainPicture: MainPicture,
+	val mainPicture: MainPicture?,
 	val mean: String?,
 	val rank: Int?,
 	val mediaType: MediaType?,

@@ -44,7 +44,7 @@ fun ListItemCalenderColumn(
 	onItemClick: () -> Unit
 ) {
 	val title = data.node.title
-	val mainPictureUrl = data.node.mainPicture.medium
+	val mainPictureUrl = data.node.mainPicture?.medium
 	val ranking = data.node.rank ?: "N/A"
 	val meanScore = data.node.mean?.takeUnless { it.isEmpty() } ?: "N/A"
 	val hour = if (data.node.broadcast?.startTime?.isNotEmpty() == true) Calendar.convertTimeToLocalTimezone(timeString = data.node.broadcast.startTime) else "N/A"

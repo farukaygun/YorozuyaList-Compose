@@ -52,7 +52,7 @@ fun ListItemRow(
 		modifier = Modifier.width(IMAGE_WIDTH.dp)
 	) {
 		MediaImage(
-			imageUrl = node.mainPicture.medium,
+			imageUrl = node.mainPicture?.medium,
 			contentDescription = node.title
 		)
 		

@@ -22,8 +22,6 @@ fun ShimmerEffect(
 	angleOfAxisY: Float = 270f,
 	durationMillis: Int = 1000,
 ) {
-
-
 	val shimmerColors = listOf(
 		Color.LightGray.copy(alpha = 0.3f),
 		Color.LightGray.copy(alpha = 0.5f),

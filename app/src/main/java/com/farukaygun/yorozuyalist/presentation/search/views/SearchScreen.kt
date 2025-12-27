@@ -81,7 +81,13 @@ fun SearchScreen(
 				viewModel = viewModel
 			)
 		} else if (state.isLoading) {
-			ShimmerEffectVerticalList()
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                ShimmerEffectVerticalList()
+            }
 		}
 	}
 
@@ -165,7 +171,6 @@ fun SearchList(
 		listState.scrollToItem(0)
 		viewModel.scrollToTop.value = false
 	}
-
 
 	LazyColumn(
 		state = listState,

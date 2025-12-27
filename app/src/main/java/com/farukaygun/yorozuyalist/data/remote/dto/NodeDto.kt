@@ -16,7 +16,7 @@ data class NodeDto(
 	@SerializedName("broadcast")
 	val broadcast: BroadcastDto?,
 	@SerializedName("main_picture")
-	val mainPicture: MainPictureDto,
+	val mainPicture: MainPictureDto?,
 	@SerializedName("mean")
 	val mean: String?,
 	@SerializedName("rank")
@@ -38,7 +38,7 @@ fun NodeDto.toNode(): Node {
 		id = id,
 		title = title,
 		broadcast = broadcast?.toBroadcast(),
-		mainPicture = mainPicture.toMainPicture(),
+		mainPicture = mainPicture?.toMainPicture(),
 		mean = mean,
 		rank = rank,
 		mediaType = MediaType.TV,
