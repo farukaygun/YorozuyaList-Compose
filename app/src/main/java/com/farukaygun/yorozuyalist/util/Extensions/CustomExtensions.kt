@@ -3,9 +3,7 @@ package com.farukaygun.yorozuyalist.util.Extensions
 import android.content.Context
 import android.content.Intent
 import android.icu.text.DecimalFormat
-import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -14,6 +12,8 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+import androidx.core.net.toUri
+import kotlin.time.Instant
 
 object CustomExtensions {
 	/** Open link in Chrome Custom Tabs */
@@ -21,7 +21,7 @@ object CustomExtensions {
 		CustomTabsIntent.Builder()
 			.build().apply {
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-				launchUrl(this@openCustomTab, Uri.parse(url))
+				launchUrl(this@openCustomTab, url.toUri())
 			}
 	}
 
@@ -31,7 +31,7 @@ object CustomExtensions {
 
 	fun String.formatDate(): String {
 		val ymdFormat = LocalDate.Format {
-			dayOfMonth(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
+			day(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
 		}
 
 		val ymFormat = DateTimeComponents.Format {
@@ -52,7 +52,7 @@ object CustomExtensions {
 		val instantTime = Instant.parse(this)
 		val localDateTime = instantTime.toLocalDateTime(TimeZone.currentSystemDefault())
 		val customFormat = LocalDateTime.Format {
-			dayOfMonth(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
+			day(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
 		}
 
 		return localDateTime.format(customFormat)
@@ -62,12 +62,12 @@ object CustomExtensions {
 		if (this.isEmpty()) return ""
 
 		val customFormat = LocalDate.Format {
-			dayOfMonth(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
+			day(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
 		}
 
 		val customlocalDateTime = LocalDate.parse(this, customFormat)
 		val isoFormat = LocalDate.Format {
-			year(); char('-'); monthNumber(); char('-'); dayOfMonth()
+			year(); char('-'); monthNumber(); char('-'); day()
 		}
 
 		return customlocalDateTime.format(isoFormat)
@@ -77,7 +77,7 @@ object CustomExtensions {
 		val instantTime = Instant.fromEpochMilliseconds(this)
 		val localDateTime = instantTime.toLocalDateTime(TimeZone.currentSystemDefault())
 		val customFormat = LocalDateTime.Format {
-			dayOfMonth(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
+			day(); char(' '); monthName(MonthNames.ENGLISH_ABBREVIATED); char(' '); year()
 		}
 
 		return localDateTime.format(customFormat)

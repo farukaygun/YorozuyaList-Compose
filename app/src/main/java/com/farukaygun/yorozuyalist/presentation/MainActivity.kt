@@ -20,10 +20,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -45,7 +43,6 @@ import androidx.navigation.navArgument
 import com.farukaygun.yorozuyalist.presentation.calendar.views.CalendarScreen
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomAppBarState
-import com.farukaygun.yorozuyalist.presentation.composables.search_bar.SearchBar
 import com.farukaygun.yorozuyalist.presentation.composables.search_bar.rememberSearchBarState
 import com.farukaygun.yorozuyalist.presentation.detail.views.DetailScreen
 import com.farukaygun.yorozuyalist.presentation.grid_list.views.GridListScreen
@@ -90,16 +87,12 @@ class MainActivity : ComponentActivity() {
 								it.firstVisibleItemIndex == 0 && it.firstVisibleItemScrollOffset == 0
 							}?.let {
 								isScaffoldBarVisible = true
-								accumulatedScroll = 0f
-								scrollState = ScrollState.IDLE
 								return Offset.Zero
 							}
 							
 							currentListState?.takeIf {
 								it.layoutInfo.visibleItemsInfo.lastOrNull()?.index == it.layoutInfo.totalItemsCount - 1
 							}?.let {
-								accumulatedScroll = 0f
-								scrollState = ScrollState.IDLE
 								return Offset.Zero
 							}
 							
@@ -118,25 +111,21 @@ class MainActivity : ComponentActivity() {
 								accumulatedScroll += abs(available.y)
 							}
 
-							return when {
-								scrollState == ScrollState.SCROLLING_DOWN &&
-										isScaffoldBarVisible &&
-										accumulatedScroll >= threshold -> {
-									isScaffoldBarVisible = false
-									accumulatedScroll = 0f
-									available
-								}
-								
-								scrollState == ScrollState.SCROLLING_UP &&
-										!isScaffoldBarVisible &&
-										accumulatedScroll >= threshold -> {
-									isScaffoldBarVisible = true
-									accumulatedScroll = 0f
-									available
-								}
+							return when (scrollState) {
+                                ScrollState.SCROLLING_DOWN if isScaffoldBarVisible &&
+                                        accumulatedScroll >= threshold -> {
+                                    isScaffoldBarVisible = false
+                                    available
+                                }
 
-								else -> Offset.Zero
-							}
+                                ScrollState.SCROLLING_UP if !isScaffoldBarVisible &&
+                                        accumulatedScroll >= threshold -> {
+                                    isScaffoldBarVisible = true
+                                    available
+                                }
+
+                                else -> Offset.Zero
+                            }
 						}
 					}
 				}
@@ -147,27 +136,21 @@ class MainActivity : ComponentActivity() {
 				}
 
 				Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-					AnimatedVisibility(
-						modifier = Modifier.statusBarsPadding(),
-						visible = searchBarState.isVisible && isScaffoldBarVisible,
-						enter = expandVertically(
-							expandFrom = Alignment.Bottom,
-							animationSpec = tween(durationMillis = 200)
-						),
-						exit = shrinkVertically(
-							shrinkTowards = Alignment.Top,
-							animationSpec = tween(durationMillis = 200)
-						)
-					) {
-						Box(modifier = Modifier
-							.fillMaxWidth()
-							.padding(vertical = 8.dp)) {
-							SearchBar(
-								navController = navController
-							)
-						}
-					}
-				}, bottomBar = {
+                    AnimatedVisibility(
+                        visible = searchBarState.isVisible && isScaffoldBarVisible,
+                        enter = expandVertically(
+                            animationSpec = tween(durationMillis = 200)
+                        ),
+                        exit = shrinkVertically(
+                            animationSpec = tween(durationMillis = 200)
+                        )
+                    ) {
+                        Box(modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)) {
+                            SearchScreen(navController = navController)
+                        }
+                    }
+
+                }, bottomBar = {
 					AnimatedVisibility(
 						modifier = Modifier.navigationBarsPadding(),
 						visible = bottomAppBarState.isEnabled && isScaffoldBarVisible,

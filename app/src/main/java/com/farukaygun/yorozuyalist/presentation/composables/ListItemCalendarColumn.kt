@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -53,13 +54,12 @@ fun ListItemCalenderColumn(
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.surface,
 		),
-		elevation = CardDefaults.cardElevation(
-			defaultElevation = 2.dp
-		),
+        shape = RoundedCornerShape(10.dp),
 		onClick = onItemClick,
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(vertical = 8.dp),
+			.padding(vertical = 8.dp)
+            .shadow(4.dp, RoundedCornerShape(10.dp)),
 	) {
 		Row(
 			verticalAlignment = Alignment.Top,
