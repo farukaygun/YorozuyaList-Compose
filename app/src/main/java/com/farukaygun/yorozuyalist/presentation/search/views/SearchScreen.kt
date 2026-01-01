@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -54,6 +53,7 @@ import org.koin.compose.KoinApplication
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
+    modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: SearchViewModel = koinViewModel()
 ) {
@@ -66,8 +66,7 @@ fun SearchScreen(
     )
 
     Box(
-        modifier = Modifier
-            .statusBarsPadding()
+        modifier = modifier
     ) {
         SearchBar(
             inputField = {

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.icu.text.DecimalFormat
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -12,7 +13,6 @@ import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
-import androidx.core.net.toUri
 import kotlin.time.Instant
 
 object CustomExtensions {
