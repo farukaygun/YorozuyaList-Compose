@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -31,11 +30,8 @@ import org.koin.compose.KoinApplication
 
 @Composable
 fun ShimmerEffectProfileScreen() {
-	Scaffold { paddingValues ->
+	Scaffold { _ ->
 		Column(
-			modifier = Modifier
-				.padding(paddingValues)
-				.statusBarsPadding(),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			ShimmerEffectUserInfoSection()

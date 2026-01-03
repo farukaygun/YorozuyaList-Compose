@@ -42,19 +42,19 @@ class Calendar {
 				val (hour, minute) = timeString.split(":").map { it.toInt() }
 				val today = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.UTC).date
 				val sourceDateTime = LocalDateTime(
-					year = today.year,
-					month = today.month,
-					dayOfMonth = today.dayOfMonth,
-					hour = hour,
-					minute = minute,
-					second = 0,
-					nanosecond = 0
-				)
+                    year = today.year,
+                    month = today.month,
+                    day = today.day,
+                    hour = hour,
+                    minute = minute,
+                    second = 0,
+                    nanosecond = 0
+                )
 				val sourceInstant = sourceDateTime.toInstant(TimeZone.of(sourceTimezoneId))
 				val localDateTime = sourceInstant.toLocalDateTime(TimeZone.currentSystemDefault())
 				
 				"${localDateTime.hour.toString().padStart(2, '0')}:${localDateTime.minute.toString().padStart(2, '0')}"
-			} catch (e: Exception) {
+			} catch (_: Exception) {
 				timeString
 			}
 		}
@@ -66,14 +66,14 @@ class Calendar {
 			val currentDateTime =
                 kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 			val givenDateTime = LocalDateTime(
-				year = currentDateTime.year,
-				month = currentDateTime.month,
-				dayOfMonth = currentDateTime.dayOfMonth,
-				hour = hour,
-				minute = minute,
-				second = 0,
-				nanosecond = 0
-			)
+                year = currentDateTime.year,
+                month = currentDateTime.month,
+                day = currentDateTime.day,
+                hour = hour,
+                minute = minute,
+                second = 0,
+                nanosecond = 0
+            )
 
 			val differenceInMinutes = givenDateTime.toInstant(TimeZone.currentSystemDefault())
 				.minus(kotlin.time.Clock.System.now())
