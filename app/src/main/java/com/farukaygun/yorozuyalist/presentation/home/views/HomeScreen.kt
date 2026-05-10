@@ -16,12 +16,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -57,19 +59,27 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(
 	navController: NavController,
 	viewModel: HomeViewModel = koinViewModel()
 ) {
 	val state = viewModel.state.value
+	val pullToRefreshState = rememberPullToRefreshState()
 
 	PullToRefreshBox(
 		isRefreshing = state.isLoading,
 		onRefresh = { viewModel.onEvent(event = HomeEvent.InitRequestChain) },
-		state = rememberPullToRefreshState(),
-		modifier = Modifier.padding(horizontal = 16.dp)
+		state = pullToRefreshState,
+		modifier = Modifier.padding(horizontal = 16.dp),
+		indicator = {
+			PullToRefreshDefaults.LoadingIndicator(
+				state = pullToRefreshState,
+				isRefreshing = state.isLoading,
+				modifier = Modifier.align(Alignment.TopCenter)
+			)
+		}
 	) {
 		Column(
 			modifier = Modifier

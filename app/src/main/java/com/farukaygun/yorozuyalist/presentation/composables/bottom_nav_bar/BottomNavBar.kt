@@ -1,59 +1,85 @@
 package com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar
 
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.presentation.Screen.UserAnimeListScreen.getScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BottomNavBar(
 	navController: NavController,
 	bottomAppBarState: BottomAppBarState,
 ) {
-	NavigationBar {
-		bottomAppBarState.items.forEachIndexed { _, bottomNavItem ->
-			NavigationBarItem(
-				selected = bottomAppBarState.currentScreen?.route == bottomNavItem.screen.route,
-				onClick = {
-					val route = bottomNavItem.screen.route + bottomNavItem.screen.navArg
-					navController.navigate(route) {
-						navController.graph.startDestinationRoute?.let {
-							popUpTo(it) {
-								saveState = true
+	HorizontalFloatingToolbar(
+		expanded = true,
+		shape = RectangleShape,
+		colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
+			toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainer
+		),
+		expandedShadowElevation = 0.dp,
+		collapsedShadowElevation = 0.dp,
+		contentPadding = FloatingToolbarDefaults.ContentPadding,
+		modifier = Modifier
+			.fillMaxWidth()
+			.navigationBarsPadding(),
+	) {
+		bottomAppBarState.items.forEach { item ->
+			val isSelected = bottomAppBarState.currentScreen?.route == item.screen.route
+			val contentColor = if (isSelected)
+				MaterialTheme.colorScheme.primary
+			else
+				MaterialTheme.colorScheme.onSurfaceVariant
+
+			Column(
+				modifier = Modifier
+					.weight(1f)
+					.clickable {
+						navController.navigate(item.screen.route + item.screen.navArg) {
+							navController.graph.startDestinationRoute?.let {
+								popUpTo(it) { saveState = true }
 							}
 							launchSingleTop = true
 							restoreState = true
 						}
+						bottomAppBarState.currentScreen = getScreen(item.screen.route)
 					}
-					bottomAppBarState.currentScreen = getScreen(bottomNavItem.screen.route)
-				},
-				icon = {
-					Icon(
-						painter = painterResource(
-							id = if (bottomNavItem.screen.route == bottomAppBarState.currentScreen?.route) {
-								bottomNavItem.selectedIcon
-							} else {
-								bottomNavItem.unselectedIcon
-							}
-						),
-						contentDescription = bottomNavItem.screen.title
-					)
-				},
-				label = {
-					Text(
-						text = bottomNavItem.screen.title,
-					)
-				}
-			)
+					.padding(vertical = 8.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.spacedBy(4.dp)
+			) {
+				Icon(
+					painter = painterResource(
+						id = if (isSelected) item.selectedIcon else item.unselectedIcon
+					),
+					contentDescription = item.screen.title,
+					tint = contentColor
+				)
+				Text(
+					text = item.screen.title,
+					style = MaterialTheme.typography.labelSmall,
+					color = contentColor
+				)
+			}
 		}
 	}
 }

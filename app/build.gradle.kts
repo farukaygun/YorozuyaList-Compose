@@ -9,7 +9,7 @@ plugins {
 
 extensions.configure<ApplicationExtension> {
 	namespace = "com.farukaygun.yorozuyalist"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
 		applicationId = "com.farukaygun.yorozuyalist"
@@ -58,6 +58,7 @@ extensions.configure<ApplicationExtension> {
 }
 
 dependencies {
+	implementation("androidx.compose.material3:material3:1.4.0")
 	val ktorVersion = "3.4.3"
 	val koinVersion="4.2.1"
 	val coilVersion = "3.4.0"
@@ -70,7 +71,9 @@ dependencies {
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3-android:1.4.0")
+	implementation("androidx.compose.material3:material3:1.5.0-alpha19")
+	implementation("androidx.compose.material3:material3-window-size-class:1.5.0-alpha19")
+	implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.5.0-alpha19")
 
 	// navigation
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
