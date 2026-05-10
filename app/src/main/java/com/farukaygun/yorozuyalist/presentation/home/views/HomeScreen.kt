@@ -55,6 +55,7 @@ import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,7 +114,8 @@ fun HomeScreen(
 fun HomeLargeActionButtons(navController: NavController) {
 	Row(
 		modifier = Modifier
-			.fillMaxWidth(),
+			.fillMaxWidth()
+			.padding(top = 4.dp),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		LargeActionButtonWithIcon(
@@ -307,7 +309,7 @@ fun TodayCarousel(
 fun HomeScreenPreview() {
 	val context = LocalContext.current
 
-	KoinApplication(application = {
+	KoinApplication(configuration = koinConfiguration(declaration = {
 		androidContext(context)
 		modules(
 			viewModelModule,
@@ -315,9 +317,9 @@ fun HomeScreenPreview() {
 			useCaseModule,
 			apiServiceModule
 		)
-	}) {
+	}), content = {
 		HomeScreen(
 			navController = rememberNavController()
 		)
-	}
+	})
 }

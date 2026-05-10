@@ -32,6 +32,7 @@ import com.farukaygun.yorozuyalist.presentation.detail.views.DetailScreen
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun ShimmerEffectDetailScreen() {
@@ -102,15 +103,15 @@ fun ShimmerEffectGenresSection() {
 			.horizontalScroll(rememberScrollState()),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
-		(1..5).forEach { i ->
-			ShimmerEffect(
-				modifier = Modifier
-					.padding(vertical = 8.dp)
-					.clip(RoundedCornerShape(10.dp))
-					.size(72.dp, 32.dp)
-			)
-		}
-	}
+        repeat((1..5).count()) {
+            ShimmerEffect(
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .size(72.dp, 32.dp)
+            )
+        }
+    }
 }
 
 @Composable
@@ -124,14 +125,14 @@ fun ShimmerEffectSynopsisSection() {
 		Column(
 			verticalArrangement = Arrangement.spacedBy(8.dp)
 		) {
-			(1..5).forEach { i ->
-				ShimmerEffect(
-					modifier = Modifier
-						.clip(RoundedCornerShape(10.dp))
-						.size(400.dp, 12.dp)
-				)
-			}
-		}
+            repeat((1..5).count()) {
+                ShimmerEffect(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .size(400.dp, 12.dp)
+                )
+            }
+        }
 
 		ShimmerEffect(
 			modifier = Modifier
@@ -188,20 +189,20 @@ fun ShimmerEffectMoreInfoSection() {
 			color = MaterialTheme.colorScheme.onBackground
 		)
 
-		(1..6).forEach { i ->
-			ShimmerEffectMediaInfoView()
-		}
+        repeat((1..6).count()) {
+            ShimmerEffectMediaInfoView()
+        }
 
-		HorizontalDivider()
+        HorizontalDivider()
 
 		ShimmerEffectMediaInfoView()
 
 		HorizontalDivider()
 
-		(1..3).forEach { i ->
-			ShimmerEffectMediaInfoView()
-		}
-	}
+        repeat((1..3).count()) {
+            ShimmerEffectMediaInfoView()
+        }
+    }
 }
 
 @Composable
@@ -227,20 +228,20 @@ fun ShimmerEffectRecommendationSection() {
 @Preview
 @Composable
 fun ShimmerEffectDetailScreenPreview() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		DetailScreen(
-			navController = rememberNavController(),
-			type = ScreenType.ANIME.name
-		)
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        DetailScreen(
+            navController = rememberNavController(),
+            type = ScreenType.ANIME.name
+        )
+    })
 }

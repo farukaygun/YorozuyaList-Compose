@@ -10,15 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -131,23 +130,20 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(topBar = {
-                    AnimatedVisibility(
-                        modifier = Modifier.systemBarsPadding(),
-                        visible = searchBarState.isVisible && isScaffoldBarVisible,
-                        enter = expandVertically(
-                            expandFrom = Alignment.Bottom,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        ),
-                        exit = shrinkVertically(
-                            shrinkTowards = Alignment.Bottom,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
-                    ) {
-                        SearchScreen(navController = navController)
-                    }
-
-                    if (!searchBarState.isVisible || !isScaffoldBarVisible) {
-                        Spacer(modifier = Modifier.systemBarsPadding())
+                    Box(modifier = Modifier.statusBarsPadding()) {
+                        AnimatedVisibility(
+                            visible = searchBarState.isVisible && isScaffoldBarVisible,
+                            enter = expandVertically(
+                                expandFrom = Alignment.Bottom,
+                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                            ),
+                            exit = shrinkVertically(
+                                shrinkTowards = Alignment.Bottom,
+                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                            )
+                        ) {
+                            SearchScreen(navController = navController)
+                        }
                     }
                 }, bottomBar = {
                     AnimatedVisibility(
@@ -167,25 +163,10 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }) { paddingValues ->
-                    val targetTopPadding = paddingValues.calculateTopPadding()
-                    val targetBottomPadding = paddingValues.calculateBottomPadding()
-
-                    val animatedTopPadding by animateDpAsState(
-                        targetValue = targetTopPadding,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                        label = "TopPaddingAnimation"
-                    )
-
-                    val animatedBottomPadding by animateDpAsState(
-                        targetValue = targetBottomPadding,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                        label = "BottomPaddingAnimation"
-                    )
-
                     NavHost(
                         modifier = Modifier.padding(
-                            top = animatedTopPadding,
-                            bottom = animatedBottomPadding
+                            top = paddingValues.calculateTopPadding(),
+                            bottom = paddingValues.calculateBottomPadding()
                         ),
                         navController = navController,
                         startDestination = if (loginViewModel.isLoggedIn()) Screen.HomeScreen.route else Screen.LoginScreen.route,

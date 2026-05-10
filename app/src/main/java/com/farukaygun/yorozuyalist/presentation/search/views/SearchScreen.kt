@@ -1,7 +1,6 @@
 package com.farukaygun.yorozuyalist.presentation.search.views
 
 import android.widget.Toast
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,12 +20,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,9 +46,12 @@ import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.Shimm
 import com.farukaygun.yorozuyalist.presentation.search.SearchEvent
 import com.farukaygun.yorozuyalist.presentation.search.SearchViewModel
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,100 +61,132 @@ fun SearchScreen(
     viewModel: SearchViewModel = koinViewModel()
 ) {
     val state = viewModel.state.value
-    var query by rememberSaveable { mutableStateOf("") }
-    var isActive by rememberSaveable { mutableStateOf(false) }
-    val horizontalPadding by animateDpAsState(
-        targetValue = if (isActive) 0.dp else 16.dp,
-        label = "horizontalPadding"
-    )
+    val searchBarState = rememberSearchBarState()
+    val textFieldState = rememberTextFieldState()
+    val coroutineScope = rememberCoroutineScope()
 
-    Box(
+    LaunchedEffect(Unit) {
+        snapshotFlow { textFieldState.text.toString() }
+            .distinctUntilChanged()
+            .collect { query ->
+                if (query.replace("\\s".toRegex(), "").length >= 3) {
+                    viewModel.onEvent(SearchEvent.Search(query))
+                }
+            }
+    }
+
+    SearchBar(
+        state = searchBarState,
         modifier = modifier
-    ) {
-        SearchBar(
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = query,
-                    onQueryChange = { newQuery ->
-                        query = newQuery
-                        if (newQuery.replace("\\s".toRegex(), "").length >= 3) {
-                            viewModel.onEvent(SearchEvent.Search(newQuery))
-                        }
-                    },
-                    onSearch = {
-                        isActive = false
-                    },
-                    expanded = isActive,
-                    onExpandedChange = { isActive = it },
-                    placeholder = { Text("Search") },
-                    leadingIcon = {
-                        IconButton(onClick = {
-                            if (isActive) {
-                                isActive = false
-                            } else {
-                                navController.popBackStack()
-                            }}) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.arrow_back_24px),
-                                contentDescription = "Back"
-                            )
-                        }
-                    },
-                    trailingIcon = {
-                        if (query.isNotEmpty()) {
-                            IconButton(onClick = {
-                                query = ""
-                                viewModel.onEvent(SearchEvent.Search(""))
-                            }) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.close_24px),
-                                    contentDescription = "Clear"
-                                )
-                            }
-                        } else {
-                            Icon(
-                                painter = painterResource(id =  R.drawable.search_24px),
-                                contentDescription = "Search"
-                            )
-                        }
-                    }
-                )
-            },
-            expanded = isActive,
-            onExpandedChange = { isActive = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding)
-        ) {
-            when {
-                state.isLoading -> {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        ShimmerEffectVerticalList()
-                    }
-                }
-                !state.isLoading && state.animeSearched?.data?.isNotEmpty() == true -> {
-                    SearchList(
-                        navController = navController,
-                        data = state.animeSearched.data,
-                        viewModel = viewModel
-                    )
-                }
-                query.isNotEmpty() && !state.isLoading && state.animeSearched?.data?.isEmpty() == true -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "No results found",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        inputField = {
+            SearchBarDefaults.InputField(
+                textFieldState = textFieldState,
+                searchBarState = searchBarState,
+                onSearch = {
+                    coroutineScope.launch { searchBarState.animateToCollapsed() }
+                },
+                placeholder = { Text("Search") },
+                leadingIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrow_back_24px),
+                            contentDescription = "Back"
                         )
                     }
+                },
+                trailingIcon = {
+                    if (textFieldState.text.isNotEmpty()) {
+                        IconButton(onClick = {
+                            textFieldState.edit { replace(0, originalText.length, "") }
+                            viewModel.onEvent(SearchEvent.Search(""))
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close_24px),
+                                contentDescription = "Clear"
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.search_24px),
+                            contentDescription = "Search"
+                        )
+                    }
+                }
+            )
+        }
+    )
+
+    ExpandedFullScreenSearchBar(
+        state = searchBarState,
+        inputField = {
+            SearchBarDefaults.InputField(
+                textFieldState = textFieldState,
+                searchBarState = searchBarState,
+                onSearch = {
+                    coroutineScope.launch { searchBarState.animateToCollapsed() }
+                },
+                placeholder = { Text("Search") },
+                leadingIcon = {
+                    IconButton(onClick = {
+                        coroutineScope.launch { searchBarState.animateToCollapsed() }
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrow_back_24px),
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                trailingIcon = {
+                    if (textFieldState.text.isNotEmpty()) {
+                        IconButton(onClick = {
+                            textFieldState.edit { replace(0, originalText.length, "") }
+                            viewModel.onEvent(SearchEvent.Search(""))
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.close_24px),
+                                contentDescription = "Clear"
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.search_24px),
+                            contentDescription = "Search"
+                        )
+                    }
+                }
+            )
+        }
+    ) {
+        when {
+            state.isLoading -> {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    ShimmerEffectVerticalList()
+                }
+            }
+            !state.isLoading && state.animeSearched?.data?.isNotEmpty() == true -> {
+                SearchList(
+                    navController = navController,
+                    data = state.animeSearched.data,
+                    viewModel = viewModel
+                )
+            }
+            textFieldState.text.isNotEmpty() && !state.isLoading && state.animeSearched?.data?.isEmpty() == true -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No results found",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }
@@ -213,21 +248,19 @@ fun SearchList(
     }
 }
 
-
-
 @Composable
 @Preview
 fun SearchScreenPreview() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
-		)
-	}) {
-		SearchScreen(
-			navController = rememberNavController()
-		)
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule, repositoryModule, useCaseModule, apiServiceModule
+        )
+    }), content = {
+        SearchScreen(
+            navController = rememberNavController()
+        )
+    })
 }

@@ -52,6 +52,7 @@ import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToAbbr
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
@@ -332,17 +333,17 @@ private fun DonutChart(data: PieChartData) {
 @Composable
 @Preview
 fun PreviewProfileScreen() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		ProfileScreen()
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        ProfileScreen()
+    })
 }

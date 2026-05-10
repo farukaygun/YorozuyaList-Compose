@@ -55,6 +55,7 @@ import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun UserListScreen(
@@ -209,18 +210,18 @@ fun UserList(
 @Composable
 @Preview
 fun AnimeListScreenPreview() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
-		)
-	}) {
-		UserListScreen(
-			navController = rememberNavController(),
-			nestedScrollConnection = rememberNestedScrollInteropConnection(),
-			onListStateChanged = {}
-		)
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule, repositoryModule, useCaseModule, apiServiceModule
+        )
+    }), content = {
+        UserListScreen(
+            navController = rememberNavController(),
+            nestedScrollConnection = rememberNestedScrollInteropConnection(),
+            onListStateChanged = {}
+        )
+    })
 }
