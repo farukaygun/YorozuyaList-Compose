@@ -43,6 +43,7 @@ import com.farukaygun.yorozuyalist.util.StringValue
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun LoginScreen(
@@ -128,17 +129,17 @@ fun LoginScreen(
 @Composable
 @Preview
 fun LoginScreenPreview() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		LoginScreen(navController = rememberNavController())
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        LoginScreen(navController = rememberNavController())
+    })
 }

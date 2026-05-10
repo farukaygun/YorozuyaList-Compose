@@ -43,6 +43,7 @@ import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun CalendarScreen(
@@ -133,18 +134,18 @@ fun ShimmerEffectCalendarScreen() {
 @Composable
 @Preview
 fun CalendarScreenPreview() {
-	val context = LocalContext.current
-	
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
-		)
-	}) {
-		CalendarScreen(
-			navController = rememberNavController(),
-			nestedScrollConnection = rememberNestedScrollInteropConnection(),
-			onListStateChanged = {}
-		)
-	}
+    val context = LocalContext.current
+
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule, repositoryModule, useCaseModule, apiServiceModule
+        )
+    }), content = {
+        CalendarScreen(
+            navController = rememberNavController(),
+            nestedScrollConnection = rememberNestedScrollInteropConnection(),
+            onListStateChanged = {}
+        )
+    })
 }

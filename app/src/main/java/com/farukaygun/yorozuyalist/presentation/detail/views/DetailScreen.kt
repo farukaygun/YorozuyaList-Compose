@@ -80,6 +80,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
@@ -564,20 +565,20 @@ private fun ErrorImagePlaceholder(
 @Preview
 @Composable
 fun DetailScreenPreview() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		DetailScreen(
-			navController = rememberNavController(),
-			type = ScreenType.ANIME.name
-		)
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        DetailScreen(
+            navController = rememberNavController(),
+            type = ScreenType.ANIME.name
+        )
+    })
 }

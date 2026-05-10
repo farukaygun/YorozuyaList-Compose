@@ -27,11 +27,13 @@ import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun ShimmerEffectProfileScreen() {
-	Scaffold { _ ->
+	Scaffold { paddingValues ->
 		Column(
+			modifier = Modifier.padding(paddingValues),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			ShimmerEffectUserInfoSection()
@@ -154,17 +156,17 @@ fun ShimmerEffectAnimeStatisticsSection() {
 @Composable
 @Preview
 fun ShimmerEffectPreviewProfileScreen() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		ProfileScreen()
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        ProfileScreen()
+    })
 }

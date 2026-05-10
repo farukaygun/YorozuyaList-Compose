@@ -100,7 +100,7 @@ class Calendar {
 	}
 
 	enum class Seasons(val displayName: String, val apiName: String, val icon: Int) {
-		WINTER("Winter", "winter", R.drawable.winter_24),
+		WINTER("Winter", "winter", R.drawable.winter_24px),
 		SPRING("Spring", "spring", R.drawable.spring_24px),
 		SUMMER("Summer", "summer", R.drawable.summer_24px),
 		FALL("Fall", "fall", R.drawable.fall_24px);
