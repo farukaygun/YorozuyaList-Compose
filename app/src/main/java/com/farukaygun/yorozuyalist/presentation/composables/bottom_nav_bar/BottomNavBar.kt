@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
@@ -16,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -32,12 +31,10 @@ fun BottomNavBar(
 ) {
 	HorizontalFloatingToolbar(
 		expanded = true,
-		shape = RectangleShape,
-		colors = FloatingToolbarDefaults.standardFloatingToolbarColors(
-			toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainer
-		),
-		expandedShadowElevation = 0.dp,
-		collapsedShadowElevation = 0.dp,
+		shape = FloatingToolbarDefaults.ContainerShape,
+		colors = FloatingToolbarDefaults.standardFloatingToolbarColors(),
+		expandedShadowElevation = FloatingToolbarDefaults.ContainerExpandedElevation,
+		collapsedShadowElevation = FloatingToolbarDefaults.ContainerCollapsedElevation,
 		contentPadding = FloatingToolbarDefaults.ContentPadding,
 		modifier = Modifier
 			.fillMaxWidth()
@@ -53,6 +50,7 @@ fun BottomNavBar(
 			Column(
 				modifier = Modifier
 					.weight(1f)
+					.clip(FloatingToolbarDefaults.ContainerShape)
 					.clickable {
 						navController.navigate(item.screen.route + item.screen.navArg) {
 							navController.graph.startDestinationRoute?.let {
@@ -62,8 +60,7 @@ fun BottomNavBar(
 							restoreState = true
 						}
 						bottomAppBarState.currentScreen = getScreen(item.screen.route)
-					}
-					.padding(vertical = 8.dp),
+					},
 				horizontalAlignment = Alignment.CenterHorizontally,
 				verticalArrangement = Arrangement.spacedBy(4.dp)
 			) {
