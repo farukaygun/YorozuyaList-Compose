@@ -15,12 +15,15 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +59,7 @@ import kotlin.math.abs
 class MainActivity : ComponentActivity() {
     private val loginViewModel: LoginViewModel by inject()
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3AdaptiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -129,33 +132,42 @@ class MainActivity : ComponentActivity() {
                     accumulatedScroll = 0f
                 }
 
-                Scaffold(topBar = {
-                    Box(modifier = Modifier.statusBarsPadding()) {
-                        AnimatedVisibility(
-                            visible = searchBarState.isVisible && isScaffoldBarVisible,
-                            enter = expandVertically(
-                                expandFrom = Alignment.Bottom,
-                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                            ),
-                            exit = shrinkVertically(
-                                shrinkTowards = Alignment.Bottom,
-                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                            )
-                        ) {
-                            SearchScreen(navController = navController)
+                Scaffold(
+                    contentWindowInsets = WindowInsets(0),
+                    topBar = {
+                        Box(modifier = Modifier.statusBarsPadding()) {
+                            AnimatedVisibility(
+                                visible = searchBarState.isVisible && isScaffoldBarVisible,
+                                enter = expandVertically(
+                                    expandFrom = Alignment.Bottom,
+                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                                ),
+                                exit = shrinkVertically(
+                                    shrinkTowards = Alignment.Bottom,
+                                    animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                                )
+                            ) {
+                                SearchScreen(navController = navController)
+                            }
                         }
-                    }
-                }, bottomBar = {
+                    },
+                    bottomBar = {
                     AnimatedVisibility(
                         visible = bottomAppBarState.isEnabled && isScaffoldBarVisible,
-                        enter = expandVertically(
+                        enter = slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                        ) + expandVertically(
                             expandFrom = Alignment.Bottom,
                             animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        ),
-                        exit = shrinkVertically(
+                        ) + fadeIn(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)),
+                        exit = slideOutVertically(
+                            targetOffsetY = { it },
+                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                        ) + shrinkVertically(
                             shrinkTowards = Alignment.Bottom,
                             animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
+                        ) + fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMediumLow))
                     ) {
                         BottomNavBar(
                             navController = navController,

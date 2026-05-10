@@ -2,6 +2,7 @@ package com.farukaygun.yorozuyalist.presentation.login.views
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +13,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +48,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LoginScreen(
 	navController: NavController,
@@ -60,68 +64,77 @@ fun LoginScreen(
 		}
 	}
 
-	Column(
-		modifier = Modifier.fillMaxSize(),
-		verticalArrangement = Arrangement.Center,
-		horizontalAlignment = Alignment.CenterHorizontally
-	) {
-
-		Image(
-			painter = painterResource(id = R.drawable.icon),
-			contentDescription = "Yorozuya List Icon",
-			modifier = Modifier.fillMaxWidth(.5f)
-		)
-
-		Text(
-			text = StringValue.StringResource(R.string.app_name)
-				.asString(context)
-				.toUpperCase(Locale.current),
-			fontFamily = appTitleFontFamily,
-			style = MaterialTheme.typography.headlineLarge,
-			color = MaterialTheme.colorScheme.onBackground
-		)
-
-		Spacer(modifier = Modifier.height(32.dp))
-
-		Button(
-			enabled = !state.isLoading,
-			colors = ButtonDefaults.buttonColors(
-				containerColor = MaterialTheme.colorScheme.primary,
-				contentColor = MaterialTheme.colorScheme.onPrimary
-			),
-			onClick = { viewModel.onEvent(LoginEvent.Login(context)) },
+	Box(modifier = Modifier.fillMaxSize()) {
+		Column(
+			modifier = Modifier.fillMaxSize(),
+			verticalArrangement = Arrangement.Center,
+			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			Box(
-				contentAlignment = Alignment.Center
-			) {
-				Text(
-					text = stringResource(R.string.login),
-					style = MaterialTheme.typography.bodyMedium,
-					modifier = Modifier.alpha(if (state.isLoading) 0f else 1f)
-				)
+			Image(
+				painter = painterResource(id = R.drawable.icon),
+				contentDescription = "Yorozuya List Icon",
+				modifier = Modifier.fillMaxWidth(.5f)
+			)
 
-				if (state.isLoading) {
-					CircularProgressIndicator(
-						modifier = Modifier.size(20.dp),
-						color = MaterialTheme.colorScheme.onSurface,
-					)
-				}
-			}
-		}
-
-		if (state.error.isNotEmpty()) {
 			Text(
-				text = state.error,
-				style = MaterialTheme.typography.bodyMedium,
-				color = MaterialTheme.colorScheme.onErrorContainer,
-				textAlign = TextAlign.Center,
+				text = StringValue.StringResource(R.string.app_name)
+					.asString(context)
+					.toUpperCase(Locale.current),
+				fontFamily = appTitleFontFamily,
+				style = MaterialTheme.typography.headlineLarge,
+				color = MaterialTheme.colorScheme.onBackground
 			)
 
 			Spacer(modifier = Modifier.height(32.dp))
+
+			Button(
+				enabled = !state.isLoading,
+				colors = ButtonDefaults.buttonColors(
+					containerColor = MaterialTheme.colorScheme.primary,
+					contentColor = MaterialTheme.colorScheme.onPrimary
+				),
+				onClick = { viewModel.onEvent(LoginEvent.Login(context)) },
+			) {
+				Text(
+					text = stringResource(R.string.login),
+					style = MaterialTheme.typography.bodyMedium
+				)
+			}
+
+			if (state.error.isNotEmpty()) {
+				Text(
+					text = state.error,
+					style = MaterialTheme.typography.bodyMedium,
+					color = MaterialTheme.colorScheme.onErrorContainer,
+					textAlign = TextAlign.Center,
+				)
+
+				Spacer(modifier = Modifier.height(32.dp))
+			}
+
+			if (state.error.isNotEmpty()) {
+				Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+			}
 		}
 
-		if (state.error.isNotEmpty()) {
-			Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+		if (state.isLoading) {
+			Box(
+				modifier = Modifier
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f))
+					.pointerInput(Unit) {
+						awaitPointerEventScope {
+							while (true) {
+								awaitPointerEvent(PointerEventPass.Initial)
+									.changes
+									.forEach { it.consume() }
+							}
+						}
+					},
+				contentAlignment = Alignment.Center
+			) {
+				LoadingIndicator(modifier = Modifier.size(72.dp))
+			}
 		}
 	}
 }

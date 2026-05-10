@@ -53,14 +53,14 @@ fun ListItemColumn(
 	Card(
 		onClick = onItemClick,
 		colors = CardDefaults.cardColors(
-			containerColor = MaterialTheme.colorScheme.surface,
+			containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
 		),
 		elevation = CardDefaults.cardElevation(
-			defaultElevation = 2.dp
+			defaultElevation = 0.dp
 		),
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(vertical = 8.dp)
+			.padding(vertical = 4.dp)
 	) {
 		Row(
 			verticalAlignment = Alignment.Top,
@@ -147,7 +147,7 @@ private fun MediaInfo(
 			minLines = 2,
 			maxLines = 2,
 			overflow = TextOverflow.Ellipsis,
-			color = MaterialTheme.colorScheme.onSurfaceVariant,
+			color = MaterialTheme.colorScheme.onSurface,
 			style = MaterialTheme.typography.titleMedium
 		)
 		

@@ -16,7 +16,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.CircularWavyProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -167,6 +168,7 @@ fun MyListStatusFilterChips(
 	}
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun UserList(
 	navController: NavController,
@@ -200,7 +202,7 @@ fun UserList(
 					verticalArrangement = Arrangement.Center,
 					horizontalAlignment = Alignment.CenterHorizontally
 				) {
-					CircularProgressIndicator()
+					CircularWavyProgressIndicator()
 				}
 			}
 		}

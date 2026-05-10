@@ -75,8 +75,7 @@ fun ProfileScreen(
 			)
 
 			HorizontalDivider(
-				color = MaterialTheme.colorScheme.onBackground,
-				thickness = 1.dp,
+				modifier = Modifier.padding(horizontal = 16.dp),
 			)
 
 			AnimeStatisticsSection(data = state.profileData)
@@ -101,7 +100,7 @@ fun UserInfoSection(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(16.dp),
-		horizontalArrangement = Arrangement.spacedBy(32.dp),
+		horizontalArrangement = Arrangement.spacedBy(16.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		SubcomposeAsyncImage(
@@ -117,7 +116,7 @@ fun UserInfoSection(
 				) {
 					ShimmerEffect(
 						modifier = Modifier
-							.clip(RoundedCornerShape(10.dp))
+							.clip(RoundedCornerShape(16.dp))
 							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 					)
 				}
@@ -126,14 +125,14 @@ fun UserInfoSection(
 				Icon(
 					painter = painterResource(id = R.drawable.broken_image_24px),
 					contentDescription = "Error icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 			},
 			contentDescription = "",
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
-				.clip(RoundedCornerShape(10.dp))
-				.size(IMAGE_WIDTH.dp, 150.dp)
+				.clip(RoundedCornerShape(16.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
 		Column(
@@ -161,8 +160,8 @@ fun UserInfoSection(
 
 				Icon(
 					painter = painterResource(id = R.drawable.link_24px),
-					contentDescription = "Verified icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Open profile link",
+					tint = MaterialTheme.colorScheme.primary
 				)
 			}
 
@@ -172,8 +171,8 @@ fun UserInfoSection(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.location_on_24px),
-					contentDescription = "Season icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Location",
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 
 				Text(
@@ -181,7 +180,7 @@ fun UserInfoSection(
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onBackground,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			}
@@ -192,8 +191,8 @@ fun UserInfoSection(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.cake_24px),
-					contentDescription = "Season icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Birthday",
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 
 				Text(
@@ -201,7 +200,7 @@ fun UserInfoSection(
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onBackground,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			}
@@ -212,8 +211,8 @@ fun UserInfoSection(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.calendar_month_24px),
-					contentDescription = "Register date icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Join date",
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 
 				Text(
@@ -221,7 +220,7 @@ fun UserInfoSection(
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			}
@@ -265,17 +264,14 @@ fun AnimeStatisticsSection(data: User) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(vertical = 16.dp)
+			.padding(horizontal = 16.dp, vertical = 16.dp)
 	) {
 		Text(
 			text = "Anime Stats",
-			modifier = Modifier
-				.padding(bottom = 16.dp)
-				.fillMaxWidth(),
+			modifier = Modifier.padding(bottom = 16.dp),
 			style = MaterialTheme.typography.titleMedium,
 			fontWeight = FontWeight.Bold,
 			color = MaterialTheme.colorScheme.onBackground,
-			textAlign = TextAlign.Center
 		)
 		
 		Row(
