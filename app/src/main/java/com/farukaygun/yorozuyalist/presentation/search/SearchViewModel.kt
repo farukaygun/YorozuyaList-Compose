@@ -1,17 +1,16 @@
 package com.farukaygun.yorozuyalist.presentation.search
 
 import androidx.compose.runtime.mutableStateOf
-import com.farukaygun.yorozuyalist.R
-import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.SearchAnimeUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
-import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 
 class SearchViewModel(
-	private val animeUseCase: AnimeUseCase,
+	private val searchAnime: SearchAnimeUseCase,
 ) : BaseViewModel<SearchState>() {
-	override val _state = mutableStateOf(SearchState())
+	override val _state = MutableStateFlow(SearchState())
 
 	val scrollToTop = mutableStateOf(false)
 
@@ -27,7 +26,7 @@ class SearchViewModel(
 			animeSearched = null
 		)
 
-		jobs += animeUseCase.executeSearchedAnime(
+		jobs += searchAnime(
 			query = query,
 			limit = 30
 		)
@@ -37,13 +36,12 @@ class SearchViewModel(
 					_state.value = _state.value.copy(
 						animeSearched = animeSearched,
 						isLoading = false,
-						error = ""
+						error = null
 					)
 				},
 				onError = { error ->
 					_state.value = _state.value.copy(
-						error = error
-							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						error = error,
 						isLoading = false
 					)
 				},
@@ -57,7 +55,7 @@ class SearchViewModel(
 		if (_state.value.query.isEmpty()) return
 
 		_state.value.animeSearched?.paging?.next?.let { nextPageUrl ->
-			jobs += animeUseCase.executeSearchedAnime(url = nextPageUrl)
+			jobs += searchAnime(url = nextPageUrl)
 				.flowOn(Dispatchers.IO)
 				.handleResource(
 					onSuccess = { animeSearched ->
@@ -75,14 +73,12 @@ class SearchViewModel(
 								}
 							},
 							isLoadingMore = false,
-							error = ""
+							error = null
 						)
 					},
 					onError = { error ->
 						_state.value = _state.value.copy(
-							error = error
-								?: StringValue.StringResource(R.string.error_fetching)
-									.toString(),
+							error = error,
 							isLoadingMore = false
 						)
 					},

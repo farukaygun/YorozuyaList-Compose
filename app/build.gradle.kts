@@ -2,21 +2,20 @@ import com.android.build.api.dsl.ApplicationExtension
 
 plugins {
 	id("com.android.application")
-	id("org.jetbrains.kotlin.android")
 	id("org.jetbrains.kotlin.plugin.compose")
 	id("com.google.devtools.ksp")
 }
 
 extensions.configure<ApplicationExtension> {
 	namespace = "com.farukaygun.yorozuyalist"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
 		targetSdk = 37
-		versionCode = 22
-		versionName = "2.2.2"
+		versionCode = 23
+		versionName = "2.3"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 		vectorDrawables {
@@ -34,6 +33,7 @@ extensions.configure<ApplicationExtension> {
 	buildTypes {
 		release {
 			isMinifyEnabled = true
+   			isShrinkResources = true
 			proguardFiles(
 				getDefaultProguardFile("proguard-android-optimize.txt"),
 				"proguard-rules.pro"
@@ -46,6 +46,7 @@ extensions.configure<ApplicationExtension> {
 	}
 	buildFeatures {
 		compose = true
+		buildConfig = true
 	}
 
 	packaging {
@@ -57,23 +58,27 @@ extensions.configure<ApplicationExtension> {
 }
 
 dependencies {
-	val ktorVersion = "3.4.2"
-	val koinVersion="4.2.0"
+	implementation("androidx.compose.material3:material3:1.4.0")
+	val ktorVersion = "3.5.0"
+	val koinVersion="4.2.1"
 	val coilVersion = "3.4.0"
 
-	implementation("com.google.android.engage:engage-core:1.5.11")
+	implementation("com.google.android.engage:engage-core:1.5.12")
 	implementation("androidx.core:core-ktx:1.18.0")
 	implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+	implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
 	implementation("androidx.activity:activity-compose:1.13.0")
-	implementation(platform("androidx.compose:compose-bom:2026.03.01"))
+	implementation(platform("androidx.compose:compose-bom:2026.05.00"))
 	implementation("androidx.compose.ui:ui")
 	implementation("androidx.compose.ui:ui-graphics")
 	implementation("androidx.compose.ui:ui-tooling-preview")
-	implementation("androidx.compose.material3:material3-android:1.4.0")
+	implementation("androidx.compose.material3:material3:1.5.0-alpha19")
+	implementation("androidx.compose.material3:material3-window-size-class:1.5.0-alpha19")
+	implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.5.0-alpha19")
 
 	// navigation
 	implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
-	implementation("androidx.navigation:navigation-compose:2.9.7")
+	implementation("androidx.navigation:navigation-compose:2.9.8")
 
 	// Ktor
 	implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -82,6 +87,7 @@ dependencies {
 	implementation("io.ktor:ktor-client-json:$ktorVersion")
 	implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
 	implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+	implementation("io.ktor:ktor-client-auth:$ktorVersion")
 
 	//Koin
 	implementation ("io.insert-koin:koin-android:$koinVersion")
@@ -97,14 +103,14 @@ dependencies {
 	implementation("androidx.browser:browser:1.10.0")
 	implementation("androidx.preference:preference-ktx:1.2.1")
 
-	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
+	implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
 	implementation("co.yml:ycharts:2.1.0")
 
 	testImplementation("junit:junit:4.13.2")
 	androidTestImplementation("androidx.test.ext:junit:1.3.0")
 	androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-	androidTestImplementation(platform("androidx.compose:compose-bom:2026.03.01"))
+	androidTestImplementation(platform("androidx.compose:compose-bom:2026.05.00"))
 	androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 	debugImplementation("androidx.compose.ui:ui-tooling")
-	debugImplementation("androidx.compose.ui:ui-test-manifest:1.10.6")
+	debugImplementation("androidx.compose.ui:ui-test-manifest:1.11.1")
 }

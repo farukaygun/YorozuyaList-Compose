@@ -1,6 +1,11 @@
 package com.farukaygun.yorozuyalist.presentation.home.views
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -16,14 +22,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
@@ -48,6 +58,7 @@ import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.Shimm
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectHorizontalList
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
 import com.farukaygun.yorozuyalist.presentation.home.HomeViewModel
+import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.season
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.year
 import com.farukaygun.yorozuyalist.util.enums.GridListType
@@ -55,56 +66,84 @@ import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(
 	navController: NavController,
-	viewModel: HomeViewModel = koinViewModel()
+	viewModel: HomeViewModel = koinViewModel(),
+	isTopBarVisible: Boolean = true
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
+	val pullToRefreshState = rememberPullToRefreshState()
 
-	PullToRefreshBox(
-		isRefreshing = state.isLoading,
-		onRefresh = { viewModel.onEvent(event = HomeEvent.InitRequestChain) },
-		state = rememberPullToRefreshState(),
-		modifier = Modifier.padding(horizontal = 16.dp)
-	) {
-		Column(
-			modifier = Modifier
-				.verticalScroll(rememberScrollState()),
-			verticalArrangement = Arrangement.spacedBy(16.dp)
+	Column {
+		AnimatedVisibility(
+			visible = isTopBarVisible,
+			enter = expandVertically(
+				expandFrom = Alignment.Bottom,
+				animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+			),
+			exit = shrinkVertically(
+				shrinkTowards = Alignment.Bottom,
+				animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+			)
 		) {
-			HomeLargeActionButtons(navController = navController)
-
-			TodayCarousel(
-				navController = navController,
-				data = state.animeTodayList,
-				isLoading = state.isLoading,
-				title = "Today",
-				icon = R.drawable.schedule_24px,
-				isMoreVisible = false
-			)
-			HomeScreenSection(
-				navController = navController,
-				data = state.animeSeasonalList,
-				isLoading = state.isLoading,
-				title = "${season.displayName} $year Anime",
-				icon = season.icon,
-				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
-			)
-			HomeScreenSection(
-				navController = navController,
-				data = state.animeSuggestionList,
-				isLoading = state.isLoading,
-				title = "Suggested Anime",
-				icon = R.drawable.for_you_24px,
-				onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
-			)
+			Box(modifier = Modifier.statusBarsPadding()) {
+				SearchScreen(navController = navController)
+			}
 		}
 
-		if (state.error.isNotEmpty()) {
-			Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+		PullToRefreshBox(
+			isRefreshing = state.isLoading,
+			onRefresh = { viewModel.onEvent(event = HomeEvent.InitRequestChain) },
+			state = pullToRefreshState,
+			modifier = Modifier.padding(horizontal = 16.dp),
+			indicator = {
+				PullToRefreshDefaults.LoadingIndicator(
+					state = pullToRefreshState,
+					isRefreshing = state.isLoading,
+					modifier = Modifier.align(Alignment.TopCenter)
+				)
+			}
+		) {
+			Column(
+				modifier = Modifier
+					.verticalScroll(rememberScrollState()),
+				verticalArrangement = Arrangement.spacedBy(16.dp)
+			) {
+				HomeLargeActionButtons(navController = navController)
+
+				TodayCarousel(
+					navController = navController,
+					data = state.animeTodayList,
+					isLoading = state.isLoading,
+					title = "Today",
+					icon = R.drawable.schedule_24px,
+					isMoreVisible = false
+				)
+				HomeScreenSection(
+					navController = navController,
+					data = state.animeSeasonalList,
+					isLoading = state.isLoading,
+					title = "${season.displayName} $year Anime",
+					icon = season.icon,
+					onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SEASONAL_ANIME_LIST.name}") }
+				)
+				HomeScreenSection(
+					navController = navController,
+					data = state.animeSuggestionList,
+					isLoading = state.isLoading,
+					title = "Suggested Anime",
+					icon = R.drawable.for_you_24px,
+					onClick = { navController.navigate(Screen.GridListScreen.route + "/${GridListType.SUGGESTED_ANIME_LIST.name}") }
+				)
+			}
+
+			state.error?.let { error ->
+				Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
+			}
 		}
 	}
 }
@@ -113,7 +152,8 @@ fun HomeScreen(
 fun HomeLargeActionButtons(navController: NavController) {
 	Row(
 		modifier = Modifier
-			.fillMaxWidth(),
+			.fillMaxWidth()
+			.padding(top = 4.dp),
 		horizontalArrangement = Arrangement.spacedBy(8.dp)
 	) {
 		LargeActionButtonWithIcon(
@@ -307,7 +347,7 @@ fun TodayCarousel(
 fun HomeScreenPreview() {
 	val context = LocalContext.current
 
-	KoinApplication(application = {
+	KoinApplication(configuration = koinConfiguration(declaration = {
 		androidContext(context)
 		modules(
 			viewModelModule,
@@ -315,9 +355,9 @@ fun HomeScreenPreview() {
 			useCaseModule,
 			apiServiceModule
 		)
-	}) {
+	}), content = {
 		HomeScreen(
 			navController = rememberNavController()
 		)
-	}
+	})
 }

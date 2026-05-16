@@ -10,18 +10,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +40,6 @@ import androidx.navigation.navArgument
 import com.farukaygun.yorozuyalist.presentation.calendar.views.CalendarScreen
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBar
 import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.rememberBottomAppBarState
-import com.farukaygun.yorozuyalist.presentation.composables.search_bar.rememberSearchBarState
 import com.farukaygun.yorozuyalist.presentation.detail.views.DetailScreen
 import com.farukaygun.yorozuyalist.presentation.grid_list.views.GridListScreen
 import com.farukaygun.yorozuyalist.presentation.home.views.HomeScreen
@@ -57,7 +57,7 @@ import kotlin.math.abs
 class MainActivity : ComponentActivity() {
     private val loginViewModel: LoginViewModel by inject()
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3AdaptiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -65,7 +65,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 val navController = rememberNavController()
-                val searchBarState = rememberSearchBarState(navController = navController)
                 val bottomAppBarState = rememberBottomAppBarState(navController = navController)
                 var currentListState by remember { mutableStateOf<LazyListState?>(null) }
                 var isScaffoldBarVisible by remember { mutableStateOf(true) }
@@ -130,63 +129,38 @@ class MainActivity : ComponentActivity() {
                     accumulatedScroll = 0f
                 }
 
-                Scaffold(topBar = {
-                    AnimatedVisibility(
-                        modifier = Modifier.systemBarsPadding(),
-                        visible = searchBarState.isVisible && isScaffoldBarVisible,
-                        enter = expandVertically(
-                            expandFrom = Alignment.Bottom,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        ),
-                        exit = shrinkVertically(
-                            shrinkTowards = Alignment.Bottom,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
-                    ) {
-                        SearchScreen(navController = navController)
+                Scaffold(
+                    contentWindowInsets = WindowInsets(0),
+                    bottomBar = {
+                        AnimatedVisibility(
+                            visible = bottomAppBarState.isEnabled && isScaffoldBarVisible,
+                            enter = slideInVertically(
+                                initialOffsetY = { it },
+                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                            ) + expandVertically(
+                                expandFrom = Alignment.Bottom,
+                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+                            ) + fadeIn(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)),
+                            exit = scaleOut(
+                                targetScale = 0f,
+                                transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 1f),
+                                animationSpec = spring(stiffness = Spring.StiffnessLow)
+                            ) + slideOutVertically(
+                                targetOffsetY = { it },
+                                animationSpec = spring(stiffness = Spring.StiffnessLow)
+                            )
+                        ) {
+                            BottomNavBar(
+                                navController = navController,
+                                bottomAppBarState = bottomAppBarState
+                            )
+                        }
                     }
-
-                    if (!searchBarState.isVisible || !isScaffoldBarVisible) {
-                        Spacer(modifier = Modifier.systemBarsPadding())
-                    }
-                }, bottomBar = {
-                    AnimatedVisibility(
-                        visible = bottomAppBarState.isEnabled && isScaffoldBarVisible,
-                        enter = expandVertically(
-                            expandFrom = Alignment.Bottom,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        ),
-                        exit = shrinkVertically(
-                            shrinkTowards = Alignment.Bottom,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
-                    ) {
-                        BottomNavBar(
-                            navController = navController,
-                            bottomAppBarState = bottomAppBarState
-                        )
-                    }
-                }) { paddingValues ->
-                    val targetTopPadding = paddingValues.calculateTopPadding()
-                    val targetBottomPadding = paddingValues.calculateBottomPadding()
-
-                    val animatedTopPadding by animateDpAsState(
-                        targetValue = targetTopPadding,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                        label = "TopPaddingAnimation"
-                    )
-
-                    val animatedBottomPadding by animateDpAsState(
-                        targetValue = targetBottomPadding,
-                        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                        label = "BottomPaddingAnimation"
-                    )
-
+                ) { paddingValues ->
                     NavHost(
-                        modifier = Modifier.padding(
-                            top = animatedTopPadding,
-                            bottom = animatedBottomPadding
-                        ),
+                        modifier = Modifier
+                            .statusBarsPadding()
+                            .padding(top = paddingValues.calculateTopPadding()),
                         navController = navController,
                         startDestination = if (loginViewModel.isLoggedIn()) Screen.HomeScreen.route else Screen.LoginScreen.route,
                         enterTransition = {
@@ -231,6 +205,7 @@ class MainActivity : ComponentActivity() {
 
                             HomeScreen(
                                 navController = navController,
+                                isTopBarVisible = isScaffoldBarVisible
                             )
                         }
 
@@ -250,7 +225,8 @@ class MainActivity : ComponentActivity() {
                                 nestedScrollConnection = nestedScrollConnection,
                                 onListStateChanged = { listState ->
                                     currentListState = listState
-                                }
+                                },
+                                isTopBarVisible = isScaffoldBarVisible
                             )
                         }
 
@@ -270,7 +246,8 @@ class MainActivity : ComponentActivity() {
                                 nestedScrollConnection = nestedScrollConnection,
                                 onListStateChanged = { listState ->
                                     currentListState = listState
-                                }
+                                },
+                                isTopBarVisible = isScaffoldBarVisible
                             )
                         }
 

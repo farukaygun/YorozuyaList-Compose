@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
@@ -52,6 +54,7 @@ import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToAbbr
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 private const val IMAGE_WIDTH = 120
 private const val IMAGE_HEIGHT = 150
@@ -60,9 +63,10 @@ private const val IMAGE_HEIGHT = 150
 fun ProfileScreen(
 	viewModel: ProfileViewModel = koinViewModel()
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
+	val profileData = state.profileData
 
-	if (state.profileData != null && !state.isLoading) {
+	if (profileData != null && !state.isLoading) {
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState()),
@@ -70,22 +74,21 @@ fun ProfileScreen(
 		) {
 			UserInfoSection(
 				viewModel = viewModel,
-				data = state.profileData
+				data = profileData
 			)
 
 			HorizontalDivider(
-				color = MaterialTheme.colorScheme.onBackground,
-				thickness = 1.dp,
+				modifier = Modifier.padding(horizontal = 16.dp),
 			)
 
-			AnimeStatisticsSection(data = state.profileData)
+			AnimeStatisticsSection(data = profileData)
 		}
 	} else {
 		ShimmerEffectProfileScreen()
 	}
 
-	if (state.error.isNotEmpty()) {
-		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	state.error?.let { error ->
+		Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 	}
 }
 
@@ -100,7 +103,7 @@ fun UserInfoSection(
 		modifier = Modifier
 			.fillMaxWidth()
 			.padding(16.dp),
-		horizontalArrangement = Arrangement.spacedBy(32.dp),
+		horizontalArrangement = Arrangement.spacedBy(16.dp),
 		verticalAlignment = Alignment.CenterVertically
 	) {
 		SubcomposeAsyncImage(
@@ -116,7 +119,7 @@ fun UserInfoSection(
 				) {
 					ShimmerEffect(
 						modifier = Modifier
-							.clip(RoundedCornerShape(10.dp))
+							.clip(RoundedCornerShape(16.dp))
 							.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 					)
 				}
@@ -125,14 +128,14 @@ fun UserInfoSection(
 				Icon(
 					painter = painterResource(id = R.drawable.broken_image_24px),
 					contentDescription = "Error icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 			},
 			contentDescription = "",
 			contentScale = ContentScale.Crop,
 			modifier = Modifier
-				.clip(RoundedCornerShape(10.dp))
-				.size(IMAGE_WIDTH.dp, 150.dp)
+				.clip(RoundedCornerShape(16.dp))
+				.size(IMAGE_WIDTH.dp, IMAGE_HEIGHT.dp)
 		)
 
 		Column(
@@ -160,8 +163,8 @@ fun UserInfoSection(
 
 				Icon(
 					painter = painterResource(id = R.drawable.link_24px),
-					contentDescription = "Verified icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Open profile link",
+					tint = MaterialTheme.colorScheme.primary
 				)
 			}
 
@@ -171,8 +174,8 @@ fun UserInfoSection(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.location_on_24px),
-					contentDescription = "Season icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Location",
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 
 				Text(
@@ -180,7 +183,7 @@ fun UserInfoSection(
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onBackground,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			}
@@ -191,8 +194,8 @@ fun UserInfoSection(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.cake_24px),
-					contentDescription = "Season icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Birthday",
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 
 				Text(
@@ -200,7 +203,7 @@ fun UserInfoSection(
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onBackground,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			}
@@ -211,8 +214,8 @@ fun UserInfoSection(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.calendar_month_24px),
-					contentDescription = "Register date icon",
-					tint = MaterialTheme.colorScheme.onBackground
+					contentDescription = "Join date",
+					tint = MaterialTheme.colorScheme.onSurfaceVariant
 				)
 
 				Text(
@@ -220,7 +223,7 @@ fun UserInfoSection(
 					textAlign = TextAlign.Start,
 					maxLines = 1,
 					overflow = TextOverflow.Ellipsis,
-					color = MaterialTheme.colorScheme.onSurface,
+					color = MaterialTheme.colorScheme.onSurfaceVariant,
 					style = MaterialTheme.typography.bodyMedium,
 				)
 			}
@@ -264,17 +267,14 @@ fun AnimeStatisticsSection(data: User) {
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.padding(vertical = 16.dp)
+			.padding(horizontal = 16.dp, vertical = 16.dp)
 	) {
 		Text(
 			text = "Anime Stats",
-			modifier = Modifier
-				.padding(bottom = 16.dp)
-				.fillMaxWidth(),
+			modifier = Modifier.padding(bottom = 16.dp),
 			style = MaterialTheme.typography.titleMedium,
 			fontWeight = FontWeight.Bold,
 			color = MaterialTheme.colorScheme.onBackground,
-			textAlign = TextAlign.Center
 		)
 		
 		Row(
@@ -332,17 +332,17 @@ private fun DonutChart(data: PieChartData) {
 @Composable
 @Preview
 fun PreviewProfileScreen() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		ProfileScreen()
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        ProfileScreen()
+    })
 }

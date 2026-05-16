@@ -9,12 +9,22 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.GridListItem
@@ -27,36 +37,64 @@ import com.farukaygun.yorozuyalist.util.enums.GridListType
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GridListScreen(
 	navController: NavController,
 	viewModel: GridListViewModel = koinViewModel(),
 	type: String
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
+	val gridList = state.gridList
+	val gridListType = GridListType.valueOf(type)
+	val title = when (gridListType) {
+		GridListType.RANKING_ANIME_LIST -> "Anime Ranking"
+		GridListType.RANKING_MANGA_LIST -> "Manga Ranking"
+		GridListType.SEASONAL_ANIME_LIST -> "Seasonal Anime"
+		GridListType.SUGGESTED_ANIME_LIST -> "Suggested Anime"
+	}
 
 	LaunchedEffect(Unit) {
-		viewModel.updateType(GridListType.valueOf(type))
+		viewModel.updateType(gridListType)
 		viewModel.onEvent(GridListEvent.InitRequestChain)
 	}
 
-	Column(
-		modifier = Modifier
-			.padding(16.dp)
-	) {
-		if (!state.isLoading && state.gridList?.data?.isNotEmpty() == true) {
-			GridList(
-				navController = navController,
-				data = state.gridList.data,
-				viewModel = viewModel
+	Scaffold(
+		topBar = {
+			TopAppBar(
+				title = { Text(title) },
+				navigationIcon = {
+					IconButton(onClick = { navController.popBackStack() }) {
+						Icon(
+							painter = painterResource(id = R.drawable.arrow_back_24px),
+							contentDescription = "Back"
+						)
+					}
+				}
 			)
-		} else {
-			ShimmerEffectGridList()
+		}
+	) { paddingValues ->
+		Column(
+			modifier = Modifier.padding(
+				top = paddingValues.calculateTopPadding(),
+				start = 16.dp,
+				end = 16.dp
+			)
+		) {
+			if (!state.isLoading && gridList?.data?.isNotEmpty() == true) {
+				GridList(
+					navController = navController,
+					data = gridList.data,
+					viewModel = viewModel
+				)
+			} else {
+				ShimmerEffectGridList()
+			}
 		}
 	}
 
-	if (state.error.isNotEmpty()) {
-		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	state.error?.let { error ->
+		Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 	}
 }
 
@@ -66,6 +104,8 @@ fun GridList(
 	data: List<Data>,
 	viewModel: GridListViewModel,
 ) {
+	val gridState by viewModel.state.collectAsStateWithLifecycle()
+	val type = gridState.type
 	val listState = rememberLazyGridState()
 	listState.OnBottomReached(buffer = 10) {
 		viewModel.onEvent(GridListEvent.LoadMore)
@@ -78,7 +118,6 @@ fun GridList(
 			horizontalArrangement = Arrangement.SpaceBetween,
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
-			val type = viewModel.state.value.type
 			items(data) { media ->
 				when (type) {
 					GridListType.SUGGESTED_ANIME_LIST, GridListType.SEASONAL_ANIME_LIST -> {
@@ -92,7 +131,7 @@ fun GridList(
 							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME.name}/${media.node.id}")
 						})
 					}
-					
+
 					GridListType.RANKING_MANGA_LIST -> {
 						GridListItemWithRank(data = media, onItemClick = {
 							navController.navigate(Screen.DetailScreen.route + "/${ScreenType.MANGA.name}/${media.node.id}")

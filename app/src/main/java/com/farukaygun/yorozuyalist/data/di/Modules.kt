@@ -3,18 +3,30 @@ package com.farukaygun.yorozuyalist.data.di
 import com.farukaygun.yorozuyalist.data.di.AppModule.provideKtorClient
 import com.farukaygun.yorozuyalist.data.remote.APIService
 import com.farukaygun.yorozuyalist.data.remote.APIServiceImpl
-import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
-import com.farukaygun.yorozuyalist.data.repository.LoginRepository
-import com.farukaygun.yorozuyalist.data.repository.MangaRepository
-import com.farukaygun.yorozuyalist.data.repository.UserRepository
-import com.farukaygun.yorozuyalist.domain.repository.AnimeRepositoryImpl
-import com.farukaygun.yorozuyalist.domain.repository.LoginRepositoryImpl
-import com.farukaygun.yorozuyalist.domain.repository.MangaRepositoryImpl
-import com.farukaygun.yorozuyalist.domain.repository.UserRepositoryImpl
-import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
-import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
-import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
-import com.farukaygun.yorozuyalist.domain.use_case.UserUseCase
+import com.farukaygun.yorozuyalist.data.repository.AnimeRepositoryImpl
+import com.farukaygun.yorozuyalist.data.repository.LoginRepositoryImpl
+import com.farukaygun.yorozuyalist.data.repository.MangaRepositoryImpl
+import com.farukaygun.yorozuyalist.data.repository.UserRepositoryImpl
+import com.farukaygun.yorozuyalist.domain.repository.AnimeRepository
+import com.farukaygun.yorozuyalist.domain.repository.LoginRepository
+import com.farukaygun.yorozuyalist.domain.repository.MangaRepository
+import com.farukaygun.yorozuyalist.domain.repository.UserRepository
+import com.farukaygun.yorozuyalist.domain.use_case.anime.DeleteAnimeListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetAnimeDetailUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetAnimeRankingUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetSeasonalAnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetSuggestedAnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetUserAnimeListUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.SearchAnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.UpdateAnimeListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.login.GetAccessTokenUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.login.GetRefreshTokenUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.DeleteMangaListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.GetMangaDetailUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.GetMangaRankingUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.GetUserMangaListUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.UpdateMangaListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.user.GetUserProfileUseCase
 import com.farukaygun.yorozuyalist.presentation.calendar.CalendarViewModel
 import com.farukaygun.yorozuyalist.presentation.detail.DetailViewModel
 import com.farukaygun.yorozuyalist.presentation.detail.bottom_sheet.MyListModalBottomSheetViewModel
@@ -29,28 +41,43 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val apiServiceModule = module {
-	single { provideKtorClient() }
-	single<APIService> { APIServiceImpl(get(), get()) }
 	single { SharedPrefsHelper(get()) }
+	single { provideKtorClient(get()) }
+	single<APIService> { APIServiceImpl(get()) }
 }
 
 val viewModelModule = module {
-	viewModel { LoginViewModel(get(), get()) }
-	viewModel { HomeViewModel(get()) }
+	viewModel { LoginViewModel(get(), get(), get()) }
+	viewModel { HomeViewModel(get(), get()) }
 	viewModel { CalendarViewModel(get()) }
 	viewModel { UserListViewModel(get(), get(), get()) }
 	viewModel { ProfileViewModel(get()) }
 	viewModel { SearchViewModel(get()) }
-	viewModel { GridListViewModel(get(), get()) }
+	viewModel { GridListViewModel(get(), get(), get(), get()) }
 	viewModel { DetailViewModel(get(), get(), get()) }
-	viewModel { MyListModalBottomSheetViewModel(get(), get()) }
+	viewModel { MyListModalBottomSheetViewModel(get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
-	single { LoginUseCase(get()) }
-	single { AnimeUseCase(get()) }
-	single { MangaUseCase(get()) }
-	single { UserUseCase(get()) }
+	single { GetSeasonalAnimeUseCase(get()) }
+	single { GetSuggestedAnimeUseCase(get()) }
+	single { SearchAnimeUseCase(get()) }
+	single { GetUserAnimeListUseCase(get()) }
+	single { GetAnimeDetailUseCase(get()) }
+	single { UpdateAnimeListItemUseCase(get()) }
+	single { DeleteAnimeListItemUseCase(get()) }
+	single { GetAnimeRankingUseCase(get()) }
+
+	single { GetUserMangaListUseCase(get()) }
+	single { GetMangaDetailUseCase(get()) }
+	single { UpdateMangaListItemUseCase(get()) }
+	single { DeleteMangaListItemUseCase(get()) }
+	single { GetMangaRankingUseCase(get()) }
+
+	single { GetAccessTokenUseCase(get()) }
+	single { GetRefreshTokenUseCase(get()) }
+
+	single { GetUserProfileUseCase(get()) }
 }
 
 val repositoryModule = module {

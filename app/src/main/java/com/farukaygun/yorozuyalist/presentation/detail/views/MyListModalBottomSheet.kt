@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.MyListStatus
@@ -74,14 +75,16 @@ fun MyListModalBottomSheet(
 	mediaDetail: MediaDetail,
 	type: ScreenType
 ) {
+	val uiState by viewModel.state.collectAsStateWithLifecycle()
+
 	LaunchedEffect(mediaDetail) {
 		viewModel.onEvent(MyListBottomSheetEvent.Init(mediaDetail, type))
 	}
 
-	LaunchedEffect(viewModel.state.value.isSuccess) {
-		if (viewModel.state.value.isSuccess) {
+	LaunchedEffect(uiState.isSuccess) {
+		if (uiState.isSuccess) {
 			viewModel.onEvent(MyListBottomSheetEvent.SetSuccess(false))
-			onUpdateSuccess(viewModel.state.value.myListStatus, viewModel.state.value.isRemoved)
+			onUpdateSuccess(uiState.myListStatus, uiState.isRemoved)
 		}
 	}
 
@@ -140,7 +143,7 @@ fun StatusFilterOptions(
 	type: ScreenType
 ) {
 	val viewModel = LocalViewModel.current
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
 
 	val statusList = remember(type) {
 		buildList {
@@ -214,7 +217,7 @@ fun StatusFilterOptions(
 @Composable
 fun ProgressInputField(mediaDetail: MediaDetail) {
 	val viewModel = LocalViewModel.current
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
 
 	when (mediaDetail) {
 		is AnimeDetail -> {
@@ -368,7 +371,7 @@ fun ProgressInputField(mediaDetail: MediaDetail) {
 @Composable
 fun MediaScoreSlider() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 
 	Column {
@@ -412,7 +415,7 @@ fun MediaScoreSlider() {
 @Composable
 fun DateRangePicker() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 
 	Column {
 		Row(
@@ -442,7 +445,7 @@ fun DateRangePicker() {
 @Composable
 fun PrioritySlider() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 
 	Column {
@@ -486,7 +489,7 @@ fun PrioritySlider() {
 @Composable
 fun RewatchCount() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 
 	Column(horizontalAlignment = Alignment.CenterHorizontally) {
 		Row(
@@ -557,7 +560,7 @@ fun RewatchCount() {
 @Composable
 fun RewatchValueSlider() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 
 	Column {
@@ -601,7 +604,7 @@ fun RewatchValueSlider() {
 @Composable
 fun TagsField() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 
 	OutlinedTextField(
 		value = state.tags.toString(),
@@ -617,7 +620,7 @@ fun TagsField() {
 @Composable
 fun NoteInputField() {
 	val viewModel = LocalViewModel.current
-	val state by viewModel.state
+	val state by viewModel.state.collectAsStateWithLifecycle()
 
 	OutlinedTextField(
 		value = state.comments,

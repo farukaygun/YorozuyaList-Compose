@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,22 +26,21 @@ import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun ShimmerEffectProfileScreen() {
-	Scaffold { _ ->
-		Column(
-			verticalArrangement = Arrangement.spacedBy(16.dp)
-		) {
-			ShimmerEffectUserInfoSection()
+	Column(
+		verticalArrangement = Arrangement.spacedBy(16.dp)
+	) {
+		ShimmerEffectUserInfoSection()
 
-			HorizontalDivider(
-				color = MaterialTheme.colorScheme.onBackground,
-				thickness = 1.dp,
-			)
+		HorizontalDivider(
+			color = MaterialTheme.colorScheme.onBackground,
+			thickness = 1.dp,
+		)
 
-			ShimmerEffectAnimeStatisticsSection()
-		}
+		ShimmerEffectAnimeStatisticsSection()
 	}
 }
 
@@ -154,17 +152,17 @@ fun ShimmerEffectAnimeStatisticsSection() {
 @Composable
 @Preview
 fun ShimmerEffectPreviewProfileScreen() {
-	val context = LocalContext.current
+    val context = LocalContext.current
 
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule,
-			repositoryModule,
-			useCaseModule,
-			apiServiceModule
-		)
-	}) {
-		ProfileScreen()
-	}
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule,
+            repositoryModule,
+            useCaseModule,
+            apiServiceModule
+        )
+    }), content = {
+        ProfileScreen()
+    })
 }

@@ -3,6 +3,7 @@ package com.farukaygun.yorozuyalist.presentation.detail.bottom_sheet
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.MyListStatus
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
+import com.farukaygun.yorozuyalist.util.AppError
 
 data class MyListModalBottomSheetState(
 	val mediaDetail: MediaDetail? = null,
@@ -23,5 +24,5 @@ data class MyListModalBottomSheetState(
 	val isSuccess: Boolean = false,
 	val isRemoved: Boolean = false,
 	val isLoading: Boolean = false,
-	val error: String = ""
+	val error: AppError? = null
 )

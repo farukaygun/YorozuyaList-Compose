@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.domain.repository
+package com.farukaygun.yorozuyalist.data.repository
 
 import androidx.annotation.IntRange
 import com.farukaygun.yorozuyalist.data.remote.APIService
@@ -9,7 +9,7 @@ import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSearchedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSeasonalDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeSuggestedDto
 import com.farukaygun.yorozuyalist.data.remote.dto.anime.AnimeUserListDto
-import com.farukaygun.yorozuyalist.data.repository.AnimeRepository
+import com.farukaygun.yorozuyalist.domain.repository.AnimeRepository
 
 class AnimeRepositoryImpl(
 	private val api: APIService

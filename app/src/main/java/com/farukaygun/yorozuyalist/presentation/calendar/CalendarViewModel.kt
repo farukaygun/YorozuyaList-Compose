@@ -1,24 +1,22 @@
 package com.farukaygun.yorozuyalist.presentation.calendar
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.domain.models.enums.MediaStatus
-import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetSeasonalAnimeUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.season
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.year
 import com.farukaygun.yorozuyalist.util.Calendar.WeekDays
-import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class CalendarViewModel(
-	private val animeUseCase: AnimeUseCase
+	private val getSeasonalAnime: GetSeasonalAnimeUseCase
 ) : BaseViewModel<CalendarState>() {
-	override val _state = mutableStateOf(CalendarState())
+	override val _state = MutableStateFlow(CalendarState())
 
 	init {
 		onEvent(CalendarEvent.GetWeeklyAnimeList)
@@ -29,7 +27,7 @@ class CalendarViewModel(
 	) {
 		val animesByDay = mutableMapOf<WeekDays, List<Data>>()
 
-		jobs += animeUseCase.executeSeasonalAnime(
+		jobs += getSeasonalAnime(
 			year = year,
 			season = season.apiName,
 			limit = limit
@@ -51,13 +49,12 @@ class CalendarViewModel(
 
 					_state.value = _state.value.copy(
 						animeWeeklyList = animesByDay,
-						error = ""
+						error = null
 					)
 				},
 				onError = { error ->
 					_state.value = CalendarState(
-						error = error
-							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						error = error,
 						isLoading = false
 					)
 				}

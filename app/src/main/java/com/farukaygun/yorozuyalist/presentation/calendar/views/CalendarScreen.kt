@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
@@ -43,6 +44,7 @@ import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.KoinApplication
+import org.koin.dsl.koinConfiguration
 
 @Composable
 fun CalendarScreen(
@@ -51,7 +53,7 @@ fun CalendarScreen(
 	nestedScrollConnection: NestedScrollConnection,
 	onListStateChanged: (LazyListState) -> Unit
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val listState = rememberLazyListState()
 
 	LaunchedEffect(listState) {
@@ -133,18 +135,18 @@ fun ShimmerEffectCalendarScreen() {
 @Composable
 @Preview
 fun CalendarScreenPreview() {
-	val context = LocalContext.current
-	
-	KoinApplication(application = {
-		androidContext(context)
-		modules(
-			viewModelModule, repositoryModule, useCaseModule, apiServiceModule
-		)
-	}) {
-		CalendarScreen(
-			navController = rememberNavController(),
-			nestedScrollConnection = rememberNestedScrollInteropConnection(),
-			onListStateChanged = {}
-		)
-	}
+    val context = LocalContext.current
+
+    KoinApplication(configuration = koinConfiguration(declaration = {
+        androidContext(context)
+        modules(
+            viewModelModule, repositoryModule, useCaseModule, apiServiceModule
+        )
+    }), content = {
+        CalendarScreen(
+            navController = rememberNavController(),
+            nestedScrollConnection = rememberNestedScrollInteropConnection(),
+            onListStateChanged = {}
+        )
+    })
 }

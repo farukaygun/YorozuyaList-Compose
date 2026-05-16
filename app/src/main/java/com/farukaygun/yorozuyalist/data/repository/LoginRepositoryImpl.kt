@@ -1,9 +1,9 @@
-package com.farukaygun.yorozuyalist.domain.repository
+package com.farukaygun.yorozuyalist.data.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
 import com.farukaygun.yorozuyalist.data.remote.dto.AccessTokenDto
 import com.farukaygun.yorozuyalist.data.remote.dto.RefreshTokenDto
-import com.farukaygun.yorozuyalist.data.repository.LoginRepository
+import com.farukaygun.yorozuyalist.domain.repository.LoginRepository
 
 class LoginRepositoryImpl(private val api: APIService) : LoginRepository {
 	override suspend fun getAccessToken(
