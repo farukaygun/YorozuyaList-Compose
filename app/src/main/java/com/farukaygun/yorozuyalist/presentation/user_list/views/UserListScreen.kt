@@ -2,15 +2,22 @@ package com.farukaygun.yorozuyalist.presentation.user_list.views
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -50,6 +57,7 @@ import com.farukaygun.yorozuyalist.presentation.composables.NoDataView
 import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.composables.UserListItemColumn
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectVerticalList
+import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListEvent
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListViewModel
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
@@ -63,7 +71,8 @@ fun UserListScreen(
 	navController: NavController,
 	viewModel: UserListViewModel = koinViewModel(),
 	nestedScrollConnection: NestedScrollConnection,
-	onListStateChanged: (LazyListState) -> Unit
+	onListStateChanged: (LazyListState) -> Unit,
+	isTopBarVisible: Boolean = true
 ) {
 	val state = viewModel.state.value
 	val listState = rememberLazyListState()
@@ -72,25 +81,42 @@ fun UserListScreen(
 		onListStateChanged(listState)
 	}
 
-	Column(
-		modifier = Modifier
-			.padding(horizontal = 16.dp),
-		verticalArrangement = Arrangement.SpaceBetween
-	) {
-		MyListStatusFilterChips(viewModel)
-
-		if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
-			UserList(
-				navController = navController,
-				data = state.userList.data,
-				viewModel = viewModel,
-				listState = listState,
-				nestedScrollConnection = nestedScrollConnection
+	Column {
+		AnimatedVisibility(
+			visible = isTopBarVisible,
+			enter = expandVertically(
+				expandFrom = Alignment.Bottom,
+				animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+			),
+			exit = shrinkVertically(
+				shrinkTowards = Alignment.Bottom,
+				animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
 			)
-		} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
-			NoDataView()
-		} else {
-			ShimmerEffectVerticalList()
+		) {
+			Box(modifier = Modifier.statusBarsPadding()) {
+				SearchScreen(navController = navController)
+			}
+		}
+
+		Column(
+			modifier = Modifier.padding(horizontal = 16.dp),
+			verticalArrangement = Arrangement.SpaceBetween
+		) {
+			MyListStatusFilterChips(viewModel)
+
+			if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
+				UserList(
+					navController = navController,
+					data = state.userList.data,
+					viewModel = viewModel,
+					listState = listState,
+					nestedScrollConnection = nestedScrollConnection
+				)
+			} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
+				NoDataView()
+			} else {
+				ShimmerEffectVerticalList()
+			}
 		}
 	}
 
