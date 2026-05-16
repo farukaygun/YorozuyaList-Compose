@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.SubcomposeAsyncImage
@@ -93,7 +94,8 @@ fun DetailScreen(
 	viewModel: DetailViewModel = koinViewModel(),
 	type: String
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
+	val detail = state.detail
 	val sheetState = rememberModalBottomSheetState()
 	val showBottomSheet = remember { mutableStateOf(false) }
 	val scope = rememberCoroutineScope()
@@ -104,8 +106,8 @@ fun DetailScreen(
 		}
 	}
 
-	if (state.detail != null && !state.isLoading) {
-		CompositionLocalProvider(LocalMediaDetail provides state.detail) {
+	if (detail != null && !state.isLoading) {
+		CompositionLocalProvider(LocalMediaDetail provides detail) {
 			Box(
 				contentAlignment = Alignment.BottomEnd,
 			) {
@@ -127,7 +129,7 @@ fun DetailScreen(
 					)
 				}
 
-				MyListFloatingActionButton(state.detail, showBottomSheet)
+				MyListFloatingActionButton(detail, showBottomSheet)
 			}
 
 			AnimatedVisibility(
@@ -151,7 +153,7 @@ fun DetailScreen(
 							sheetState.hide()
 						}
 					},
-					mediaDetail = state.detail,
+					mediaDetail = detail,
 					type = ScreenType.valueOf(type),
 				)
 			}
@@ -160,8 +162,8 @@ fun DetailScreen(
 		ShimmerEffectDetailScreen()
 	}
 
-	if (state.error.isNotEmpty()) {
-		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	state.error?.let { error ->
+		Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 	}
 }
 

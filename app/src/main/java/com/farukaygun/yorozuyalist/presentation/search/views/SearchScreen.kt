@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -32,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
@@ -61,7 +63,8 @@ fun SearchScreen(
     navController: NavController,
     viewModel: SearchViewModel = koinViewModel()
 ) {
-    val state = viewModel.state.value
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val animeSearched = state.animeSearched
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
     val coroutineScope = rememberCoroutineScope()
@@ -169,10 +172,10 @@ fun SearchScreen(
                     ShimmerEffectVerticalList()
                 }
             }
-            !state.isLoading && state.animeSearched?.data?.isNotEmpty() == true -> {
+            !state.isLoading && animeSearched?.data?.isNotEmpty() == true -> {
                 SearchList(
                     navController = navController,
-                    data = state.animeSearched.data,
+                    data = animeSearched.data,
                     viewModel = viewModel
                 )
             }
@@ -193,8 +196,8 @@ fun SearchScreen(
         }
     }
 
-    if (state.error.isNotEmpty()) {
-        Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+    state.error?.let { error ->
+        Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -205,6 +208,7 @@ fun SearchList(
     data: List<Data>,
     viewModel: SearchViewModel
 ) {
+    val searchState by viewModel.state.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     listState.OnBottomReached(buffer = 10) {
         viewModel.onEvent(SearchEvent.LoadMore)
@@ -235,7 +239,7 @@ fun SearchList(
             )
         }
 
-        if (viewModel.state.value.isLoadingMore) {
+        if (searchState.isLoadingMore) {
             item {
                 Box(
                     modifier = Modifier

@@ -1,11 +1,11 @@
-package com.farukaygun.yorozuyalist.domain.repository
+package com.farukaygun.yorozuyalist.data.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
 import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto
 import com.farukaygun.yorozuyalist.data.remote.dto.MyListStatusDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaDetailDto
 import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
-import com.farukaygun.yorozuyalist.data.repository.MangaRepository
+import com.farukaygun.yorozuyalist.domain.repository.MangaRepository
 
 class MangaRepositoryImpl(
 	private val api: APIService

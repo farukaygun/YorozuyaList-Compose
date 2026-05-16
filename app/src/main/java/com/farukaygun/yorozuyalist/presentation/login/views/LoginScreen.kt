@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
@@ -54,7 +56,7 @@ fun LoginScreen(
 	navController: NavController,
 	viewModel: LoginViewModel = koinViewModel()
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val context = LocalContext.current
 
 	LaunchedEffect(state.accessToken) {
@@ -101,19 +103,17 @@ fun LoginScreen(
 				)
 			}
 
-			if (state.error.isNotEmpty()) {
+			state.error?.let { error ->
 				Text(
-					text = state.error,
+					text = error.toMessage(),
 					style = MaterialTheme.typography.bodyMedium,
 					color = MaterialTheme.colorScheme.onErrorContainer,
 					textAlign = TextAlign.Center,
 				)
 
 				Spacer(modifier = Modifier.height(32.dp))
-			}
 
-			if (state.error.isNotEmpty()) {
-				Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+				Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 			}
 		}
 

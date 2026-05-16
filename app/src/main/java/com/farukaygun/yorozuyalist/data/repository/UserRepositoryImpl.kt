@@ -1,8 +1,8 @@
-package com.farukaygun.yorozuyalist.domain.repository
+package com.farukaygun.yorozuyalist.data.repository
 
 import com.farukaygun.yorozuyalist.data.remote.APIService
 import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
-import com.farukaygun.yorozuyalist.data.repository.UserRepository
+import com.farukaygun.yorozuyalist.domain.repository.UserRepository
 
 class UserRepositoryImpl(
 	private val api: APIService

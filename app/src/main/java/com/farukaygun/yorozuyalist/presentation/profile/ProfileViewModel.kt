@@ -1,28 +1,26 @@
 package com.farukaygun.yorozuyalist.presentation.profile
 
-import androidx.compose.runtime.mutableStateOf
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.Stat
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
-import com.farukaygun.yorozuyalist.domain.use_case.UserUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.user.GetUserProfileUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.openCustomTab
-import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 
 class ProfileViewModel(
-	private val user: UserUseCase
+	private val getUserProfile: GetUserProfileUseCase
 ) : BaseViewModel<ProfileState>() {
-	override val _state = mutableStateOf(ProfileState())
+	override val _state = MutableStateFlow(ProfileState())
 
 	init {
 		onEvent(ProfileEvent.InitRequestChain)
 	}
 
-	private fun getUserProfile() {
-		jobs += user.executeUser()
+	private fun loadUserProfile() {
+		jobs += getUserProfile()
 			.flowOn(Dispatchers.IO)
 			.handleResource(
 				onSuccess = { userData ->
@@ -68,13 +66,12 @@ class ProfileViewModel(
 						profileData = userData,
 						animeStats = tempStatList,
 						isLoading = false,
-						error = ""
+						error = null
 					)
 				},
 				onError = {
 					_state.value = _state.value.copy(
-						error = it ?: StringValue.StringResource(R.string.error_fetching)
-							.toString(),
+						error = it,
 						isLoading = false
 					)
 				},
@@ -85,7 +82,7 @@ class ProfileViewModel(
 	fun onEvent(event: ProfileEvent) {
 		when (event) {
 			is ProfileEvent.InitRequestChain -> {
-				getUserProfile()
+				loadUserProfile()
 			}
 
 			is ProfileEvent.OpenProfileWithCustomTab -> {

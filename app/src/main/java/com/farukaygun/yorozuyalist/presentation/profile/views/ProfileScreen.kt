@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.DonutPieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
@@ -61,9 +63,10 @@ private const val IMAGE_HEIGHT = 150
 fun ProfileScreen(
 	viewModel: ProfileViewModel = koinViewModel()
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
+	val profileData = state.profileData
 
-	if (state.profileData != null && !state.isLoading) {
+	if (profileData != null && !state.isLoading) {
 		Column(
 			modifier = Modifier
 				.verticalScroll(rememberScrollState()),
@@ -71,21 +74,21 @@ fun ProfileScreen(
 		) {
 			UserInfoSection(
 				viewModel = viewModel,
-				data = state.profileData
+				data = profileData
 			)
 
 			HorizontalDivider(
 				modifier = Modifier.padding(horizontal = 16.dp),
 			)
 
-			AnimeStatisticsSection(data = state.profileData)
+			AnimeStatisticsSection(data = profileData)
 		}
 	} else {
 		ShimmerEffectProfileScreen()
 	}
 
-	if (state.error.isNotEmpty()) {
-		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	state.error?.let { error ->
+		Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 	}
 }
 

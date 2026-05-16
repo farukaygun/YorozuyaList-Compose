@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
@@ -74,7 +75,8 @@ fun UserListScreen(
 	onListStateChanged: (LazyListState) -> Unit,
 	isTopBarVisible: Boolean = true
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
+	val userList = state.userList
 	val listState = rememberLazyListState()
 
 	LaunchedEffect(listState) {
@@ -104,15 +106,15 @@ fun UserListScreen(
 		) {
 			MyListStatusFilterChips(viewModel)
 
-			if (!state.isLoading && state.userList?.data?.isNotEmpty() == true) {
+			if (!state.isLoading && userList?.data?.isNotEmpty() == true) {
 				UserList(
 					navController = navController,
-					data = state.userList.data,
+					data = userList.data,
 					viewModel = viewModel,
 					listState = listState,
 					nestedScrollConnection = nestedScrollConnection
 				)
-			} else if (!state.isLoading && state.userList?.data?.isEmpty() == true) {
+			} else if (!state.isLoading && userList?.data?.isEmpty() == true) {
 				NoDataView()
 			} else {
 				ShimmerEffectVerticalList()
@@ -120,8 +122,8 @@ fun UserListScreen(
 		}
 	}
 
-	if (state.error.isNotEmpty()) {
-		Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+	state.error?.let { error ->
+		Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 	}
 }
 
@@ -131,9 +133,10 @@ fun MyListStatusFilterChips(
 	viewModel: UserListViewModel,
 ) {
 	var statusFilter by rememberSaveable { mutableStateOf<MyListMediaStatus?>(null) }
+	val vmState by viewModel.state.collectAsStateWithLifecycle()
 
 	val statuses = buildList {
-		if (viewModel.state.value.type == ScreenType.ANIME) {
+		if (vmState.type == ScreenType.ANIME) {
 			addAll(listOf(MyListMediaStatus.WATCHING, MyListMediaStatus.PLAN_TO_WATCH))
 		} else {
 			addAll(listOf(MyListMediaStatus.READING, MyListMediaStatus.PLAN_TO_READ))
@@ -203,6 +206,8 @@ fun UserList(
 	listState: LazyListState,
 	nestedScrollConnection: NestedScrollConnection
 ) {
+	val userListState by viewModel.state.collectAsStateWithLifecycle()
+
 	listState.OnBottomReached(buffer = 10) {
 		viewModel.onEvent(UserListEvent.LoadMore)
 	}
@@ -215,13 +220,13 @@ fun UserList(
 	) {
 		items(data) { media ->
 			UserListItemColumn(data = media, onItemClick = {
-				if (viewModel.state.value.type == ScreenType.ANIME)
+				if (userListState.type == ScreenType.ANIME)
 					navController.navigate(Screen.DetailScreen.route + "/${ScreenType.ANIME}/${media.node.id}")
 				else navController.navigate(Screen.DetailScreen.route + "/${ScreenType.MANGA}/${media.node.id}")
 			})
 		}
 
-		if (viewModel.state.value.isLoadingMore) {
+		if (userListState.isLoadingMore) {
 			item {
 				Column(
 					modifier = Modifier.padding(16.dp),

@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
@@ -52,7 +53,7 @@ fun CalendarScreen(
 	nestedScrollConnection: NestedScrollConnection,
 	onListStateChanged: (LazyListState) -> Unit
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val listState = rememberLazyListState()
 
 	LaunchedEffect(listState) {

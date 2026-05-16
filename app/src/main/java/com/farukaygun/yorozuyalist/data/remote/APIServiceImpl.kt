@@ -15,26 +15,21 @@ import com.farukaygun.yorozuyalist.data.remote.dto.manga.MangaUserListDto
 import com.farukaygun.yorozuyalist.data.remote.dto.user.UserDto
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Private
-import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.basicAuth
 import io.ktor.client.request.delete
 import io.ktor.client.request.forms.FormDataContent
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.Parameters
 import io.ktor.http.isSuccess
 
 class APIServiceImpl(
-	private val client: HttpClient,
-	private val sharedPrefsHelper: SharedPrefsHelper
+	private val client: HttpClient
 ) : APIService {
 
 	override suspend fun getAuthToken(
@@ -58,8 +53,6 @@ class APIServiceImpl(
 	): RefreshTokenDto {
 		return client.post("${Constants.OAUTH2_URL}token") {
 			basicAuth(Private.CLIENT_ID, "")
-			header(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded.toString())
-
 			setBody(FormDataContent(Parameters.build {
 				append("grant_type", "refresh_token")
 				append("refresh_token", refreshToken)
@@ -72,12 +65,7 @@ class APIServiceImpl(
 		season: String,
 		limit: Int
 	): AnimeSeasonalDto {
-		println("accessToken: ${sharedPrefsHelper.getString("accessToken")}")
 		return client.get("${Constants.ANIME_URL}/season/$year/$season") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter(
 				"fields",
 				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics"
@@ -90,10 +78,6 @@ class APIServiceImpl(
 		url: String
 	): AnimeSeasonalDto {
 		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter(
 				"fields",
 				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics"
@@ -106,10 +90,6 @@ class APIServiceImpl(
 		offset: Int
 	): AnimeSuggestedDto {
 		return client.get("${Constants.ANIME_URL}/suggestions") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter("limit", limit)
 			parameter("offset", offset)
 		}.body()
@@ -118,12 +98,7 @@ class APIServiceImpl(
 	override suspend fun getSuggestedAnime(
 		url: String
 	): AnimeSuggestedDto {
-		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-		}.body()
+		return client.get(url).body()
 	}
 
 	override suspend fun getSearchedAnime(
@@ -132,10 +107,6 @@ class APIServiceImpl(
 		offset: Int,
 	): AnimeSearchedDto {
 		return client.get(Constants.ANIME_URL) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter("q", query)
 			parameter("limit", limit)
 			parameter("offset", offset)
@@ -147,10 +118,6 @@ class APIServiceImpl(
 		url: String
 	): AnimeSearchedDto {
 		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter("fields", "id,title,main_picture,mean,media_type,num_episodes,start_season")
 		}.body()
 	}
@@ -162,19 +129,11 @@ class APIServiceImpl(
 		offset: Int
 	): AnimeUserListDto {
 		return client.get(Constants.USER_ANIME_LIST_URL) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-			status?.let {
-				parameter("status", status)
-			}
+			status?.let { parameter("status", status) }
 			parameter("sort", sort)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter(
-				"fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
-			)
+			parameter("fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type")
 		}.body()
 	}
 
@@ -182,13 +141,7 @@ class APIServiceImpl(
 		url: String
 	): AnimeUserListDto {
 		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-			parameter(
-				"fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type"
-			)
+			parameter("fields", "list_status,num_episodes,start_season,main_picture,title,mean,media_type")
 		}.body()
 	}
 
@@ -199,19 +152,11 @@ class APIServiceImpl(
 		offset: Int
 	): MangaUserListDto {
 		return client.get(Constants.USER_MANGA_LIST_URL) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-			status?.let {
-				parameter("status", status)
-			}
+			status?.let { parameter("status", status) }
 			parameter("sort", sort)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter(
-				"fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
-			)
+			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type")
 		}.body()
 	}
 
@@ -219,22 +164,12 @@ class APIServiceImpl(
 		url: String
 	): MangaUserListDto {
 		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-			parameter(
-				"fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type"
-			)
+			parameter("fields", "list_status,num_volumes,start_season,main_picture,title,mean,media_type")
 		}.body()
 	}
 
 	override suspend fun getUserProfile(): UserDto {
 		return client.get("${Constants.BASE_URL}/users/@me") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter("fields", "anime_statistics")
 		}.body()
 	}
@@ -245,10 +180,6 @@ class APIServiceImpl(
 		val myListStatusFields =
 			"start_date,finish_date,num_times_rewatched,is_rewatching,rewatch_value,priority,tags,comments"
 		return client.get("${Constants.ANIME_URL}/${id}") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter(
 				"fields",
 				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity," +
@@ -263,10 +194,6 @@ class APIServiceImpl(
 		id: String
 	): MangaDetailDto {
 		return client.get("${Constants.MANGA_URL}/${id}") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter(
 				"fields",
 				"id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity," +
@@ -292,10 +219,6 @@ class APIServiceImpl(
 		comments: String?
 	): MyListStatusDto {
 		return client.patch("${Constants.ANIME_URL}/${id}/my_list_status") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			setBody(FormDataContent(Parameters.build {
 				status?.let { append("status", it) }
 				episodeCount?.let { append("num_watched_episodes", it.toString()) }
@@ -328,10 +251,6 @@ class APIServiceImpl(
 		comments: String?
 	): MyListStatusDto {
 		return client.patch("${Constants.MANGA_URL}/${id}/my_list_status") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			setBody(FormDataContent(Parameters.build {
 				status?.let { append("status", it) }
 				chapterCount?.let { append("num_chapters_read", it.toString()) }
@@ -352,23 +271,13 @@ class APIServiceImpl(
 	override suspend fun deleteMyAnimeListItem(
 		id: Int
 	): Boolean {
-		return client.delete("${Constants.ANIME_URL}/${id}/my_list_status") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-		}.status.isSuccess()
+		return client.delete("${Constants.ANIME_URL}/${id}/my_list_status").status.isSuccess()
 	}
 
 	override suspend fun deleteMyMangaListItem(
 		id: Int
 	): Boolean {
-		return client.delete("${Constants.MANGA_URL}/${id}/my_list_status") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-		}.status.isSuccess()
+		return client.delete("${Constants.MANGA_URL}/${id}/my_list_status").status.isSuccess()
 	}
 
 	override suspend fun getAnimeRanking(
@@ -377,30 +286,16 @@ class APIServiceImpl(
 		offset: Int,
 	): MediaRankingDto {
 		return client.get("${Constants.ANIME_URL}/ranking") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter("ranking_type", rankingType)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter(
-				"fields",
-				"alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users"
-			)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users")
 		}.body()
 	}
 
 	override suspend fun getAnimeRanking(url: String): MediaRankingDto {
 		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-			parameter(
-				"fields",
-				"alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users"
-			)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_episodes,num_list_users")
 		}.body()
 	}
 
@@ -410,30 +305,16 @@ class APIServiceImpl(
 		offset: Int,
 	): MediaRankingDto {
 		return client.get("${Constants.MANGA_URL}/ranking") {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
 			parameter("ranking_type", rankingType)
 			parameter("limit", limit)
 			parameter("offset", offset)
-			parameter(
-				"fields",
-				"alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users"
-			)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users")
 		}.body()
 	}
 
 	override suspend fun getMangaRanking(url: String): MediaRankingDto {
 		return client.get(url) {
-			header(
-				HttpHeaders.Authorization,
-				"Bearer ${sharedPrefsHelper.getString("accessToken")}"
-			)
-			parameter(
-				"fields",
-				"alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users"
-			)
+			parameter("fields", "alternative_titles{en,ja},mean,media_type,num_volumes,num_list_users")
 		}.body()
 	}
 }

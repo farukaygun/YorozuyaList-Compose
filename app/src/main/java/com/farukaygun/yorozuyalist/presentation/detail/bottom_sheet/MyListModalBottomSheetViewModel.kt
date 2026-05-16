@@ -1,30 +1,32 @@
 package com.farukaygun.yorozuyalist.presentation.detail.bottom_sheet
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaDetail
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeDetail
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
 import com.farukaygun.yorozuyalist.domain.models.manga.MangaDetail
-import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
-import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.DeleteAnimeListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.UpdateAnimeListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.DeleteMangaListItemUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.UpdateMangaListItemUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatDate
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.formatToISODate
 import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.StringValue
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class MyListModalBottomSheetViewModel(
-	private val animeUseCase: AnimeUseCase,
-	private val mangaUseCase: MangaUseCase
+	private val updateAnimeListItem: UpdateAnimeListItemUseCase,
+	private val deleteAnimeListItem: DeleteAnimeListItemUseCase,
+	private val updateMangaListItem: UpdateMangaListItemUseCase,
+	private val deleteMangaListItem: DeleteMangaListItemUseCase
 ) : BaseViewModel<MyListModalBottomSheetState>() {
-	override val _state = mutableStateOf(MyListModalBottomSheetState())
+	override val _state = MutableStateFlow(MyListModalBottomSheetState())
 
 	private fun init(mediaDetail: MediaDetail) {
 		val myListStatus = mediaDetail.myListStatus
@@ -168,7 +170,7 @@ class MyListModalBottomSheetViewModel(
 					val episodeCount =
 						episodeCount.takeIf { it != myListStatus?.numEpisodesWatched }
 
-					animeUseCase.executeUpdateMyAnimeListItem(
+					updateAnimeListItem(
 						id = id,
 						status = formattedStatus,
 						episodeCount = episodeCount,
@@ -188,7 +190,7 @@ class MyListModalBottomSheetViewModel(
 					val chapterCount = chapterCount.takeIf { it != myListStatus?.numChaptersRead }
 					val volumeCount = volumeCount.takeIf { it != myListStatus?.numVolumesRead }
 
-					mangaUseCase.executeUpdateMyMangaListItem(
+					updateMangaListItem(
 						id = id,
 						status = formattedStatus,
 						chapterCount = chapterCount,
@@ -216,7 +218,7 @@ class MyListModalBottomSheetViewModel(
 								myListStatus = it.data,
 								isSuccess = true,
 								isLoading = false,
-								error = ""
+								error = null
 							)
 						}
 
@@ -224,9 +226,7 @@ class MyListModalBottomSheetViewModel(
 							_state.value = _state.value.copy(
 								isSuccess = false,
 								isLoading = false,
-								error = it.message
-									?: StringValue.StringResource(R.string.error_fetching)
-										.toString(),
+								error = it.error,
 							)
 						}
 
@@ -245,8 +245,8 @@ class MyListModalBottomSheetViewModel(
 		_state.value.run {
 			val id = mediaDetail?.id ?: return
 			val deleteMyListStatusItem = when (type) {
-				ScreenType.ANIME -> animeUseCase.executeDeleteMyAnimeListItem(id)
-				ScreenType.MANGA -> mangaUseCase.executeDeleteMyMangaListItem(id)
+				ScreenType.ANIME -> deleteAnimeListItem(id)
+				ScreenType.MANGA -> deleteMangaListItem(id)
 			}
 
 			jobs += deleteMyListStatusItem
@@ -259,7 +259,7 @@ class MyListModalBottomSheetViewModel(
 								isSuccess = true,
 								isRemoved = true,
 								isLoading = false,
-								error = ""
+								error = null
 							)
 						}
 
@@ -268,9 +268,7 @@ class MyListModalBottomSheetViewModel(
 								isSuccess = false,
 								isRemoved = false,
 								isLoading = false,
-								error = it.message
-									?: StringValue.StringResource(R.string.error_fetching)
-										.toString(),
+								error = it.error,
 							)
 						}
 

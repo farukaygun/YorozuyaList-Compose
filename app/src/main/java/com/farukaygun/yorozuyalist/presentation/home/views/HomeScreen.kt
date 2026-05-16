@@ -32,6 +32,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.farukaygun.yorozuyalist.R
@@ -73,7 +75,7 @@ fun HomeScreen(
 	viewModel: HomeViewModel = koinViewModel(),
 	isTopBarVisible: Boolean = true
 ) {
-	val state = viewModel.state.value
+	val state by viewModel.state.collectAsStateWithLifecycle()
 	val pullToRefreshState = rememberPullToRefreshState()
 
 	Column {
@@ -139,8 +141,8 @@ fun HomeScreen(
 				)
 			}
 
-			if (state.error.isNotEmpty()) {
-				Toast.makeText(LocalContext.current, state.error, Toast.LENGTH_SHORT).show()
+			state.error?.let { error ->
+				Toast.makeText(LocalContext.current, error.toMessage(), Toast.LENGTH_SHORT).show()
 			}
 		}
 	}

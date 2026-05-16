@@ -1,4 +1,4 @@
-package com.farukaygun.yorozuyalist.data.repository
+package com.farukaygun.yorozuyalist.domain.repository
 
 import androidx.annotation.IntRange
 import com.farukaygun.yorozuyalist.data.remote.dto.MediaRankingDto

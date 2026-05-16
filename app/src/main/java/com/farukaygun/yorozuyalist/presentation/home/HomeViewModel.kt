@@ -1,23 +1,24 @@
 package com.farukaygun.yorozuyalist.presentation.home
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.enums.MediaStatus
-import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetSeasonalAnimeUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetSuggestedAnimeUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.season
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.weekDayJapan
 import com.farukaygun.yorozuyalist.util.Calendar.Companion.year
-import com.farukaygun.yorozuyalist.util.StringValue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-	private val animeUseCase: AnimeUseCase
+	private val getSeasonalAnime: GetSeasonalAnimeUseCase,
+	private val getSuggestedAnime: GetSuggestedAnimeUseCase
 ) : BaseViewModel<HomeState>() {
-	override val _state = mutableStateOf(HomeState())
+	override val _state = MutableStateFlow(HomeState())
 
 	init {
 		onEvent(HomeEvent.InitRequestChain)
@@ -26,18 +27,18 @@ class HomeViewModel(
 	private suspend fun initRequestChain() {
 		_state.value = _state.value.copy(isLoading = true)
 
-		getTodayAnime()
-		getSeasonalAnime()
-		getSuggestedAnime()
+		loadTodayAnime()
+		loadSeasonalAnime()
+		loadSuggestedAnime()
 
-		jobs.forEach { it.join() }
+		jobs.joinAll()
 		_state.value = _state.value.copy(isLoading = false)
 	}
 
-	private fun getTodayAnime(
+	private fun loadTodayAnime(
 		limit: Int = 500
 	) {
-		jobs += animeUseCase.executeSeasonalAnime(
+		jobs += getSeasonalAnime(
 			year = year,
 			season = season.apiName,
 			limit = limit
@@ -52,21 +53,20 @@ class HomeViewModel(
 
 					_state.value = _state.value.copy(
 						animeTodayList = filteredList,
-						error = ""
+						error = null
 					)
 				},
 				onError = { error ->
 					_state.value = HomeState(
-						error = error
-							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						error = error,
 						isLoading = false
 					)
 				}
 			)
 	}
 
-	private fun getSeasonalAnime() {
-		jobs += animeUseCase.executeSeasonalAnime(
+	private fun loadSeasonalAnime() {
+		jobs += getSeasonalAnime(
 			year = year,
 			season = season.apiName
 		)
@@ -75,33 +75,31 @@ class HomeViewModel(
 				onSuccess = { animeData ->
 					_state.value = _state.value.copy(
 						animeSeasonalList = animeData?.data ?: emptyList(),
-						error = ""
+						error = null
 					)
 				},
 				onError = { error ->
 					_state.value = _state.value.copy(
-						error = error
-							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						error = error,
 						isLoading = false
 					)
 				}
 			)
 	}
 
-	private fun getSuggestedAnime() {
-		jobs += animeUseCase.executeSuggestedAnime()
+	private fun loadSuggestedAnime() {
+		jobs += getSuggestedAnime()
 			.flowOn(Dispatchers.IO)
 			.handleResource(
 				onSuccess = { animeData ->
 					_state.value = _state.value.copy(
 						animeSuggestionList = animeData?.data ?: emptyList(),
-						error = ""
+						error = null
 					)
 				},
 				onError = { error ->
 					_state.value = _state.value.copy(
-						error = error
-							?: StringValue.StringResource(R.string.error_fetching).toString(),
+						error = error,
 						isLoading = false
 					)
 				}

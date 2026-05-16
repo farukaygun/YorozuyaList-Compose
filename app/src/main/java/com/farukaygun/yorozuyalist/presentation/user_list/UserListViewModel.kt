@@ -1,27 +1,23 @@
 package com.farukaygun.yorozuyalist.presentation.user_list
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.interfaces.MediaList
 import com.farukaygun.yorozuyalist.domain.models.anime.AnimeUserList
 import com.farukaygun.yorozuyalist.domain.models.enums.MyListMediaStatus
-import com.farukaygun.yorozuyalist.domain.use_case.AnimeUseCase
-import com.farukaygun.yorozuyalist.domain.use_case.MangaUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.anime.GetUserAnimeListUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.manga.GetUserMangaListUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
-import com.farukaygun.yorozuyalist.util.Resource
-import com.farukaygun.yorozuyalist.util.StringValue
 import com.farukaygun.yorozuyalist.util.enums.ScreenType
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 
 class UserListViewModel(
-	private val animeUseCase: AnimeUseCase,
-	private val mangaUseCase: MangaUseCase,
+	private val getUserAnimeList: GetUserAnimeListUseCase,
+	private val getUserMangaList: GetUserMangaListUseCase,
 	savedStateHandle: SavedStateHandle
 ) : BaseViewModel<UserListState>() {
-	override val _state = mutableStateOf(UserListState())
+	override val _state = MutableStateFlow(UserListState())
 
 	init {
 		savedStateHandle.get<String>("SCREEN_TYPE_PARAM")?.let { type ->
@@ -30,76 +26,68 @@ class UserListViewModel(
 		}
 	}
 
-	@Suppress("UNCHECKED_CAST")
 	private fun getUserList() {
-		val getUserList = when (_state.value.type) {
-			ScreenType.ANIME -> animeUseCase.executeUserAnimeList(_state.value.filter)
-			ScreenType.MANGA -> mangaUseCase.executeUserMangaList(_state.value.filter)
-		} as Flow<Resource<MediaList>>
-
-		jobs += getUserList
-			.flowOn(Dispatchers.IO)
-			.handleResource(
-				onSuccess = { userList ->
-					_state.value = _state.value.copy(
-						userList = userList,
-						isLoading = false,
-						error = ""
-					)
-				},
-				onError = { error ->
-					_state.value = _state.value.copy(
-						error = error
-							?: StringValue.StringResource(R.string.error_fetching).toString(),
-						isLoading = false
-					)
-				},
-				onLoading = {
-					_state.value = _state.value.copy(isLoading = true)
-				}
-			)
-	}
-
-	@Suppress("UNCHECKED_CAST")
-	private fun loadMore() {
-		_state.value.userList?.paging?.next?.let { nextPageUrl ->
-			val loadMore = when (_state.value.type) {
-				ScreenType.ANIME -> animeUseCase.executeUserAnimeList(url = nextPageUrl)
-				ScreenType.MANGA -> mangaUseCase.executeUserMangaList(url = nextPageUrl)
-			} as Flow<Resource<MediaList>>
-
-			jobs += loadMore
+		jobs += when (_state.value.type) {
+			ScreenType.ANIME -> getUserAnimeList(_state.value.filter)
 				.flowOn(Dispatchers.IO)
 				.handleResource(
 					onSuccess = { userList ->
-						val currentData =
-							_state.value.userList?.data?.toMutableList() ?: mutableListOf()
-						val newData = userList?.data ?: emptyList()
-						val mergedData =
-							(currentData + newData).distinctBy { media -> media.node.id }
-
-						_state.value = _state.value.copy(
-							userList = userList?.paging?.let { paging ->
-								AnimeUserList(
-									data = mergedData,
-									paging = paging
-								)
-							},
-							isLoadingMore = false,
-							error = ""
-						)
+						_state.value = _state.value.copy(userList = userList, isLoading = false, error = null)
 					},
 					onError = { error ->
-						_state.value = _state.value.copy(
-							error = error
-								?: StringValue.StringResource(R.string.error_fetching).toString(),
-							isLoadingMore = false
-						)
+						_state.value = _state.value.copy(error = error, isLoading = false)
 					},
-					onLoading = {
-						_state.value = _state.value.copy(isLoadingMore = true)
-					}
+					onLoading = { _state.value = _state.value.copy(isLoading = true) }
 				)
+			ScreenType.MANGA -> getUserMangaList(_state.value.filter)
+				.flowOn(Dispatchers.IO)
+				.handleResource(
+					onSuccess = { userList ->
+						_state.value = _state.value.copy(userList = userList, isLoading = false, error = null)
+					},
+					onError = { error ->
+						_state.value = _state.value.copy(error = error, isLoading = false)
+					},
+					onLoading = { _state.value = _state.value.copy(isLoading = true) }
+				)
+		}
+	}
+
+	private fun loadMore() {
+		_state.value.userList?.paging?.next?.let { nextPageUrl ->
+			fun mergeAndUpdate(userList: MediaList?) {
+				val currentData = _state.value.userList?.data?.toMutableList() ?: mutableListOf()
+				val newData = userList?.data ?: emptyList()
+				val mergedData = (currentData + newData).distinctBy { media -> media.node.id }
+				_state.value = _state.value.copy(
+					userList = userList?.paging?.let { paging ->
+						AnimeUserList(data = mergedData, paging = paging)
+					},
+					isLoadingMore = false,
+					error = null
+				)
+			}
+
+			jobs += when (_state.value.type) {
+				ScreenType.ANIME -> getUserAnimeList(url = nextPageUrl)
+					.flowOn(Dispatchers.IO)
+					.handleResource(
+						onSuccess = ::mergeAndUpdate,
+						onError = { error ->
+							_state.value = _state.value.copy(error = error, isLoadingMore = false)
+						},
+						onLoading = { _state.value = _state.value.copy(isLoadingMore = true) }
+					)
+				ScreenType.MANGA -> getUserMangaList(url = nextPageUrl)
+					.flowOn(Dispatchers.IO)
+					.handleResource(
+						onSuccess = ::mergeAndUpdate,
+						onError = { error ->
+							_state.value = _state.value.copy(error = error, isLoadingMore = false)
+						},
+						onLoading = { _state.value = _state.value.copy(isLoadingMore = true) }
+					)
+			}
 		}
 	}
 

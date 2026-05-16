@@ -1,30 +1,31 @@
 package com.farukaygun.yorozuyalist.presentation.login
 
-import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.farukaygun.yorozuyalist.R
 import com.farukaygun.yorozuyalist.domain.models.AccessToken
 import com.farukaygun.yorozuyalist.domain.models.RefreshToken
-import com.farukaygun.yorozuyalist.domain.use_case.LoginUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.login.GetAccessTokenUseCase
+import com.farukaygun.yorozuyalist.domain.use_case.login.GetRefreshTokenUseCase
 import com.farukaygun.yorozuyalist.presentation.base.BaseViewModel
+import com.farukaygun.yorozuyalist.util.AppError
 import com.farukaygun.yorozuyalist.util.Constants
 import com.farukaygun.yorozuyalist.util.Constants.YOROZUYA_PAGE_LINK
 import com.farukaygun.yorozuyalist.util.Extensions.CustomExtensions.openCustomTab
+import com.farukaygun.yorozuyalist.util.PrefKeys
 import com.farukaygun.yorozuyalist.util.Private
 import com.farukaygun.yorozuyalist.util.SharedPrefsHelper
-import com.farukaygun.yorozuyalist.util.StringValue
 import com.farukaygun.yorozuyalist.util.Util
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class LoginViewModel(
-	private val loginUseCase: LoginUseCase,
+	private val getAccessToken: GetAccessTokenUseCase,
+	private val getRefreshToken: GetRefreshTokenUseCase,
 	private val sharedPrefsHelper: SharedPrefsHelper
 ) : BaseViewModel<LoginState>() {
-	override val _state = mutableStateOf(LoginState())
+	override val _state = MutableStateFlow(LoginState())
 
 	private val codeVerifier = Util.generateCodeChallenge()
 	private val authState = "login"
@@ -36,10 +37,10 @@ class LoginViewModel(
 	}
 
 	fun isLoggedIn(): Boolean {
-		val accessToken = sharedPrefsHelper.getString("accessToken")
+		val accessToken = sharedPrefsHelper.getString(PrefKeys.ACCESS_TOKEN)
 		if (accessToken.isEmpty()) return false
 
-		val expiresInAsMillis = sharedPrefsHelper.getLong("expiresIn")
+		val expiresInAsMillis = sharedPrefsHelper.getLong(PrefKeys.EXPIRES_IN)
 		if (expiresInAsMillis == 0L) return false
 
 		val currentTimeMillis = kotlin.time.Clock.System.now().toEpochMilliseconds()
@@ -58,8 +59,10 @@ class LoginViewModel(
 				}
 			}
 		} else {
-			_state.value.refreshToken = RefreshToken(
-				accessToken, expiresInAsMillis, sharedPrefsHelper.getString("refreshToken"), ""
+			_state.value = _state.value.copy(
+				refreshToken = RefreshToken(
+					accessToken, expiresInAsMillis, sharedPrefsHelper.getString(PrefKeys.REFRESH_TOKEN), ""
+				)
 			)
 		}
 
@@ -68,9 +71,9 @@ class LoginViewModel(
 
 	private fun getRefreshToken() {
 		val grantType = "refresh_token"
-		val refreshToken = sharedPrefsHelper.getString("refreshToken")
+		val refreshToken = sharedPrefsHelper.getString(PrefKeys.REFRESH_TOKEN)
 
-		jobs += loginUseCase.executeRefreshToken(
+		jobs += getRefreshToken(
 			grantType,
 			refreshToken
 		)
@@ -79,13 +82,12 @@ class LoginViewModel(
 				onSuccess = { token ->
 					_state.value = _state.value.copy(
 						refreshToken = token,
-						error = ""
+						error = null
 					)
 				},
 				onError = { error ->
 					_state.value = _state.value.copy(
-						error = error
-							?: StringValue.StringResource(R.string.token_refresh_error).toString(),
+						error = error,
 						isLoading = false
 					)
 				}
@@ -95,37 +97,36 @@ class LoginViewModel(
 	private fun saveRefreshToken(refreshToken: RefreshToken) {
 		val expiresIn = System.currentTimeMillis() + refreshToken.expiresIn * 1000
 
-		sharedPrefsHelper.saveString("accessToken", refreshToken.accessToken)
-		sharedPrefsHelper.saveLong("expiresIn", expiresIn)
-		sharedPrefsHelper.saveString("refreshToken", refreshToken.refreshToken)
-		sharedPrefsHelper.saveBool("isLoggedIn", true)
+		sharedPrefsHelper.saveString(PrefKeys.ACCESS_TOKEN, refreshToken.accessToken)
+		sharedPrefsHelper.saveLong(PrefKeys.EXPIRES_IN, expiresIn)
+		sharedPrefsHelper.saveString(PrefKeys.REFRESH_TOKEN, refreshToken.refreshToken)
+		sharedPrefsHelper.saveBool(PrefKeys.IS_LOGGED_IN, true)
 	}
 
 	private fun clearToken() {
-		sharedPrefsHelper.removeKey("accessToken")
-		sharedPrefsHelper.removeKey("expiresIn")
-		sharedPrefsHelper.removeKey("refreshToken")
-		sharedPrefsHelper.removeKey("isLoggedIn")
+		sharedPrefsHelper.removeKey(PrefKeys.ACCESS_TOKEN)
+		sharedPrefsHelper.removeKey(PrefKeys.EXPIRES_IN)
+		sharedPrefsHelper.removeKey(PrefKeys.REFRESH_TOKEN)
+		sharedPrefsHelper.removeKey(PrefKeys.IS_LOGGED_IN)
 	}
 
-	private fun parseIntentData(context: Context, intent: Intent?) {
+	private fun parseIntentData(intent: Intent?) {
 		if (intent?.data?.toString()?.startsWith(YOROZUYA_PAGE_LINK) == true) {
 			intent.data?.let {
 				val code = it.getQueryParameter("code")
 				if (code != null) {
-					getAccessToken(context, code)
+					getAccessToken(code)
 				} else {
 					_state.value = _state.value.copy(
-						error = StringValue.StringResource(R.string.login_code_error)
-							.asString(context)
+						error = AppError.UnknownError("Error during user login: 'code' parameter not found.")
 					)
 				}
 			}
 		}
 	}
 
-	private fun getAccessToken(context: Context, code: String) {
-		jobs += loginUseCase.executeAuthToken(
+	private fun getAccessToken(code: String) {
+		jobs += getAccessToken(
 			code,
 			Private.CLIENT_ID,
 			codeVerifier,
@@ -135,13 +136,12 @@ class LoginViewModel(
 				onSuccess = { accessToken ->
 					_state.value = _state.value.copy(
 						accessToken = accessToken,
-						error = ""
+						error = null
 					)
 				},
 				onError = {
 					_state.value = _state.value.copy(
-						error = it ?: StringValue.StringResource(R.string.user_login_error)
-							.asString(context),
+						error = it,
 						isLoading = false
 					)
 				},
@@ -152,10 +152,10 @@ class LoginViewModel(
 	private fun saveToken(accessToken: AccessToken) {
 		val expiresIn = System.currentTimeMillis() + accessToken.expiresIn * 1000
 
-		sharedPrefsHelper.saveString("accessToken", accessToken.accessToken)
-		sharedPrefsHelper.saveLong("expiresIn", expiresIn)
-		sharedPrefsHelper.saveString("refreshToken", accessToken.refreshToken)
-		sharedPrefsHelper.saveBool("isLoggedIn", true)
+		sharedPrefsHelper.saveString(PrefKeys.ACCESS_TOKEN, accessToken.accessToken)
+		sharedPrefsHelper.saveLong(PrefKeys.EXPIRES_IN, expiresIn)
+		sharedPrefsHelper.saveString(PrefKeys.REFRESH_TOKEN, accessToken.refreshToken)
+		sharedPrefsHelper.saveBool(PrefKeys.IS_LOGGED_IN, true)
 	}
 
 	fun onEvent(event: LoginEvent) {
@@ -165,7 +165,7 @@ class LoginViewModel(
 			}
 
 			is LoginEvent.ParseIntentData -> {
-				parseIntentData(event.context, event.intent)
+				parseIntentData(event.intent)
 			}
 
 			is LoginEvent.SaveToken -> {
