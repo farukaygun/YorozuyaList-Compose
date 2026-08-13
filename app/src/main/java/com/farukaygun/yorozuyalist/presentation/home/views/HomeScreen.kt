@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,11 +37,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -54,6 +59,7 @@ import com.farukaygun.yorozuyalist.domain.models.Data
 import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemCalenderColumn
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemRow
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBarDefaults
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectHorizontalList
 import com.farukaygun.yorozuyalist.presentation.home.HomeEvent
@@ -73,7 +79,9 @@ import org.koin.dsl.koinConfiguration
 fun HomeScreen(
 	navController: NavController,
 	viewModel: HomeViewModel = koinViewModel(),
-	isTopBarVisible: Boolean = true
+	nestedScrollConnection: NestedScrollConnection,
+	isTopBarVisible: Boolean = true,
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
 ) {
 	val state by viewModel.state.collectAsStateWithLifecycle()
 	val pullToRefreshState = rememberPullToRefreshState()
@@ -109,8 +117,15 @@ fun HomeScreen(
 			}
 		) {
 			Column(
+				// Modifier order matters: `nestedScroll` must precede `verticalScroll` to
+				// be its parent, and `padding` must FOLLOW it so the reserved space becomes
+				// part of the scrollable content and extends the scroll range. Moved before
+				// `verticalScroll` it turns into an outer inset, which shrinks the viewport
+				// and reintroduces the bottom bar overlapping the last section.
 				modifier = Modifier
-					.verticalScroll(rememberScrollState()),
+					.nestedScroll(nestedScrollConnection)
+					.verticalScroll(rememberScrollState())
+					.padding(bottom = bottomContentPadding),
 				verticalArrangement = Arrangement.spacedBy(16.dp)
 			) {
 				HomeLargeActionButtons(navController = navController)
@@ -357,7 +372,8 @@ fun HomeScreenPreview() {
 		)
 	}), content = {
 		HomeScreen(
-			navController = rememberNavController()
+			navController = rememberNavController(),
+			nestedScrollConnection = rememberNestedScrollInteropConnection()
 		)
 	})
 }

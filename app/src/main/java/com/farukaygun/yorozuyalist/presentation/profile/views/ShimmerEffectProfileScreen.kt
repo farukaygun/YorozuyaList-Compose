@@ -15,22 +15,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.farukaygun.yorozuyalist.data.di.apiServiceModule
 import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBarDefaults
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import org.koin.android.ext.koin.androidContext
 import org.koin.compose.KoinApplication
 import org.koin.dsl.koinConfiguration
 
 @Composable
-fun ShimmerEffectProfileScreen() {
+fun ShimmerEffectProfileScreen(
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
+) {
 	Column(
+		// Not scrollable, so this is a plain inset — it only keeps the placeholders
+		// from sliding under the floating bottom bar while the profile loads.
+		modifier = Modifier.padding(bottom = bottomContentPadding),
 		verticalArrangement = Arrangement.spacedBy(16.dp)
 	) {
 		ShimmerEffectUserInfoSection()
@@ -163,6 +171,6 @@ fun ShimmerEffectPreviewProfileScreen() {
             apiServiceModule
         )
     }), content = {
-        ProfileScreen()
+        ProfileScreen(nestedScrollConnection = rememberNestedScrollInteropConnection())
     })
 }

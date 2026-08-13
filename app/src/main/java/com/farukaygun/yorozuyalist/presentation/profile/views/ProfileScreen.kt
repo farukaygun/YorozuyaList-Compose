@@ -24,13 +24,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.yml.charts.common.model.PlotType
@@ -46,6 +50,7 @@ import com.farukaygun.yorozuyalist.data.di.repositoryModule
 import com.farukaygun.yorozuyalist.data.di.useCaseModule
 import com.farukaygun.yorozuyalist.data.di.viewModelModule
 import com.farukaygun.yorozuyalist.domain.models.user.User
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBarDefaults
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileEvent
 import com.farukaygun.yorozuyalist.presentation.profile.ProfileViewModel
@@ -61,15 +66,21 @@ private const val IMAGE_HEIGHT = 150
 
 @Composable
 fun ProfileScreen(
-	viewModel: ProfileViewModel = koinViewModel()
+	viewModel: ProfileViewModel = koinViewModel(),
+	nestedScrollConnection: NestedScrollConnection,
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
 ) {
 	val state by viewModel.state.collectAsStateWithLifecycle()
 	val profileData = state.profileData
 
 	if (profileData != null && !state.isLoading) {
 		Column(
+			// See HomeScreen: `padding` must follow `verticalScroll` so the reserved
+			// space extends the scroll range instead of shrinking the viewport.
 			modifier = Modifier
-				.verticalScroll(rememberScrollState()),
+				.nestedScroll(nestedScrollConnection)
+				.verticalScroll(rememberScrollState())
+				.padding(bottom = bottomContentPadding),
 			verticalArrangement = Arrangement.spacedBy(16.dp)
 		) {
 			UserInfoSection(
@@ -84,7 +95,7 @@ fun ProfileScreen(
 			AnimeStatisticsSection(data = profileData)
 		}
 	} else {
-		ShimmerEffectProfileScreen()
+		ShimmerEffectProfileScreen(bottomContentPadding = bottomContentPadding)
 	}
 
 	state.error?.let { error ->
@@ -343,6 +354,6 @@ fun PreviewProfileScreen() {
             apiServiceModule
         )
     }), content = {
-        ProfileScreen()
+        ProfileScreen(nestedScrollConnection = rememberNestedScrollInteropConnection())
     })
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,7 +30,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -57,6 +58,7 @@ import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.composables.NoDataView
 import com.farukaygun.yorozuyalist.presentation.composables.OnBottomReached
 import com.farukaygun.yorozuyalist.presentation.composables.UserListItemColumn
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBarDefaults
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectVerticalList
 import com.farukaygun.yorozuyalist.presentation.search.views.SearchScreen
 import com.farukaygun.yorozuyalist.presentation.user_list.UserListEvent
@@ -72,16 +74,12 @@ fun UserListScreen(
 	navController: NavController,
 	viewModel: UserListViewModel = koinViewModel(),
 	nestedScrollConnection: NestedScrollConnection,
-	onListStateChanged: (LazyListState) -> Unit,
-	isTopBarVisible: Boolean = true
+	isTopBarVisible: Boolean = true,
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
 ) {
 	val state by viewModel.state.collectAsStateWithLifecycle()
 	val userList = state.userList
 	val listState = rememberLazyListState()
-
-	LaunchedEffect(listState) {
-		onListStateChanged(listState)
-	}
 
 	Column {
 		AnimatedVisibility(
@@ -112,7 +110,8 @@ fun UserListScreen(
 					data = userList.data,
 					viewModel = viewModel,
 					listState = listState,
-					nestedScrollConnection = nestedScrollConnection
+					nestedScrollConnection = nestedScrollConnection,
+					bottomContentPadding = bottomContentPadding
 				)
 			} else if (!state.isLoading && userList?.data?.isEmpty() == true) {
 				NoDataView()
@@ -204,7 +203,8 @@ fun UserList(
 	data: List<Data>,
 	viewModel: UserListViewModel,
 	listState: LazyListState,
-	nestedScrollConnection: NestedScrollConnection
+	nestedScrollConnection: NestedScrollConnection,
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
 ) {
 	val userListState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -216,7 +216,10 @@ fun UserList(
 		state = listState,
 		modifier = Modifier
 			.fillMaxWidth()
-			.nestedScroll(nestedScrollConnection)
+			.nestedScroll(nestedScrollConnection),
+		// Reserved inside the list so the last item can scroll clear of the
+		// floating bottom bar, which overlays the content.
+		contentPadding = PaddingValues(bottom = bottomContentPadding)
 	) {
 		items(data) { media ->
 			UserListItemColumn(data = media, onItemClick = {
@@ -253,8 +256,7 @@ fun AnimeListScreenPreview() {
     }), content = {
         UserListScreen(
             navController = rememberNavController(),
-            nestedScrollConnection = rememberNestedScrollInteropConnection(),
-            onListStateChanged = {}
+            nestedScrollConnection = rememberNestedScrollInteropConnection()
         )
     })
 }
