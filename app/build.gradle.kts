@@ -14,7 +14,7 @@ extensions.configure<ApplicationExtension> {
 		applicationId = "com.farukaygun.yorozuyalist"
 		minSdk = 26
 		targetSdk = 37
-		versionCode = 24
+		versionCode = 26
 		versionName = "2.3"
 
 		testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
