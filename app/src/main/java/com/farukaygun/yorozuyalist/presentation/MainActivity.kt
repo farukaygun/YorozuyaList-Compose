@@ -20,18 +20,19 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -66,67 +67,21 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 val navController = rememberNavController()
                 val bottomAppBarState = rememberBottomAppBarState(navController = navController)
-                var currentListState by remember { mutableStateOf<LazyListState?>(null) }
-                var isScaffoldBarVisible by remember { mutableStateOf(true) }
-                var scrollState by remember { mutableStateOf(ScrollState.IDLE) }
-                var accumulatedScroll = 0f
-                val threshold = 5f
+                val barVisibleState = remember { mutableStateOf(true) }
+                val isScaffoldBarVisible by barVisibleState
 
                 val nestedScrollConnection = remember {
-                    object : NestedScrollConnection {
-                        override fun onPreScroll(
-                            available: Offset,
-                            source: NestedScrollSource
-                        ): Offset {
-                            currentListState?.takeIf {
-                                it.firstVisibleItemIndex == 0 && it.firstVisibleItemScrollOffset == 0
-                            }?.let {
-                                isScaffoldBarVisible = true
-                                return Offset.Zero
-                            }
-
-                            currentListState?.takeIf {
-                                it.layoutInfo.visibleItemsInfo.lastOrNull()?.index == it.layoutInfo.totalItemsCount - 1
-                            }?.let {
-                                return Offset.Zero
-                            }
-
-                            val currentScrollDirection = when {
-                                available.y < -1f -> ScrollState.SCROLLING_DOWN
-                                available.y > 1f -> ScrollState.SCROLLING_UP
-                                else -> ScrollState.IDLE
-                            }
-
-                            if (scrollState != currentScrollDirection && currentScrollDirection != ScrollState.IDLE) {
-                                accumulatedScroll = 0f
-                                scrollState = currentScrollDirection
-                            }
-
-                            if (currentScrollDirection != ScrollState.IDLE) {
-                                accumulatedScroll += abs(available.y)
-                            }
-
-                            return when (scrollState) {
-                                ScrollState.SCROLLING_DOWN if isScaffoldBarVisible &&
-                                        accumulatedScroll >= threshold -> {
-                                    isScaffoldBarVisible = false
-                                    available
-                                }
-
-                                ScrollState.SCROLLING_UP if !isScaffoldBarVisible &&
-                                        accumulatedScroll >= threshold -> {
-                                    isScaffoldBarVisible = true
-                                    available
-                                }
-                                else -> Offset.Zero
-                            }
-                        }
-                    }
+                    BarVisibilityNestedScrollConnection(barVisibleState)
                 }
 
-                navController.addOnDestinationChangedListener { _, _, _ ->
-                    isScaffoldBarVisible = true
-                    accumulatedScroll = 0f
+                DisposableEffect(navController) {
+                    val listener =
+                        NavController.OnDestinationChangedListener { _, _, _ ->
+                            barVisibleState.value = true
+                            nestedScrollConnection.reset()
+                        }
+                    navController.addOnDestinationChangedListener(listener)
+                    onDispose { navController.removeOnDestinationChangedListener(listener) }
                 }
 
                 Scaffold(
@@ -205,6 +160,7 @@ class MainActivity : ComponentActivity() {
 
                             HomeScreen(
                                 navController = navController,
+                                nestedScrollConnection = nestedScrollConnection,
                                 isTopBarVisible = isScaffoldBarVisible
                             )
                         }
@@ -223,9 +179,6 @@ class MainActivity : ComponentActivity() {
                             UserListScreen(
                                 navController = navController,
                                 nestedScrollConnection = nestedScrollConnection,
-                                onListStateChanged = { listState ->
-                                    currentListState = listState
-                                },
                                 isTopBarVisible = isScaffoldBarVisible
                             )
                         }
@@ -244,9 +197,6 @@ class MainActivity : ComponentActivity() {
                             UserListScreen(
                                 navController = navController,
                                 nestedScrollConnection = nestedScrollConnection,
-                                onListStateChanged = { listState ->
-                                    currentListState = listState
-                                },
                                 isTopBarVisible = isScaffoldBarVisible
                             )
                         }
@@ -258,7 +208,7 @@ class MainActivity : ComponentActivity() {
                             popEnterTransition = { fadeIn() },
                             popExitTransition = { fadeOut() },
                         ) {
-                            ProfileScreen()
+                            ProfileScreen(nestedScrollConnection = nestedScrollConnection)
                         }
 
                         composable(
@@ -304,10 +254,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             CalendarScreen(
                                 navController = navController,
-                                nestedScrollConnection = nestedScrollConnection,
-                                onListStateChanged = { listState ->
-                                    currentListState = listState
-                                }
+                                nestedScrollConnection = nestedScrollConnection
                             )
                         }
                     }
@@ -319,5 +266,69 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         loginViewModel.onEvent(LoginEvent.ParseIntentData(applicationContext, intent))
+    }
+}
+
+/**
+ * Hides the search bar and the bottom navigation bar while scrolling down, and reveals
+ * them again on scroll up or at the top of the content.
+ *
+ * Deliberately free of any [androidx.compose.foundation.lazy.LazyListState]: it reads
+ * nothing but the scroll deltas, so it works with `LazyColumn` and plain `verticalScroll`
+ * screens alike (Home and Profile use the latter).
+ *
+ * [accumulatedScroll] and [scrollDirection] are plain fields rather than Compose state on
+ * purpose — they are only touched inside the scroll callbacks and never read during
+ * composition. As captured local `var`s they were silently broken: each composition boxed
+ * them into a separate `Ref`, so the reset on navigation wrote to a box this connection
+ * never read.
+ */
+private class BarVisibilityNestedScrollConnection(
+    private val isBarVisible: MutableState<Boolean>,
+    private val threshold: Float = 5f
+) : NestedScrollConnection {
+    private var accumulatedScroll = 0f
+    private var scrollDirection = ScrollState.IDLE
+
+    fun reset() {
+        accumulatedScroll = 0f
+        scrollDirection = ScrollState.IDLE
+    }
+
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        val direction = when {
+            available.y < -1f -> ScrollState.SCROLLING_DOWN
+            available.y > 1f -> ScrollState.SCROLLING_UP
+            else -> ScrollState.IDLE
+        }
+
+        if (direction == ScrollState.IDLE) return Offset.Zero
+
+        if (scrollDirection != direction) {
+            accumulatedScroll = 0f
+            scrollDirection = direction
+        }
+        accumulatedScroll += abs(available.y)
+
+        if (accumulatedScroll >= threshold) {
+            isBarVisible.value = direction == ScrollState.SCROLLING_UP
+        }
+
+        // Never consume: the scrollable itself still needs the full delta.
+        return Offset.Zero
+    }
+
+    override fun onPostScroll(
+        consumed: Offset,
+        available: Offset,
+        source: NestedScrollSource
+    ): Offset {
+        // A downward drag the content did not consume means we are already at the top,
+        // so the bars should always be showing there.
+        if (available.y > 0f) {
+            isBarVisible.value = true
+            reset()
+        }
+        return Offset.Zero
     }
 }

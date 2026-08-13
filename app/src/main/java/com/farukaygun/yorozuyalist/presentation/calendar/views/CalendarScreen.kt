@@ -1,6 +1,7 @@
 package com.farukaygun.yorozuyalist.presentation.calendar.views
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,7 +14,6 @@ import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +25,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -37,6 +38,7 @@ import com.farukaygun.yorozuyalist.presentation.Screen
 import com.farukaygun.yorozuyalist.presentation.calendar.CalendarState
 import com.farukaygun.yorozuyalist.presentation.calendar.CalendarViewModel
 import com.farukaygun.yorozuyalist.presentation.composables.ListItemCalenderColumn
+import com.farukaygun.yorozuyalist.presentation.composables.bottom_nav_bar.BottomNavBarDefaults
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffect
 import com.farukaygun.yorozuyalist.presentation.composables.shimmer_effect.ShimmerEffectVerticalList
 import com.farukaygun.yorozuyalist.util.Calendar
@@ -51,14 +53,10 @@ fun CalendarScreen(
 	navController: NavController,
 	viewModel: CalendarViewModel = koinViewModel(),
 	nestedScrollConnection: NestedScrollConnection,
-	onListStateChanged: (LazyListState) -> Unit
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
 ) {
 	val state by viewModel.state.collectAsStateWithLifecycle()
 	val listState = rememberLazyListState()
-
-	LaunchedEffect(listState) {
-		onListStateChanged(listState)
-	}
 
 	Column(
 		modifier = Modifier.padding(horizontal = 16.dp)
@@ -69,7 +67,8 @@ fun CalendarScreen(
 				navController = navController,
 				state = state,
 				listState = listState,
-				nestedScrollConnection = nestedScrollConnection
+				nestedScrollConnection = nestedScrollConnection,
+				bottomContentPadding = bottomContentPadding
 			)
 		} else {
 			ShimmerEffectCalendarScreen()
@@ -82,7 +81,8 @@ fun WeeklyTabView(
 	navController: NavController,
 	state: CalendarState,
 	listState: LazyListState,
-	nestedScrollConnection: NestedScrollConnection
+	nestedScrollConnection: NestedScrollConnection,
+	bottomContentPadding: Dp = BottomNavBarDefaults.contentBottomPadding()
 ) {
 	var selectedDay by remember { mutableStateOf(Calendar.WeekDays.entries[0]) }
 	
@@ -106,7 +106,10 @@ fun WeeklyTabView(
 			state = listState,
 			modifier = Modifier
 				.fillMaxWidth()
-				.nestedScroll(nestedScrollConnection)
+				.nestedScroll(nestedScrollConnection),
+			// Reserved inside the list so the last item can scroll clear of the
+			// floating bottom bar, which overlays the content.
+			contentPadding = PaddingValues(bottom = bottomContentPadding)
 		) {
 			state.animeWeeklyList[selectedDay]?.let { data ->
 				items(data) { media ->
@@ -145,8 +148,7 @@ fun CalendarScreenPreview() {
     }), content = {
         CalendarScreen(
             navController = rememberNavController(),
-            nestedScrollConnection = rememberNestedScrollInteropConnection(),
-            onListStateChanged = {}
+            nestedScrollConnection = rememberNestedScrollInteropConnection()
         )
     })
 }

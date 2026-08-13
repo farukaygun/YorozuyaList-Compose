@@ -4,6 +4,10 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -116,7 +120,12 @@ fun GridList(
 			state = listState,
 			columns = GridCells.Adaptive(minSize = 120.dp),
 			horizontalArrangement = Arrangement.SpaceBetween,
-			verticalArrangement = Arrangement.spacedBy(16.dp)
+			verticalArrangement = Arrangement.spacedBy(16.dp),
+			// No bottom bar on this screen (Screen.GridListScreen.isBottomAppBarVisible is
+			// false), so only the system navigation bar has to be cleared.
+			contentPadding = PaddingValues(
+				bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+			)
 		) {
 			items(data) { media ->
 				when (type) {
